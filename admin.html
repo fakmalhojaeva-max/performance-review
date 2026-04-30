@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Админ-панель</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --sidebar-w: 240px;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: flex; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w); min-height: 100vh; background: var(--bg2);
+    border-right: 1px solid var(--border); display: flex; flex-direction: column;
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 50;
+  }
+  .sidebar-logo {
+    padding: 20px 20px 24px; font-family: var(--font-head);
+    font-size: 17px; font-weight: 800; letter-spacing: -0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px; cursor: pointer;
+    transition: all 0.15s; color: var(--muted); font-size: 13px; font-weight: 400;
+    text-decoration: none; border: none; background: none; width: 100%;
+    font-family: var(--font-body);
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active {
+    background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500;
+    border: 1px solid rgba(108,123,255,0.2);
+  }
+  .nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+
+  .sidebar-footer {
+    padding: 16px 20px; border-top: 1px solid var(--border);
+    font-size: 11px; color: var(--muted);
+  }
+  .sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .sidebar-user-avatar {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: rgba(108,123,255,0.15); color: var(--accent2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-size: 10px; font-weight: 700;
+  }
+  .sidebar-user-name { font-weight: 500; color: var(--text); font-size: 12px; }
+  .sidebar-user-role { font-size: 10px; color: var(--muted); }
+
+  /* MAIN */
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 28px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 40;
+  }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+  .topbar-right { display: flex; gap: 8px; }
+
+  .content { padding: 24px 28px; }
+
+  /* BUTTONS */
+  .btn {
+    font-family: var(--font-body); font-size: 12px; font-weight: 500;
+    padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s; border: 1px solid var(--border2);
+    background: var(--bg3); color: var(--text); display: inline-flex;
+    align-items: center; gap: 6px;
+  }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #7b8aff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-danger { color: var(--red); border-color: rgba(248,113,113,0.3); }
+  .btn-danger:hover { background: rgba(248,113,113,0.08); }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 18px;
+  }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+  .stat-value { font-family: var(--font-head); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-top: 4px; }
+
+  /* CYCLES TABLE */
+  .table-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .table-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 1px solid var(--border);
+  }
+  .table-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; }
+  .table-filters { display: flex; gap: 6px; }
+  .filter-chip {
+    font-size: 11px; padding: 4px 12px; border-radius: 20px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all 0.12s;
+    font-family: var(--font-body);
+  }
+  .filter-chip:hover, .filter-chip.active { border-color: var(--accent); color: var(--accent2); background: rgba(108,123,255,0.08); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 16px; text-align: left; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted);
+    font-weight: 600; border-bottom: 1px solid var(--border);
+    background: rgba(255,255,255,0.015);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; cursor: pointer; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 12px 16px; vertical-align: middle; }
+
+  .badge {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px; letter-spacing: 0.2px;
+  }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-gray { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+  .badge-red { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+
+  .cycle-name { font-weight: 500; color: var(--text); }
+  .cycle-dates { font-size: 11px; color: var(--muted); }
+
+  /* PROGRESS MINI */
+  .mini-progress { display: flex; align-items: center; gap: 8px; }
+  .mini-bar-bg { width: 80px; height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+  .mini-bar-fill { height: 100%; border-radius: 2px; }
+  .mini-pct { font-size: 11px; font-weight: 600; font-family: var(--font-head); min-width: 32px; }
+
+  /* ACTION DOTS */
+  .actions-cell { display: flex; gap: 4px; }
+  .action-btn {
+    padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer;
+    font-size: 11px; transition: all 0.12s; font-family: var(--font-body);
+  }
+  .action-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 200;
+    align-items: center; justify-content: center; backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 16px; padding: 28px; max-width: 520px; width: 90%;
+  }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+
+  .field-group { margin-bottom: 16px; }
+  .field-label {
+    display: block; font-size: 11px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+  }
+  .field-input {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 9px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 13px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .field-select {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 9px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 13px; outline: none;
+    appearance: none; cursor: pointer;
+  }
+
+  /* WEIGHT SLIDERS */
+  .weights-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .weight-item {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px;
+  }
+  .weight-name { font-size: 12px; color: var(--muted); }
+  .weight-val {
+    font-family: var(--font-head); font-size: 14px; font-weight: 700;
+    color: var(--accent2); min-width: 36px; text-align: right;
+  }
+
+  /* WIZARD STEPPER */
+  .wiz-step {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    gap: 4px; position: relative;
+  }
+  .wiz-step:not(:last-child)::after {
+    content: ''; position: absolute; top: 12px; left: 50%; width: 100%; height: 2px;
+    background: var(--border2); z-index: 0;
+  }
+  .wiz-step.done:not(:last-child)::after { background: var(--green); opacity: 0.5; }
+  .wiz-step.active:not(:last-child)::after { background: linear-gradient(to right, rgba(108,123,255,0.5), var(--border2)); }
+  .wiz-dot {
+    width: 24px; height: 24px; border-radius: 50%;
+    border: 2px solid var(--border2); background: var(--bg3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; font-family: var(--font-head);
+    position: relative; z-index: 1; color: var(--muted); transition: all 0.2s;
+  }
+  .wiz-step.done .wiz-dot { background: var(--green); border-color: var(--green); color: #0f1117; }
+  .wiz-step.active .wiz-dot { background: var(--accent); border-color: var(--accent2); color: #fff; box-shadow: 0 0 10px rgba(108,123,255,0.3); }
+  .wiz-label { font-size: 9px; color: var(--muted); text-align: center; }
+  .wiz-step.done .wiz-label { color: var(--green); }
+  .wiz-step.active .wiz-label { color: var(--accent2); }
+
+  .wiz-panel { display: none; }
+  .wiz-panel.active { display: block; }
+
+  /* STAGE ROW */
+  .stage-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .stage-row.hidden-stage { opacity: 0.6; }
+  .stage-info { display: flex; align-items: center; gap: 10px; }
+  .stage-num {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: var(--bg4); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-size: 10px; font-weight: 700;
+    color: var(--muted); flex-shrink: 0;
+  }
+  .stage-num.vis { background: rgba(108,123,255,0.12); color: var(--accent2); border-color: rgba(108,123,255,0.25); }
+  .stage-name-text { font-size: 12px; font-weight: 500; }
+
+  /* DIRECTION CHECKBOXES */
+  .dir-check {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 14px; cursor: pointer;
+    transition: all 0.12s; font-size: 13px;
+  }
+  .dir-check:hover { border-color: var(--border2); }
+  .dir-check input[type="checkbox"] {
+    width: 16px; height: 16px; accent-color: var(--accent);
+    cursor: pointer; flex-shrink: 0;
+  }
+  .dir-name { font-weight: 500; color: var(--text); flex: 1; }
+  .dir-count { font-size: 11px; color: var(--muted); }
+
+  /* MATRIX ROWS */
+  .matrix-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px; transition: border-color 0.15s;
+  }
+  .matrix-row.ok { border-left: 3px solid var(--green); }
+  .matrix-row.warn { border-left: 3px solid var(--amber); }
+  .matrix-row.error { border-left: 3px solid var(--red); }
+  .matrix-info { flex: 1; }
+  .matrix-dir { font-size: 13px; font-weight: 500; color: var(--text); }
+  .matrix-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* FORM ASSIGN */
+  .form-assign-row {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .form-assign-label {
+    font-size: 12px; font-weight: 500; min-width: 120px; color: var(--text);
+  }
+
+  /* CHECKLIST */
+  .checklist-item { font-size: 12px; color: var(--muted); padding: 3px 0; }
+  .checklist-item.done { color: var(--green); }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar .nav-text, .sidebar-logo small, .sidebar-user-name, .sidebar-user-role { display: none; }
+    .sidebar-logo { font-size: 14px; padding: 16px 12px 20px; text-align: center; }
+    .main { margin-left: 60px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    Review<span>OS</span>
+    <small>Админ-панель</small>
+  </div>
+  <div class="sidebar-nav">
+    <button class="nav-item" onclick="setPage(this, 'dashboard')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+      <span class="nav-text">Дашборд</span>
+    </button>
+    <button class="nav-item active" onclick="setPage(this, 'cycles')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg>
+      <span class="nav-text">Циклы оценки</span>
+    </button>
+    <button class="nav-item" onclick="setPage(this, 'employees')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+      <span class="nav-text">Сотрудники</span>
+    </button>
+    <button class="nav-item" onclick="setPage(this, 'references')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+      <span class="nav-text">Справочники</span>
+    </button>
+    <button class="nav-item" onclick="setPage(this, 'competencies')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg>
+      <span class="nav-text">Компетенции</span>
+    </button>
+    <button class="nav-item" onclick="setPage(this, 'forms')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg>
+      <span class="nav-text">Конструктор форм</span>
+    </button>
+    <button class="nav-item" onclick="setPage(this, 'users')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg>
+      <span class="nav-text">Пользователи</span>
+    </button>
+    <button class="nav-item" onclick="setPage(this, 'audit')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+      <span class="nav-text">Аудит</span>
+    </button>
+    <button class="nav-item" onclick="setPage(this, 'email-templates')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+      <span class="nav-text">Шаблоны писем</span>
+    </button>
+    <button class="nav-item" onclick="setPage(this, 'email-log')">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+      <span class="nav-text">Журнал писем</span>
+    </button>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">HR</div>
+      <div>
+        <div class="sidebar-user-name">Анна Сидорова</div>
+        <div class="sidebar-user-role">HR-администратор</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Циклы оценки</div>
+    <div class="topbar-right">
+      <button class="btn btn-primary" onclick="openLaunchModal()">+ Создать цикл</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Всего циклов</div>
+        <div class="stat-value">5</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Активный</div>
+        <div class="stat-value" style="color:var(--green)">1</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Завершённых</div>
+        <div class="stat-value" style="color:var(--accent2)">3</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Черновиков</div>
+        <div class="stat-value" style="color:var(--amber)">1</div>
+      </div>
+    </div>
+
+    <!-- CYCLES TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">Все циклы</div>
+        <div class="table-filters">
+          <button class="filter-chip active" onclick="filterCycles(this,'all')">Все</button>
+          <button class="filter-chip" onclick="filterCycles(this,'active')">Активные</button>
+          <button class="filter-chip" onclick="filterCycles(this,'completed')">Завершённые</button>
+          <button class="filter-chip" onclick="filterCycles(this,'draft')">Черновики</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Цикл</th>
+            <th>Статус</th>
+            <th>Период</th>
+            <th>Сотрудников</th>
+            <th>Прогресс</th>
+            <th>Веса</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="cycles-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CYCLE DETAILS MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-title" id="detail-title">Q2 2026</div>
+    <div id="detail-content"></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" onclick="alert('Архивировать цикл')">Архивировать</button>
+      <button class="btn btn-sm" onclick="alert('Клонировать цикл')">Клонировать</button>
+      <button class="btn" onclick="closeDetailModal()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- LAUNCH WIZARD MODAL -->
+<div class="modal-overlay" id="launch-modal">
+  <div class="modal" style="max-width:680px; max-height:90vh; overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div class="modal-title" style="margin:0">Создание цикла оценки</div>
+    </div>
+
+    <!-- WIZARD STEPPER -->
+    <div style="display:flex;gap:0;margin-bottom:24px;" id="wizard-stepper">
+      <div class="wiz-step active" data-step="0">
+        <div class="wiz-dot">1</div>
+        <div class="wiz-label">Основное</div>
+      </div>
+      <div class="wiz-step" data-step="1">
+        <div class="wiz-dot">2</div>
+        <div class="wiz-label">Сотрудники</div>
+      </div>
+      <div class="wiz-step" data-step="2">
+        <div class="wiz-dot">3</div>
+        <div class="wiz-label">Матрица</div>
+      </div>
+      <div class="wiz-step" data-step="3">
+        <div class="wiz-dot">4</div>
+        <div class="wiz-label">Этапы и сроки</div>
+      </div>
+      <div class="wiz-step" data-step="4">
+        <div class="wiz-dot">5</div>
+        <div class="wiz-label">Формы оценки</div>
+      </div>
+      <div class="wiz-step" data-step="5">
+        <div class="wiz-dot">6</div>
+        <div class="wiz-label">Веса и запуск</div>
+      </div>
+    </div>
+
+    <!-- STEP 0: Основное -->
+    <div class="wiz-panel active" id="wiz-0">
+      <div style="font-size:14px;font-weight:600;font-family:var(--font-head);margin-bottom:4px">Основная информация</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Задайте название, период и при необходимости создайте цикл на основе предыдущего.</div>
+
+      <div class="field-group">
+        <label class="field-label">Название цикла</label>
+        <input class="field-input" type="text" placeholder="Например: Q3 2026" id="wiz-cycle-name">
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Дата начала</label>
+          <input class="field-input" type="date" id="wiz-cycle-start" value="2026-07-01">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Дата окончания</label>
+          <input class="field-input" type="date" id="wiz-cycle-end" value="2026-09-20">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Создать на основе</label>
+        <select class="field-select" id="wiz-cycle-clone">
+          <option value="">— С нуля —</option>
+          <option value="q2">Q2 2026 (текущий)</option>
+          <option value="q1">Q1 2026</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- STEP 1: Сотрудники -->
+    <div class="wiz-panel" id="wiz-1">
+      <div style="font-size:14px;font-weight:600;font-family:var(--font-head);margin-bottom:4px">Выбор направлений и участников</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Выберите направления, которые участвуют в цикле. Сотрудники подтянутся автоматически. Можно исключить отдельных сотрудников.</div>
+
+      <div class="field-group">
+        <label class="field-label">Направления</label>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label class="dir-check">
+            <input type="checkbox" checked onchange="updateDirCount()"> <span class="dir-name">.NET Backend</span> <span class="dir-count">6 сотрудников</span>
+          </label>
+          <label class="dir-check">
+            <input type="checkbox" checked onchange="updateDirCount()"> <span class="dir-name">Frontend</span> <span class="dir-count">5 сотрудников</span>
+          </label>
+          <label class="dir-check">
+            <input type="checkbox" checked onchange="updateDirCount()"> <span class="dir-name">QA</span> <span class="dir-count">4 сотрудника</span>
+          </label>
+          <label class="dir-check">
+            <input type="checkbox" checked onchange="updateDirCount()"> <span class="dir-name">Data</span> <span class="dir-count">3 сотрудника</span>
+          </label>
+          <label class="dir-check">
+            <input type="checkbox" onchange="updateDirCount()"> <span class="dir-name">Mobile</span> <span class="dir-count">2 сотрудника</span>
+          </label>
+          <label class="dir-check">
+            <input type="checkbox" onchange="updateDirCount()"> <span class="dir-name">DevOps</span> <span class="dir-count">2 сотрудника</span>
+          </label>
+          <label class="dir-check">
+            <input type="checkbox" onchange="updateDirCount()"> <span class="dir-name">Маркетинг</span> <span class="dir-count">2 сотрудника</span>
+          </label>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-sm" onclick="toggleAllDirs(true)">Выбрать все</button>
+          <button class="btn btn-sm" onclick="toggleAllDirs(false)">Снять все</button>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin:16px 0"></div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="font-size:12px;color:var(--muted)">Участников по выбранным направлениям: <strong style="color:var(--text)" id="total-emp-count">18</strong></span>
+        <button class="btn btn-sm" onclick="alert('Исключить отдельных сотрудников')">Исключить сотрудников</button>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;max-height:160px;overflow-y:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr>
+            <th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">Сотрудник</th>
+            <th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">Направление</th>
+            <th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">Грейд</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 12px;font-size:12px">Алексей Козлов</td><td style="padding:7px 12px;font-size:11px;color:var(--muted)">.NET Backend</td><td style="padding:7px 12px"><span class="badge badge-blue" style="font-size:9px">Mid2</span></td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 12px;font-size:12px">Мария Иванова</td><td style="padding:7px 12px;font-size:11px;color:var(--muted)">Frontend</td><td style="padding:7px 12px"><span class="badge badge-blue" style="font-size:9px">Sen1</span></td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 12px;font-size:12px">Дмитрий Ли</td><td style="padding:7px 12px;font-size:11px;color:var(--muted)">QA</td><td style="padding:7px 12px"><span class="badge badge-blue" style="font-size:9px">Jun3</span></td></tr>
+            <tr style="border-bottom:1px solid var(--border)"><td style="padding:7px 12px;font-size:12px">Анна Петрова</td><td style="padding:7px 12px;font-size:11px;color:var(--muted)">Data</td><td style="padding:7px 12px"><span class="badge badge-blue" style="font-size:9px">Mid1</span></td></tr>
+            <tr><td style="padding:7px 12px;font-size:12px">Игорь Новиков</td><td style="padding:7px 12px;font-size:11px;color:var(--muted)">.NET Backend</td><td style="padding:7px 12px"><span class="badge badge-blue" style="font-size:9px">Sen2</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px">Показаны 5 из 18 · <a href="#" style="color:var(--accent2)" onclick="event.preventDefault()">Показать всех</a></div>
+    </div>
+
+    <!-- STEP 2: Матрица -->
+    <div class="wiz-panel" id="wiz-2">
+      <div style="font-size:14px;font-weight:600;font-family:var(--font-head);margin-bottom:4px">Проверка матриц компетенций</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Система проверяет, что у выбранных направлений есть актуализированные матрицы компетенций. Галочку «Актуализирована» можно выставить в разделе «Компетенции».</div>
+
+      <div style="display:flex;gap:12px;margin-bottom:16px">
+        <div class="stat-card" style="flex:1;text-align:center">
+          <div class="stat-label">Выбрано направлений</div>
+          <div class="stat-value" style="font-size:20px">4</div>
+        </div>
+        <div class="stat-card" style="flex:1;text-align:center">
+          <div class="stat-label">Матрицы актуальны</div>
+          <div class="stat-value" style="font-size:20px;color:var(--green)">3</div>
+        </div>
+        <div class="stat-card" style="flex:1;text-align:center">
+          <div class="stat-label">Не актуализированы</div>
+          <div class="stat-value" style="font-size:20px;color:var(--red)">1</div>
+        </div>
+      </div>
+
+      <div id="matrix-status-ok" style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--green);display:none;align-items:center;gap:8px">
+        <span>✓</span> Все матрицы актуализированы. Можно продолжить.
+      </div>
+
+      <div id="matrix-status-warn" style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--text);display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:6px;color:var(--red);font-weight:500">
+          <span>⚠</span> 1 направление без актуализированной матрицы
+        </div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">
+          <strong style="color:var(--red)">Mobile</strong> — матрица не актуализирована. Перейдите в раздел <a href="#" style="color:var(--accent2)" onclick="event.preventDefault();alert('Перейти в Компетенции → Mobile')">Компетенции → Mobile</a> и выставьте галочку «Актуализирована».
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">
+          Вы можете продолжить создание цикла, но сотрудники из направления «Mobile» не получат оценку по Hard Skills и СРВ до актуализации матрицы.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Этапы и сроки -->
+    <div class="wiz-panel" id="wiz-3">
+      <div style="font-size:14px;font-weight:600;font-family:var(--font-head);margin-bottom:4px">Этапы и сроки</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Назначьте дедлайны для каждого этапа. Этапы «Актуализация участников» и «Актуализация матрицы» выполняются перед запуском и не отображаются на дашборде.</div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div class="stage-row hidden-stage">
+          <div class="stage-info">
+            <span class="stage-num">1</span>
+            <div>
+              <div class="stage-name-text">Актуализация участников</div>
+              <div style="font-size:10px;color:var(--muted)">Выполняется перед запуском · не видно на дашборде</div>
+            </div>
+          </div>
+          <div><span class="badge badge-green" style="font-size:9px">✓ Выполнено</span></div>
+        </div>
+        <div class="stage-row hidden-stage">
+          <div class="stage-info">
+            <span class="stage-num">2</span>
+            <div>
+              <div class="stage-name-text">Актуализация матрицы</div>
+              <div style="font-size:10px;color:var(--muted)">Выполняется перед запуском · не видно на дашборде</div>
+            </div>
+          </div>
+          <div><span class="badge badge-green" style="font-size:9px">✓ Выполнено</span></div>
+        </div>
+
+        <div style="height:1px;background:var(--border);margin:4px 0"></div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600">Этапы на дашборде (назначьте сроки)</div>
+
+        <div class="stage-row">
+          <div class="stage-info"><span class="stage-num vis">3</span><div class="stage-name-text">Самооценка</div></div>
+          <input class="field-input" type="date" style="width:150px;font-size:11px;padding:6px 10px" value="2026-07-14">
+        </div>
+        <div class="stage-row">
+          <div class="stage-info"><span class="stage-num vis">4</span><div class="stage-name-text">Оценка эффективности</div></div>
+          <input class="field-input" type="date" style="width:150px;font-size:11px;padding:6px 10px" value="2026-07-28">
+        </div>
+        <div class="stage-row">
+          <div class="stage-info"><span class="stage-num vis">5</span><div class="stage-name-text">Оценка Hard Skills</div></div>
+          <input class="field-input" type="date" style="width:150px;font-size:11px;padding:6px 10px" value="2026-08-11">
+        </div>
+        <div class="stage-row">
+          <div class="stage-info"><span class="stage-num vis">6</span><div class="stage-name-text">Оценка Soft Skills 360°</div></div>
+          <input class="field-input" type="date" style="width:150px;font-size:11px;padding:6px 10px" value="2026-08-25">
+        </div>
+        <div class="stage-row">
+          <div class="stage-info"><span class="stage-num vis">7</span><div class="stage-name-text">Оценка СРВ</div></div>
+          <input class="field-input" type="date" style="width:150px;font-size:11px;padding:6px 10px" value="2026-09-01">
+        </div>
+        <div class="stage-row">
+          <div class="stage-info"><span class="stage-num vis">8</span><div class="stage-name-text">Подведение итогов (1-on-1)</div></div>
+          <input class="field-input" type="date" style="width:150px;font-size:11px;padding:6px 10px" value="2026-09-15">
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Формы оценки -->
+    <div class="wiz-panel" id="wiz-4">
+      <div style="font-size:14px;font-weight:600;font-family:var(--font-head);margin-bottom:4px">Назначение форм оценки</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Назначьте шаблоны форм для каждого этапа. Формы создаются и редактируются в «Конструкторе форм». При запуске создаётся снимок — изменения в конструкторе не повлияют на цикл.</div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-assign-row">
+          <div class="form-assign-label">Самооценка</div>
+          <select class="field-select" style="flex:1;font-size:12px;padding:7px 10px">
+            <option>Самооценка v3 (по умолчанию)</option>
+            <option>Самооценка v2</option>
+            <option>Самооценка — упрощённая</option>
+          </select>
+        </div>
+        <div class="form-assign-row">
+          <div class="form-assign-label">Performance</div>
+          <select class="field-select" style="flex:1;font-size:12px;padding:7px 10px">
+            <option>Оценка эффективности v2 (по умолчанию)</option>
+            <option>Оценка эффективности v1</option>
+          </select>
+        </div>
+        <div class="form-assign-row">
+          <div class="form-assign-label">Hard Skills</div>
+          <select class="field-select" style="flex:1;font-size:12px;padding:7px 10px">
+            <option>Hard Skills — стандартный</option>
+            <option>Hard Skills — Backend</option>
+            <option>Hard Skills — Frontend</option>
+          </select>
+        </div>
+        <div class="form-assign-row">
+          <div class="form-assign-label">Soft Skills 360°</div>
+          <select class="field-select" style="flex:1;font-size:12px;padding:7px 10px">
+            <option>360° Опросник v2 (по умолчанию)</option>
+            <option>360° Опросник v1</option>
+            <option>360° Опросник — сокращённый</option>
+          </select>
+        </div>
+        <div class="form-assign-row">
+          <div class="form-assign-label">СРВ</div>
+          <select class="field-select" style="flex:1;font-size:12px;padding:7px 10px">
+            <option>СРВ — стандартный</option>
+          </select>
+        </div>
+        <div class="form-assign-row">
+          <div class="form-assign-label">Итоговый 1-on-1</div>
+          <select class="field-select" style="flex:1;font-size:12px;padding:7px 10px">
+            <option>Итоговая форма v2 (по умолчанию)</option>
+            <option>Итоговая форма v1</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;font-size:11px;color:var(--muted)">
+        Не нашли нужную форму? <a href="#" style="color:var(--accent2)" onclick="event.preventDefault();alert('Перейти в конструктор форм')">Создать в конструкторе →</a>
+      </div>
+    </div>
+
+    <!-- STEP 5: Веса и запуск -->
+    <div class="wiz-panel" id="wiz-5">
+      <div style="font-size:14px;font-weight:600;font-family:var(--font-head);margin-bottom:4px">Веса оценок и подтверждение запуска</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Установите веса для расчёта итогового балла. Сумма должна быть равна 100%.</div>
+
+      <div class="field-group">
+        <label class="field-label">Веса оценок</label>
+        <div class="weights-grid">
+          <div class="weight-item"><span class="weight-name">Performance</span><input class="field-input" type="number" value="25" min="0" max="100" style="width:60px;text-align:center;padding:6px;font-size:13px;font-weight:700;font-family:var(--font-head)"><span style="color:var(--muted)">%</span></div>
+          <div class="weight-item"><span class="weight-name">Hard Skills</span><input class="field-input" type="number" value="30" min="0" max="100" style="width:60px;text-align:center;padding:6px;font-size:13px;font-weight:700;font-family:var(--font-head)"><span style="color:var(--muted)">%</span></div>
+          <div class="weight-item"><span class="weight-name">Soft Skills</span><input class="field-input" type="number" value="25" min="0" max="100" style="width:60px;text-align:center;padding:6px;font-size:13px;font-weight:700;font-family:var(--font-head)"><span style="color:var(--muted)">%</span></div>
+          <div class="weight-item"><span class="weight-name">СРВ</span><input class="field-input" type="number" value="20" min="0" max="100" style="width:60px;text-align:center;padding:6px;font-size:13px;font-weight:700;font-family:var(--font-head)"><span style="color:var(--muted)">%</span></div>
+        </div>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-top:16px">
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:10px">Чек-лист перед запуском:</div>
+        <div class="checklist-item done">✓ Список сотрудников актуализирован (24 чел.)</div>
+        <div class="checklist-item done">✓ Матрица компетенций актуальна (снимок будет создан)</div>
+        <div class="checklist-item done">✓ Дедлайны этапов назначены (6 этапов)</div>
+        <div class="checklist-item done">✓ Формы оценки назначены (6 форм)</div>
+        <div class="checklist-item done">✓ Веса оценок настроены (100%)</div>
+      </div>
+    </div>
+
+    <!-- WIZARD ACTIONS -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:24px">
+      <button class="btn" id="wiz-back-btn" onclick="wizBack()" style="visibility:hidden">← Назад</button>
+      <div class="btn-group">
+        <button class="btn" onclick="closeLaunchModal()">Отмена</button>
+        <button class="btn btn-primary" id="wiz-next-btn" onclick="wizNext()">Далее →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const cycles = [
+  { id: 1, name: 'Q2 2026', status: 'active', start: '01.04.2026', end: '20.06.2026', employees: 24, progress: 42, weights: { perf: 25, hard: 30, soft: 25, srv: 20 } },
+  { id: 2, name: 'Q1 2026', status: 'completed', start: '10.01.2026', end: '25.03.2026', employees: 22, progress: 100, weights: { perf: 25, hard: 30, soft: 25, srv: 20 } },
+  { id: 3, name: 'Q4 2025', status: 'completed', start: '01.10.2025', end: '20.12.2025', employees: 20, progress: 100, weights: { perf: 30, hard: 25, soft: 25, srv: 20 } },
+  { id: 4, name: 'Q3 2025', status: 'completed', start: '01.07.2025', end: '20.09.2025', employees: 18, progress: 100, weights: { perf: 25, hard: 30, soft: 25, srv: 20 } },
+  { id: 5, name: 'Q3 2026', status: 'draft', start: '01.07.2026', end: '20.09.2026', employees: 0, progress: 0, weights: { perf: 25, hard: 30, soft: 25, srv: 20 } },
+];
+
+const statusMap = {
+  active: { label: 'Активный', cls: 'badge-green' },
+  completed: { label: 'Завершён', cls: 'badge-blue' },
+  draft: { label: 'Черновик', cls: 'badge-amber' },
+  cancelled: { label: 'Отменён', cls: 'badge-red' },
+};
+
+function progressColor(p) {
+  if (p >= 100) return 'var(--green)';
+  if (p >= 60) return 'var(--teal)';
+  if (p >= 30) return 'var(--amber)';
+  return 'var(--red)';
+}
+
+function renderCycles(filter = 'all') {
+  const tbody = document.getElementById('cycles-body');
+  const filtered = filter === 'all' ? cycles : cycles.filter(c => c.status === filter);
+
+  tbody.innerHTML = filtered.map(c => {
+    const st = statusMap[c.status];
+    return `<tr onclick="openDetail(${c.id})">
+      <td><div class="cycle-name">${c.name}</div></td>
+      <td><span class="badge ${st.cls}">${st.label}</span></td>
+      <td><span class="cycle-dates">${c.start} — ${c.end}</span></td>
+      <td>${c.employees}</td>
+      <td>
+        <div class="mini-progress">
+          <div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${c.progress}%;background:${progressColor(c.progress)}"></div></div>
+          <span class="mini-pct" style="color:${progressColor(c.progress)}">${c.progress}%</span>
+        </div>
+      </td>
+      <td style="font-size:11px;color:var(--muted)">${c.weights.perf}/${c.weights.hard}/${c.weights.soft}/${c.weights.srv}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="action-btn" onclick="event.stopPropagation();alert('Настройки: ${c.name}')">⚙</button>
+          ${c.status === 'draft' ? '<button class="action-btn" onclick="event.stopPropagation();alert(\'Удалить черновик\')">🗑</button>' : ''}
+          ${c.status === 'active' ? '<button class="action-btn" onclick="event.stopPropagation();alert(\'Приостановить\')">⏸</button>' : ''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterCycles(btn, filter) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCycles(filter);
+}
+
+function openDetail(id) {
+  const c = cycles.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('detail-title').textContent = c.name;
+  const st = statusMap[c.status];
+  document.getElementById('detail-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="stat-card"><div class="stat-label">Статус</div><div style="margin-top:6px"><span class="badge ${st.cls}">${st.label}</span></div></div>
+      <div class="stat-card"><div class="stat-label">Сотрудников</div><div class="stat-value" style="font-size:18px">${c.employees}</div></div>
+      <div class="stat-card"><div class="stat-label">Период</div><div style="font-size:12px;margin-top:6px;color:var(--text)">${c.start} — ${c.end}</div></div>
+      <div class="stat-card"><div class="stat-label">Прогресс</div><div class="mini-progress" style="margin-top:8px"><div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${c.progress}%;background:${progressColor(c.progress)}"></div></div><span class="mini-pct" style="color:${progressColor(c.progress)}">${c.progress}%</span></div></div>
+    </div>
+    <div style="margin-bottom:12px">
+      <div class="field-label" style="margin-bottom:8px">Веса оценок</div>
+      <div class="weights-grid">
+        <div class="weight-item"><span class="weight-name">Performance</span><span class="weight-val">${c.weights.perf}%</span></div>
+        <div class="weight-item"><span class="weight-name">Hard Skills</span><span class="weight-val">${c.weights.hard}%</span></div>
+        <div class="weight-item"><span class="weight-name">Soft Skills</span><span class="weight-val">${c.weights.soft}%</span></div>
+        <div class="weight-item"><span class="weight-name">СРВ</span><span class="weight-val">${c.weights.srv}%</span></div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:12px">
+      ${c.status === 'active' ? 'Действия: приостановить · завершить · изменить дедлайны · добавить/исключить сотрудника · переназначить оценщика' : ''}
+      ${c.status === 'completed' ? 'Архивный цикл · доступен только для просмотра' : ''}
+      ${c.status === 'draft' ? 'Черновик · можно запустить, отредактировать или удалить' : ''}
+    </div>
+  `;
+  document.getElementById('detail-modal').classList.add('show');
+}
+
+function closeDetailModal() { document.getElementById('detail-modal').classList.remove('show'); }
+
+// LAUNCH WIZARD
+let wizStep = 0;
+const wizTotal = 6;
+
+function openLaunchModal() {
+  wizStep = 0;
+  updateWizard();
+  document.getElementById('launch-modal').classList.add('show');
+}
+function closeLaunchModal() {
+  document.getElementById('launch-modal').classList.remove('show');
+}
+
+function wizNext() {
+  if (wizStep === wizTotal - 1) {
+    closeLaunchModal();
+    alert('Цикл Q3 2026 запущен!');
+    return;
+  }
+  wizStep++;
+  updateWizard();
+}
+function wizBack() {
+  if (wizStep > 0) { wizStep--; updateWizard(); }
+}
+
+function updateWizard() {
+  document.querySelectorAll('.wiz-panel').forEach((p, i) => p.classList.toggle('active', i === wizStep));
+  document.querySelectorAll('.wiz-step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i < wizStep) s.classList.add('done');
+    if (i === wizStep) s.classList.add('active');
+  });
+  document.querySelectorAll('.wiz-step .wiz-dot').forEach((d, i) => {
+    d.textContent = i < wizStep ? '✓' : (i + 1);
+  });
+  document.getElementById('wiz-back-btn').style.visibility = wizStep === 0 ? 'hidden' : 'visible';
+  const nextBtn = document.getElementById('wiz-next-btn');
+  if (wizStep === wizTotal - 1) {
+    nextBtn.textContent = '🚀 Запустить цикл';
+    nextBtn.style.background = 'var(--green)';
+    nextBtn.style.borderColor = 'var(--green)';
+  } else {
+    nextBtn.textContent = 'Далее →';
+    nextBtn.style.background = 'var(--accent)';
+    nextBtn.style.borderColor = 'var(--accent)';
+  }
+}
+
+function setPage(btn, page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  btn.classList.add('active');
+  const titles = {
+    dashboard: 'Дашборд', cycles: 'Циклы оценки', employees: 'Сотрудники',
+    references: 'Справочники', competencies: 'Компетенции', forms: 'Конструктор форм',
+    users: 'Пользователи', audit: 'Аудит', 'email-templates': 'Шаблоны писем', 'email-log': 'Журнал писем'
+  };
+  document.getElementById('page-title').textContent = titles[page] || page;
+}
+
+renderCycles();
+
+function toggleAllDirs(state) {
+  document.querySelectorAll('.dir-check input[type="checkbox"]').forEach(cb => { cb.checked = state; });
+  updateDirCount();
+}
+
+function updateDirCount() {
+  const counts = [6, 5, 4, 3, 2, 2, 2];
+  let total = 0;
+  document.querySelectorAll('.dir-check input[type="checkbox"]').forEach((cb, i) => {
+    if (cb.checked) total += counts[i];
+  });
+  document.getElementById('total-emp-count').textContent = total;
+}
+</script>
+</body>
+</html>

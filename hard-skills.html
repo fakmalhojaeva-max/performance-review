@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Оценка Hard Skills</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #171b26;
+    --bg3: #1e2333;
+    --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0;
+    --muted: #7a7f94;
+    --accent: #6c7bff;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --teal: #2dd4bf;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--font-body); font-size: 13px;
+    line-height: 1.5; min-height: 100vh;
+  }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .logo { font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .breadcrumb { font-size: 12px; color: var(--muted); }
+  .breadcrumb a { color: var(--accent2); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  /* EMPLOYEE HEADER */
+  .emp-header {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 24px;
+  }
+  .emp-avatar {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-size: 16px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .emp-info { flex: 1; }
+  .emp-name { font-family: var(--font-head); font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+  .emp-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .emp-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .tag {
+    font-size: 10px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; letter-spacing: 0.3px;
+  }
+  .tag-grade { background: rgba(167,139,250,0.12); color: var(--accent2); border: 1px solid rgba(167,139,250,0.25); }
+  .tag-team { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.25); }
+  .tag-cycle { background: rgba(108,123,255,0.12); color: var(--accent); border: 1px solid rgba(108,123,255,0.25); }
+  .tag-role { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.25); }
+
+  .section-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
+  .section-desc { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+
+  /* PROGRESS */
+  .progress-info {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .progress-text { font-size: 12px; color: var(--muted); }
+  .progress-count { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--accent2); }
+  .progress-bar { width: 100%; height: 4px; background: var(--border2); border-radius: 2px; margin-bottom: 24px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.4s; }
+
+  /* COMPETENCY CARD */
+  .comp-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; margin-bottom: 14px;
+    overflow: hidden; transition: border-color 0.2s;
+  }
+  .comp-card.scored { border-color: rgba(52,211,153,0.2); }
+  .comp-card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; cursor: pointer;
+  }
+  .comp-left { display: flex; align-items: center; gap: 12px; }
+  .comp-num {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--bg4); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-size: 12px; font-weight: 700;
+    color: var(--muted); flex-shrink: 0; transition: all 0.2s;
+  }
+  .comp-card.scored .comp-num {
+    background: rgba(52,211,153,0.12); color: var(--green);
+    border-color: rgba(52,211,153,0.25);
+  }
+  .comp-name { font-family: var(--font-head); font-size: 14px; font-weight: 700; letter-spacing: -0.2px; }
+  .comp-expected { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .comp-badge {
+    font-size: 11px; font-weight: 700; font-family: var(--font-head);
+    padding: 3px 10px; border-radius: 6px; min-width: 32px; text-align: center;
+  }
+  .comp-badge.empty { background: var(--bg4); color: var(--muted); border: 1px solid var(--border); }
+  .comp-badge.s0 { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+  .comp-badge.s1 { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .comp-badge.s2 { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .comp-badge.s3 { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+
+  .comp-body {
+    padding: 0 20px 20px;
+    display: none;
+  }
+  .comp-card.open .comp-body { display: block; }
+
+  /* SCALE DESCRIPTION */
+  .scale-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+    margin-bottom: 14px;
+  }
+  .scale-option {
+    padding: 12px; border-radius: 10px;
+    border: 2px solid var(--border2); background: var(--bg3);
+    cursor: pointer; transition: all 0.18s; text-align: center;
+  }
+  .scale-option:hover { border-color: var(--border3); }
+  .scale-score {
+    font-family: var(--font-head); font-size: 18px; font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .scale-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+  .scale-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  .scale-option.s0.selected { border-color: var(--red); background: rgba(248,113,113,0.06); }
+  .scale-option.s0.selected .scale-score { color: var(--red); }
+  .scale-option.s0.selected .scale-label { color: var(--red); }
+
+  .scale-option.s1.selected { border-color: var(--amber); background: rgba(251,191,36,0.06); }
+  .scale-option.s1.selected .scale-score { color: var(--amber); }
+  .scale-option.s1.selected .scale-label { color: var(--amber); }
+
+  .scale-option.s2.selected { border-color: var(--teal); background: rgba(45,212,191,0.06); }
+  .scale-option.s2.selected .scale-score { color: var(--teal); }
+  .scale-option.s2.selected .scale-label { color: var(--teal); }
+
+  .scale-option.s3.selected { border-color: var(--green); background: rgba(52,211,153,0.06); }
+  .scale-option.s3.selected .scale-score { color: var(--green); }
+  .scale-option.s3.selected .scale-label { color: var(--green); }
+
+  /* COMMENT TOGGLE */
+  .comment-toggle {
+    font-size: 12px; color: var(--accent2); cursor: pointer;
+    background: none; border: none; font-family: var(--font-body);
+    padding: 0; transition: opacity 0.15s;
+  }
+  .comment-toggle:hover { opacity: 0.8; }
+  .comp-comment {
+    display: none; margin-top: 10px;
+  }
+  .comp-comment.show { display: block; }
+  .comp-comment textarea {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 10px 14px; color: var(--text);
+    font-family: var(--font-body); font-size: 12px; line-height: 1.5;
+    outline: none; resize: vertical; transition: border-color 0.15s;
+  }
+  .comp-comment textarea:focus { border-color: var(--accent); }
+  .comp-comment textarea::placeholder { color: rgba(122,127,148,0.5); }
+
+  /* SUMMARY */
+  .summary-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .summary-left {}
+  .summary-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+  .summary-value {
+    font-family: var(--font-head); font-size: 28px; font-weight: 800;
+    letter-spacing: -0.5px; margin-top: 2px;
+  }
+  .summary-right { display: flex; gap: 16px; align-items: center; }
+  .summary-stat { text-align: center; }
+  .summary-stat-val { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+  .summary-stat-label { font-size: 10px; color: var(--muted); }
+
+  /* BUTTONS */
+  .form-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 28px; gap: 12px;
+  }
+  .btn {
+    font-family: var(--font-body); font-size: 13px; font-weight: 500;
+    padding: 10px 20px; border-radius: 10px; cursor: pointer;
+    transition: all 0.15s; border: 1px solid var(--border2);
+    background: var(--bg3); color: var(--text); text-decoration: none;
+  }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-draft { background: transparent; border: 1px solid rgba(251,191,36,0.3); color: var(--amber); }
+  .btn-draft:hover { background: rgba(251,191,36,0.08); }
+  .btn-submit { background: var(--green); border-color: var(--green); color: #0f1117; font-weight: 600; }
+  .btn-submit:hover { background: #4ae8af; }
+  .btn-group { display: flex; gap: 8px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 200;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 16px; padding: 28px; max-width: 420px; width: 90%;
+    text-align: center;
+  }
+  .modal-icon { font-size: 36px; margin-bottom: 12px; }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .modal-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+  /* SUCCESS */
+  .success-screen { display: none; text-align: center; padding: 60px 20px; }
+  .success-screen.show { display: block; }
+  .success-icon { font-size: 56px; margin-bottom: 16px; }
+  .success-title { font-family: var(--font-head); font-size: 22px; font-weight: 800; margin-bottom: 8px; color: var(--green); }
+  .success-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  /* CHEVRON */
+  .chevron {
+    width: 20px; height: 20px; color: var(--muted); transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .comp-card.open .chevron { transform: rotate(180deg); }
+
+  @media (max-width: 600px) {
+    .container { padding: 16px; }
+    .scale-grid { grid-template-columns: repeat(2, 1fr); }
+    .emp-header { flex-direction: column; text-align: center; }
+    .summary-card { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">Review<span>OS</span></span>
+    <span class="breadcrumb"><a href="index.html">Дашборд</a> → Оценка Hard Skills</span>
+  </div>
+</div>
+
+<div class="container" id="form-container">
+
+  <!-- EMPLOYEE -->
+  <div class="emp-header">
+    <div class="emp-avatar" style="background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.25);">МИ</div>
+    <div class="emp-info">
+      <div class="emp-name">Мария Иванова</div>
+      <div class="emp-meta">Frontend разработчик · Команда Frontend</div>
+      <div class="emp-tags">
+        <span class="tag tag-grade">Sen1</span>
+        <span class="tag tag-team">Frontend</span>
+        <span class="tag tag-cycle">Q2 2026</span>
+        <span class="tag tag-role">Оценивает: Алексей Козлов (Лид)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Оценка Hard Skills</div>
+  <div class="section-desc">Оцените компетенции сотрудника по шкале 0–3. Подтянуты только релевантные компетенции для роли «Frontend разработчик» на уровне Sen1.</div>
+
+  <!-- PROGRESS -->
+  <div class="progress-info">
+    <span class="progress-text">Прогресс оценки</span>
+    <span class="progress-count" id="progress-count">0 / 7</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+  </div>
+
+  <!-- COMPETENCIES -->
+  <div id="comp-list"></div>
+
+  <!-- SUMMARY -->
+  <div class="summary-card" id="summary-card" style="display:none">
+    <div class="summary-left">
+      <div class="summary-label">Сумма баллов Hard Skills</div>
+      <div class="summary-value" id="summary-avg">—</div>
+    </div>
+    <div class="summary-right">
+      <div class="summary-stat">
+        <div class="summary-stat-val" id="summary-scored" style="color:var(--green)">0</div>
+        <div class="summary-stat-label">Оценено</div>
+      </div>
+      <div class="summary-stat">
+        <div class="summary-stat-val" id="summary-total" style="color:var(--muted)">7</div>
+        <div class="summary-stat-label">Всего</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="form-actions">
+    <a href="index.html" class="btn">← На дашборд</a>
+    <div class="btn-group">
+      <button class="btn btn-draft" onclick="saveDraft()">💾 Черновик</button>
+      <button class="btn btn-submit" onclick="trySubmit()">Отправить оценку</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <div class="modal-icon">📋</div>
+    <div class="modal-title">Отправить оценку Hard Skills?</div>
+    <div class="modal-desc">После отправки форма станет недоступна для редактирования. Результаты будут видны HR и при подведении итогов 1-on-1.</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-submit" onclick="submitForm()">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="container success-screen" id="success-screen">
+  <div class="success-icon">✅</div>
+  <div class="success-title">Оценка отправлена!</div>
+  <div class="success-desc">
+    Оценка Hard Skills для Марии Ивановой успешно сохранена.<br>
+    Следующий этап — Soft Skills 360°.<br><br>
+    <a href="index.html" style="color: var(--accent2)">← Вернуться на дашборд</a>
+  </div>
+</div>
+
+<script>
+const competencies = [
+  {
+    id: 'html_css',
+    name: 'HTML / CSS',
+    description: 'Умение создавать семантичную, адаптивную и доступную вёрстку',
+    scoreDescs: [
+      'Не владеет базовыми знаниями HTML/CSS, не может верстать простые страницы',
+      'Верстает простые страницы, знает основные теги и свойства, но допускает ошибки в адаптивности',
+      'Уверенно верстает сложные макеты, владеет Flexbox/Grid, понимает семантику и доступность',
+      'Эксперт в CSS-архитектуре, оптимизирует рендеринг, создаёт дизайн-системы и компонентные библиотеки'
+    ]
+  },
+  {
+    id: 'javascript',
+    name: 'JavaScript / TypeScript',
+    description: 'Владение языком, паттернами, асинхронностью и типизацией',
+    scoreDescs: [
+      'Не понимает основ языка, не может написать простые скрипты',
+      'Пишет рабочий код, но не использует современные паттерны, слабое понимание асинхронности',
+      'Уверенно владеет ES6+, TypeScript, паттернами проектирования, умеет оптимизировать производительность',
+      'Глубокое знание движка, разрабатывает архитектурные решения, менторит команду по JS/TS'
+    ]
+  },
+  {
+    id: 'react',
+    name: 'React / Фреймворк',
+    description: 'Проектирование и разработка компонентных приложений на React',
+    scoreDescs: [
+      'Не работал с React или аналогичным фреймворком',
+      'Создаёт простые компоненты, знает хуки, но затрудняется со сложным стейт-менеджментом',
+      'Строит сложные приложения, владеет паттернами React, оптимизирует ререндеры, пишет кастомные хуки',
+      'Проектирует архитектуру фронтенд-приложений, внедряет лучшие практики, ведёт техническое направление'
+    ]
+  },
+  {
+    id: 'testing',
+    name: 'Тестирование',
+    description: 'Навыки написания тестов и обеспечения качества кода',
+    scoreDescs: [
+      'Не пишет тесты, не понимает необходимости тестирования',
+      'Пишет простые unit-тесты, знает основы Jest/Testing Library',
+      'Покрывает код unit и интеграционными тестами, настраивает CI-пайплайны для тестирования',
+      'Разрабатывает стратегию тестирования, внедряет E2E-тесты, обеспечивает высокий % покрытия'
+    ]
+  },
+  {
+    id: 'performance',
+    name: 'Web Performance',
+    description: 'Оптимизация производительности веб-приложений и мониторинг метрик',
+    scoreDescs: [
+      'Не знаком с метриками производительности, не оптимизирует приложения',
+      'Знает основные метрики (LCP, FCP), применяет базовые оптимизации (lazy loading, сжатие)',
+      'Профилирует и оптимизирует бандлы, рендеринг, сеть, достигает высоких показателей Core Web Vitals',
+      'Проектирует высокопроизводительные системы, внедряет мониторинг, обучает команду'
+    ]
+  },
+  {
+    id: 'git',
+    name: 'Git / Code Review',
+    description: 'Работа с системой контроля версий и проведение код-ревью',
+    scoreDescs: [
+      'Не владеет Git, не участвует в код-ревью',
+      'Базовые операции: commit, push, pull, merge. Участвует в ревью с простыми замечаниями',
+      'Уверенно работает с ветками, rebase, cherry-pick. Проводит качественные ревью с фокусом на архитектуру',
+      'Формирует стандарты код-ревью в команде, настраивает Git-workflows, менторит коллег'
+    ]
+  },
+  {
+    id: 'api',
+    name: 'REST API / GraphQL',
+    description: 'Проектирование и интеграция с серверными API',
+    scoreDescs: [
+      'Не понимает принципов работы с API',
+      'Использует готовые API, знает основы REST, может отправлять простые запросы',
+      'Проектирует взаимодействие с API, обрабатывает ошибки, использует кэширование и оптимистичные обновления',
+      'Проектирует API-слой приложения, внедряет GraphQL, оптимизирует сетевое взаимодействие'
+    ]
+  }
+];
+
+const scores = {};
+
+function renderCompetencies() {
+  const list = document.getElementById('comp-list');
+  list.innerHTML = competencies.map((comp, idx) => `
+    <div class="comp-card" id="card-${comp.id}">
+      <div class="comp-card-header" onclick="toggleCard('${comp.id}')">
+        <div class="comp-left">
+          <div class="comp-num">${idx + 1}</div>
+          <div>
+            <div class="comp-name">${comp.name}</div>
+            <div class="comp-expected">${comp.description}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="comp-badge empty" id="badge-${comp.id}">—</div>
+          <svg class="chevron" viewBox="0 0 20 20" fill="currentColor"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
+        </div>
+      </div>
+      <div class="comp-body">
+        <div class="scale-grid">
+          ${comp.scoreDescs.map((desc, i) => `
+            <div class="scale-option s${i}" onclick="selectScore('${comp.id}', ${i}, this)">
+              <div class="scale-score">${i}</div>
+              <div class="scale-desc">${desc}</div>
+            </div>
+          `).join('')}
+        </div>
+        <button class="comment-toggle" onclick="toggleComment('${comp.id}')">+ Добавить комментарий</button>
+        <div class="comp-comment" id="comment-${comp.id}">
+          <textarea rows="2" placeholder="Комментарий к компетенции (опционально)..."></textarea>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleCard(id) {
+  const card = document.getElementById('card-' + id);
+  card.classList.toggle('open');
+}
+
+function selectScore(id, score, el) {
+  scores[id] = score;
+  const card = document.getElementById('card-' + id);
+
+  card.querySelectorAll('.scale-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+
+  card.classList.add('scored');
+
+  const badge = document.getElementById('badge-' + id);
+  badge.textContent = score;
+  badge.className = 'comp-badge s' + score;
+
+  updateProgress();
+}
+
+function toggleComment(id) {
+  const comment = document.getElementById('comment-' + id);
+  comment.classList.toggle('show');
+}
+
+function updateProgress() {
+  const total = competencies.length;
+  const scored = Object.keys(scores).length;
+  const pct = (scored / total) * 100;
+
+  document.getElementById('progress-count').textContent = scored + ' / ' + total;
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  const summaryCard = document.getElementById('summary-card');
+  if (scored > 0) {
+    summaryCard.style.display = 'flex';
+    const sum = Object.values(scores).reduce((a, b) => a + b, 0);
+    const maxPossible = total * 3;
+    const avgEl = document.getElementById('summary-avg');
+    avgEl.textContent = sum + ' / ' + maxPossible;
+
+    const pctScore = sum / maxPossible;
+    let color;
+    if (pctScore < 0.33) color = 'var(--red)';
+    else if (pctScore < 0.55) color = 'var(--amber)';
+    else if (pctScore < 0.75) color = 'var(--teal)';
+    else color = 'var(--green)';
+    avgEl.style.color = color;
+
+    document.getElementById('summary-scored').textContent = scored;
+  } else {
+    summaryCard.style.display = 'none';
+  }
+}
+
+function saveDraft() {
+  const btn = event.target;
+  btn.textContent = '✓ Сохранено';
+  btn.style.color = 'var(--green)';
+  btn.style.borderColor = 'rgba(52,211,153,0.3)';
+  setTimeout(() => {
+    btn.textContent = '💾 Черновик';
+    btn.style.color = 'var(--amber)';
+    btn.style.borderColor = 'rgba(251,191,36,0.3)';
+  }, 2000);
+}
+
+function trySubmit() {
+  document.getElementById('submit-modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('submit-modal').classList.remove('show');
+}
+
+function submitForm() {
+  closeModal();
+  document.getElementById('form-container').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+}
+
+renderCompetencies();
+</script>
+</body>
+</html>

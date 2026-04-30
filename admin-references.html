@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Справочники</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --sidebar-w: 240px;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: flex; }
+
+  .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: var(--muted); font-size: 13px; border: none; background: none; width: 100%; font-family: var(--font-body); text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .sidebar-user-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(108,123,255,0.15); color: var(--accent2); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+  .content { padding: 24px 28px; }
+
+  .btn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .badge-gray { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+  /* TABS */
+  .tabs-row { display: flex; gap: 4px; margin-bottom: 20px; }
+  .tab-btn { font-family: var(--font-body); font-size: 13px; font-weight: 500; padding: 9px 20px; border-radius: 10px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border); background: transparent; color: var(--muted); }
+  .tab-btn:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .tab-btn.active { background: rgba(108,123,255,0.12); color: var(--accent2); border-color: rgba(108,123,255,0.25); font-weight: 600; }
+  .tab-count { font-size: 10px; background: var(--bg4); padding: 1px 6px; border-radius: 10px; margin-left: 4px; }
+  .tab-btn.active .tab-count { background: rgba(108,123,255,0.2); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* TABLE */
+  .table-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .table-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .table-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; }
+  .search-input { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; color: var(--text); font-family: var(--font-body); font-size: 12px; outline: none; width: 200px; }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 11px 16px; vertical-align: middle; font-size: 12px; }
+
+  .ref-name { font-weight: 500; color: var(--text); }
+  .ref-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  .action-btn { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; transition: all 0.12s; font-family: var(--font-body); }
+  .action-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  /* GRADE GRID */
+  .grade-section { display: flex; flex-direction: column; gap: 14px; }
+  .level-group {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 22px;
+  }
+  .level-group-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .level-group-title { display: flex; align-items: center; gap: 10px; }
+  .level-name { font-family: var(--font-head); font-size: 16px; font-weight: 800; letter-spacing: -0.3px; }
+  .level-color {
+    width: 8px; height: 24px; border-radius: 4px;
+  }
+  .level-actions { display: flex; gap: 6px; }
+  .sublevels { display: flex; flex-wrap: wrap; gap: 8px; }
+  .sublevel-chip {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; transition: border-color 0.12s;
+  }
+  .sublevel-chip:hover { border-color: var(--border2); }
+  .sublevel-name { font-family: var(--font-head); font-weight: 700; }
+  .sublevel-actions { display: flex; gap: 2px; }
+  .sublevel-btn {
+    width: 22px; height: 22px; border-radius: 6px;
+    border: none; background: transparent; color: var(--muted);
+    cursor: pointer; font-size: 10px; transition: all 0.12s;
+  }
+  .sublevel-btn:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+  .sublevel-btn.del:hover { color: var(--red); }
+  .add-sublevel-btn {
+    background: transparent; border: 1px dashed rgba(108,123,255,0.3);
+    color: var(--accent2); border-radius: 8px; padding: 7px 12px;
+    font-size: 11px; cursor: pointer; transition: all 0.15s; font-family: var(--font-body);
+  }
+  .add-sublevel-btn:hover { background: rgba(108,123,255,0.06); border-color: var(--accent); }
+
+  .level-color-junior { background: rgba(108,123,255,0.7); }
+  .level-color-middle { background: rgba(45,212,191,0.7); }
+  .level-color-senior { background: rgba(52,211,153,0.7); }
+  .level-color-lead { background: rgba(251,191,36,0.7); }
+  .level-color-staff { background: rgba(244,114,182,0.7); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; max-width: 480px; width: 90%; }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .field-input { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; }
+  .field-input:focus { border-color: var(--accent); }
+  .field-select { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; appearance: none; }
+  .field-textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; resize: vertical; }
+  .field-textarea:focus { border-color: var(--accent); }
+
+  .warning-banner {
+    background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+    font-size: 12px; color: var(--amber); display: flex; align-items: center; gap: 8px;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar .nav-text, .sidebar-logo small { display: none; }
+    .main { margin-left: 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">Review<span>OS</span><small>Админ-панель</small></div>
+  <div class="sidebar-nav">
+    <a class="nav-item" href="admin.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span class="nav-text">Дашборд</span></a>
+    <a class="nav-item" href="admin.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg><span class="nav-text">Циклы оценки</span></a>
+    <a class="nav-item" href="admin-employees.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg><span class="nav-text">Сотрудники</span></a>
+    <button class="nav-item active"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span class="nav-text">Справочники</span></button>
+    <a class="nav-item" href="admin-competencies.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg><span class="nav-text">Компетенции</span></a>
+    <a class="nav-item" href="admin-forms.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg><span class="nav-text">Конструктор форм</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg><span class="nav-text">Аудит</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg><span class="nav-text">Шаблоны писем</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg><span class="nav-text">Журнал писем</span></a>
+  </div>
+  <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Справочники</div>
+    <button class="btn btn-primary" onclick="openAddModal()">+ Добавить</button>
+  </div>
+
+  <div class="content">
+
+    <!-- TABS -->
+    <div class="tabs-row">
+      <button class="tab-btn active" onclick="setTab(this,'directions')">Направления<span class="tab-count">5</span></button>
+      <button class="tab-btn" onclick="setTab(this,'positions')">Должности<span class="tab-count">12</span></button>
+      <button class="tab-btn" onclick="setTab(this,'teams')">Команды<span class="tab-count">7</span></button>
+      <button class="tab-btn" onclick="setTab(this,'grades')">Грейдовая сетка</button>
+    </div>
+
+    <!-- DIRECTIONS -->
+    <div class="tab-panel active" id="panel-directions">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Направления</div>
+          <input class="search-input" placeholder="🔍 Поиск..." oninput="searchTable('directions',this.value)">
+        </div>
+        <table>
+          <thead><tr><th>Название</th><th>Описание</th><th>Сотрудников</th><th>Создано</th><th></th></tr></thead>
+          <tbody id="dir-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- POSITIONS -->
+    <div class="tab-panel" id="panel-positions">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Должности</div>
+          <input class="search-input" placeholder="🔍 Поиск..." oninput="searchTable('positions',this.value)">
+        </div>
+        <table>
+          <thead><tr><th>Название</th><th>Направление</th><th>Сотрудников</th><th></th></tr></thead>
+          <tbody id="pos-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TEAMS -->
+    <div class="tab-panel" id="panel-teams">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Команды</div>
+          <input class="search-input" placeholder="🔍 Поиск..." oninput="searchTable('teams',this.value)">
+        </div>
+        <table>
+          <thead><tr><th>Название</th><th>Описание</th><th>Сотрудников</th><th>Тимлид</th><th></th></tr></thead>
+          <tbody id="team-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- GRADE GRID -->
+    <div class="tab-panel" id="panel-grades">
+      <div class="warning-banner">
+        ⚠ Изменения грейдовой сетки применятся ко всем будущим циклам. Удаление уровня возможно, только если он не используется.
+      </div>
+
+      <div class="grade-section" id="grade-section">
+        <!-- rendered by JS -->
+      </div>
+
+      <button class="btn btn-primary" style="margin-top:16px" onclick="addLevel()">+ Добавить уровень</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Добавить</div>
+    <div id="modal-body">
+      <!-- filled by JS -->
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="saveItem()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let activeTab = 'directions';
+
+const directions = [
+  { id:1, name:'.NET Backend', desc:'Серверная разработка на C# / .NET', count:6, date:'10.01.2026' },
+  { id:2, name:'Frontend', desc:'Клиентская разработка на React / TypeScript', count:5, date:'10.01.2026' },
+  { id:3, name:'QA', desc:'Тестирование и контроль качества', count:4, date:'10.01.2026' },
+  { id:4, name:'Data', desc:'Аналитика данных и Data Engineering', count:3, date:'15.01.2026' },
+  { id:5, name:'Mobile', desc:'iOS и Android разработка', count:2, date:'20.02.2026' },
+];
+
+const positions = [
+  { id:1, name:'.NET разработчик', dir:'.NET Backend', count:5 },
+  { id:2, name:'DevOps инженер', dir:'.NET Backend', count:1 },
+  { id:3, name:'Frontend разработчик', dir:'Frontend', count:5 },
+  { id:4, name:'QA инженер (Manual)', dir:'QA', count:2 },
+  { id:5, name:'QA инженер (Automation)', dir:'QA', count:2 },
+  { id:6, name:'Data Engineer', dir:'Data', count:1 },
+  { id:7, name:'Data Analyst', dir:'Data', count:2 },
+  { id:8, name:'iOS разработчик', dir:'Mobile', count:1 },
+  { id:9, name:'Android разработчик', dir:'Mobile', count:1 },
+];
+
+const teams = [
+  { id:1, name:'Platform', desc:'Базовая платформа и инфраструктура', count:6, lead:'Петров С.А.' },
+  { id:2, name:'Web App', desc:'Основное веб-приложение', count:5, lead:'Козлов А.И.' },
+  { id:3, name:'Testing', desc:'Команда тестирования', count:4, lead:'Смирнова О.В.' },
+  { id:4, name:'Analytics', desc:'Аналитика и отчёты', count:3, lead:'Волков С.П.' },
+  { id:5, name:'Apps', desc:'Мобильные приложения', count:2, lead:'Петров С.А.' },
+  { id:6, name:'Infrastructure', desc:'CI/CD и DevOps', count:2, lead:'Морозов П.Д.' },
+  { id:7, name:'Growth', desc:'Маркетинг и рост продукта', count:2, lead:'Иванов Д.К.' },
+];
+
+const gradeGrid = [
+  { id:1, name:'Junior', color:'junior', sublevels:['Jun1','Jun2','Jun3'] },
+  { id:2, name:'Middle', color:'middle', sublevels:['Mid1','Mid2','Mid3'] },
+  { id:3, name:'Senior', color:'senior', sublevels:['Sen1','Sen2','Sen3'] },
+];
+
+function setTab(btn, tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+function renderDirections(search = '') {
+  const tbody = document.getElementById('dir-body');
+  const list = directions.filter(d => !search || d.name.toLowerCase().includes(search.toLowerCase()));
+  tbody.innerHTML = list.map(d => `
+    <tr>
+      <td><div class="ref-name">${d.name}</div></td>
+      <td style="color:var(--muted)">${d.desc}</td>
+      <td><span class="badge badge-blue">${d.count}</span></td>
+      <td style="color:var(--muted)">${d.date}</td>
+      <td style="text-align:right">
+        <button class="action-btn" onclick="alert('Редактировать: ${d.name}')">✎</button>
+        <button class="action-btn" style="color:var(--red)" onclick="alert('Удалить: ${d.name}')">🗑</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderPositions(search = '') {
+  const tbody = document.getElementById('pos-body');
+  const list = positions.filter(p => !search || p.name.toLowerCase().includes(search.toLowerCase()));
+  tbody.innerHTML = list.map(p => `
+    <tr>
+      <td><div class="ref-name">${p.name}</div></td>
+      <td><span class="badge badge-teal">${p.dir}</span></td>
+      <td><span class="badge badge-blue">${p.count}</span></td>
+      <td style="text-align:right">
+        <button class="action-btn" onclick="alert('Редактировать: ${p.name}')">✎</button>
+        <button class="action-btn" style="color:var(--red)" onclick="alert('Удалить: ${p.name}')">🗑</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderTeams(search = '') {
+  const tbody = document.getElementById('team-body');
+  const list = teams.filter(t => !search || t.name.toLowerCase().includes(search.toLowerCase()));
+  tbody.innerHTML = list.map(t => `
+    <tr>
+      <td><div class="ref-name">${t.name}</div></td>
+      <td style="color:var(--muted)">${t.desc}</td>
+      <td><span class="badge badge-blue">${t.count}</span></td>
+      <td style="color:var(--muted)">${t.lead}</td>
+      <td style="text-align:right">
+        <button class="action-btn" onclick="alert('Редактировать: ${t.name}')">✎</button>
+        <button class="action-btn" style="color:var(--red)" onclick="alert('Удалить: ${t.name}')">🗑</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderGrades() {
+  const c = document.getElementById('grade-section');
+  c.innerHTML = gradeGrid.map(lv => `
+    <div class="level-group">
+      <div class="level-group-header">
+        <div class="level-group-title">
+          <div class="level-color level-color-${lv.color}"></div>
+          <div class="level-name">${lv.name}</div>
+          <span style="font-size:11px;color:var(--muted)">${lv.sublevels.length} подуровня</span>
+        </div>
+        <div class="level-actions">
+          <button class="action-btn" onclick="alert('Редактировать уровень: ${lv.name}')">✎ Уровень</button>
+          <button class="action-btn" style="color:var(--red)" onclick="alert('Удалить уровень: ${lv.name}')">🗑</button>
+        </div>
+      </div>
+      <div class="sublevels">
+        ${lv.sublevels.map(s => `
+          <div class="sublevel-chip">
+            <span class="sublevel-name">${s}</span>
+            <div class="sublevel-actions">
+              <button class="sublevel-btn" onclick="alert('Редактировать: ${s}')" title="Редактировать">✎</button>
+              <button class="sublevel-btn del" onclick="alert('Удалить: ${s}')" title="Удалить">✕</button>
+            </div>
+          </div>
+        `).join('')}
+        <button class="add-sublevel-btn" onclick="alert('Добавить подуровень в ${lv.name}')">+ Подуровень</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function searchTable(tab, val) {
+  if (tab === 'directions') renderDirections(val);
+  if (tab === 'positions') renderPositions(val);
+  if (tab === 'teams') renderTeams(val);
+}
+
+function openAddModal() {
+  const titles = { directions:'Добавить направление', positions:'Добавить должность', teams:'Добавить команду', grades:'Добавить уровень' };
+  document.getElementById('modal-title').textContent = titles[activeTab];
+  const body = document.getElementById('modal-body');
+  if (activeTab === 'directions') {
+    body.innerHTML = `
+      <div class="field-group"><label class="field-label">Название</label><input class="field-input" placeholder="Например: Mobile"></div>
+      <div class="field-group"><label class="field-label">Описание</label><textarea class="field-textarea" rows="2" placeholder="Краткое описание направления..."></textarea></div>`;
+  } else if (activeTab === 'positions') {
+    body.innerHTML = `
+      <div class="field-group"><label class="field-label">Название должности</label><input class="field-input" placeholder="Например: Senior Frontend разработчик"></div>
+      <div class="field-group"><label class="field-label">Направление</label><select class="field-select">${directions.map(d => '<option>'+d.name+'</option>').join('')}</select></div>`;
+  } else if (activeTab === 'teams') {
+    body.innerHTML = `
+      <div class="field-group"><label class="field-label">Название команды</label><input class="field-input" placeholder="Например: Growth"></div>
+      <div class="field-group"><label class="field-label">Описание</label><textarea class="field-textarea" rows="2"></textarea></div>
+      <div class="field-group"><label class="field-label">Тимлид</label><input class="field-input" placeholder="ФИО руководителя"></div>`;
+  } else if (activeTab === 'grades') {
+    body.innerHTML = `
+      <div class="field-group"><label class="field-label">Название уровня</label><input class="field-input" placeholder="Например: Lead"></div>
+      <div class="field-group"><label class="field-label">Подуровни (через запятую)</label><input class="field-input" placeholder="Lead1, Lead2, Lead3"></div>
+      <div class="field-group"><label class="field-label">Цвет</label><select class="field-select"><option>Жёлтый</option><option>Розовый</option><option>Синий</option><option>Зелёный</option></select></div>`;
+  }
+  document.getElementById('add-modal').classList.add('show');
+}
+function closeAddModal() { document.getElementById('add-modal').classList.remove('show'); }
+function saveItem() { closeAddModal(); alert('Сохранено!'); }
+
+function addLevel() {
+  activeTab = 'grades';
+  openAddModal();
+}
+
+renderDirections();
+renderPositions();
+renderTeams();
+renderGrades();
+</script>
+</body>
+</html>

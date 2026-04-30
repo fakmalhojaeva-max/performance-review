@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Пользователи и роли</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf; --pink: #f472b6;
+    --sidebar-w: 240px;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: flex; }
+
+  .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: var(--muted); font-size: 13px; border: none; background: none; width: 100%; font-family: var(--font-body); text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .sidebar-user-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(108,123,255,0.15); color: var(--accent2); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+  .content { padding: 24px 28px; }
+
+  .btn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-danger { color: var(--red); border-color: rgba(248,113,113,0.3); }
+  .btn-danger:hover { background: rgba(248,113,113,0.08); }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .stat-icon.all { background: rgba(255,255,255,0.05); color: var(--text); }
+  .stat-icon.hr { background: rgba(108,123,255,0.12); color: var(--accent2); }
+  .stat-icon.lead { background: rgba(45,212,191,0.12); color: var(--teal); }
+  .stat-icon.po { background: rgba(244,114,182,0.12); color: var(--pink); }
+  .stat-icon.emp { background: rgba(52,211,153,0.12); color: var(--green); }
+  .stat-info { flex: 1; }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .stat-value { font-family: var(--font-head); font-size: 20px; font-weight: 700; line-height: 1.1; margin-top: 2px; }
+
+  /* FILTERS */
+  .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-label { font-size: 12px; color: var(--muted); margin-right: 4px; }
+  .filter-chip { font-size: 11px; padding: 5px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.12s; font-family: var(--font-body); }
+  .filter-chip:hover, .filter-chip.active { border-color: var(--accent); color: var(--accent2); background: rgba(108,123,255,0.08); }
+  .filter-chip.active.role-hr { border-color: var(--accent); color: var(--accent2); background: rgba(108,123,255,0.08); }
+  .filter-chip.active.role-lead { border-color: var(--teal); color: var(--teal); background: rgba(45,212,191,0.08); }
+  .filter-chip.active.role-po { border-color: var(--pink); color: var(--pink); background: rgba(244,114,182,0.08); }
+  .filter-chip.active.role-emp { border-color: var(--green); color: var(--green); background: rgba(52,211,153,0.08); }
+  .search-input { margin-left: auto; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; color: var(--text); font-family: var(--font-body); font-size: 12px; outline: none; width: 220px; }
+  .search-input:focus { border-color: var(--accent); }
+
+  /* TABLE */
+  .table-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; cursor: pointer; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 10px 16px; vertical-align: middle; font-size: 12px; }
+
+  /* USER CELL */
+  .user-cell { display: flex; align-items: center; gap: 10px; }
+  .user-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .user-name { font-weight: 500; color: var(--text); font-size: 13px; }
+  .user-email { font-size: 11px; color: var(--muted); }
+
+  /* ROLE BADGES */
+  .roles-cell { display: flex; gap: 4px; flex-wrap: wrap; }
+  .role-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .role-hr { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .role-lead { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .role-po { background: rgba(244,114,182,0.12); color: var(--pink); border: 1px solid rgba(244,114,182,0.2); }
+  .role-emp { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+
+  /* STATUS */
+  .status-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; }
+  .status-dot.active { background: var(--green); }
+  .status-dot.inactive { background: var(--muted); }
+  .status-dot.pending { background: var(--amber); }
+  .status-text { font-size: 11px; font-weight: 500; }
+  .status-text.active { color: var(--green); }
+  .status-text.inactive { color: var(--muted); }
+  .status-text.pending { color: var(--amber); }
+
+  .action-btn { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; transition: all 0.12s; font-family: var(--font-body); }
+  .action-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; max-width: 560px; width: 90%; max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .modal-subtitle { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: space-between; margin-top: 24px; align-items: center; }
+
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .field-input { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; }
+  .field-input:focus { border-color: var(--accent); }
+  .field-select { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; appearance: none; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ROLES CHECKBOXES */
+  .roles-grid { display: flex; flex-direction: column; gap: 6px; }
+  .role-check {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px; cursor: pointer; transition: all 0.12s;
+  }
+  .role-check:hover { border-color: var(--border2); }
+  .role-check input { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; }
+  .role-check-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .role-check-info { flex: 1; }
+  .role-check-name { font-size: 13px; font-weight: 500; }
+  .role-check-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* DELEGATE */
+  .delegate-banner {
+    background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 10px; padding: 12px 14px; margin-top: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .delegate-icon { font-size: 16px; flex-shrink: 0; }
+  .delegate-text { font-size: 11px; color: var(--text); line-height: 1.4; flex: 1; }
+  .delegate-text strong { color: var(--amber); }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar .nav-text, .sidebar-logo small { display: none; }
+    .main { margin-left: 60px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .table-card { overflow-x: auto; }
+    table { min-width: 800px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">Review<span>OS</span><small>Админ-панель</small></div>
+  <div class="sidebar-nav">
+    <a class="nav-item" href="admin.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span class="nav-text">Дашборд</span></a>
+    <a class="nav-item" href="admin.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg><span class="nav-text">Циклы оценки</span></a>
+    <a class="nav-item" href="admin-employees.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg><span class="nav-text">Сотрудники</span></a>
+    <a class="nav-item" href="admin-references.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span class="nav-text">Справочники</span></a>
+    <a class="nav-item" href="admin-competencies.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg><span class="nav-text">Компетенции</span></a>
+    <a class="nav-item" href="admin-forms.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg><span class="nav-text">Конструктор форм</span></a>
+    <button class="nav-item active"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></button>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg><span class="nav-text">Аудит</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg><span class="nav-text">Шаблоны писем</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg><span class="nav-text">Журнал писем</span></a>
+  </div>
+  <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Пользователи и роли</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="alert('Импорт из Сотрудников')">↓ Импорт из Сотрудников</button>
+      <button class="btn btn-primary" onclick="openEditModal(null)">+ Добавить пользователя</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon all">👥</div>
+        <div class="stat-info"><div class="stat-label">Всего</div><div class="stat-value">26</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon hr">⚙</div>
+        <div class="stat-info"><div class="stat-label">HR-админы</div><div class="stat-value" style="color:var(--accent2)">2</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon lead">★</div>
+        <div class="stat-info"><div class="stat-label">Руководители</div><div class="stat-value" style="color:var(--teal)">5</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon po">◆</div>
+        <div class="stat-info"><div class="stat-label">Продакт-оунеры</div><div class="stat-value" style="color:var(--pink)">3</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon emp">●</div>
+        <div class="stat-info"><div class="stat-label">Сотрудники</div><div class="stat-value" style="color:var(--green)">24</div></div>
+      </div>
+    </div>
+
+    <!-- FILTERS -->
+    <div class="filter-row">
+      <span class="filter-label">Роль:</span>
+      <button class="filter-chip active" onclick="setFilter(this,'all')">Все</button>
+      <button class="filter-chip role-hr" onclick="setFilter(this,'hr')">HR-админ</button>
+      <button class="filter-chip role-lead" onclick="setFilter(this,'lead')">Руководитель</button>
+      <button class="filter-chip role-po" onclick="setFilter(this,'po')">Продакт-оунер</button>
+      <button class="filter-chip role-emp" onclick="setFilter(this,'emp')">Сотрудник</button>
+      <input class="search-input" placeholder="🔍 Поиск..." oninput="searchUsers(this.value)">
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <table>
+        <thead><tr>
+          <th>Пользователь</th>
+          <th>Роли</th>
+          <th>Направление</th>
+          <th>Статус</th>
+          <th>Последний вход</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="users-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Добавить пользователя</div>
+    <div class="modal-subtitle" id="modal-subtitle">Заполните данные и назначьте роли</div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">ФИО</label>
+        <input class="field-input" placeholder="Иванова Мария Сергеевна" id="m-name">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input class="field-input" type="email" placeholder="user@company.com" id="m-email">
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Направление</label>
+        <select class="field-select">
+          <option>.NET Backend</option>
+          <option>Frontend</option>
+          <option>QA</option>
+          <option>Data</option>
+          <option>Mobile</option>
+          <option>HR / Управление</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Статус</label>
+        <select class="field-select">
+          <option>Активный</option>
+          <option>Неактивный</option>
+          <option>Ожидает активации</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Роли</label>
+      <div class="roles-grid">
+        <label class="role-check">
+          <input type="checkbox" id="r-hr">
+          <div class="role-check-icon" style="background:rgba(108,123,255,0.12);color:var(--accent2)">⚙</div>
+          <div class="role-check-info">
+            <div class="role-check-name">HR-админ</div>
+            <div class="role-check-desc">Полный доступ к системе, управление циклами и пользователями</div>
+          </div>
+        </label>
+        <label class="role-check">
+          <input type="checkbox" id="r-lead" checked>
+          <div class="role-check-icon" style="background:rgba(45,212,191,0.12);color:var(--teal)">★</div>
+          <div class="role-check-info">
+            <div class="role-check-name">Руководитель</div>
+            <div class="role-check-desc">Оценивает Hard Skills, СРВ, проводит 1-on-1 со своими подчинёнными</div>
+          </div>
+        </label>
+        <label class="role-check">
+          <input type="checkbox" id="r-po">
+          <div class="role-check-icon" style="background:rgba(244,114,182,0.12);color:var(--pink)">◆</div>
+          <div class="role-check-info">
+            <div class="role-check-name">Продакт-оунер</div>
+            <div class="role-check-desc">Оценивает Performance / эффективность работы</div>
+          </div>
+        </label>
+        <label class="role-check">
+          <input type="checkbox" id="r-emp" checked>
+          <div class="role-check-icon" style="background:rgba(52,211,153,0.12);color:var(--green)">●</div>
+          <div class="role-check-info">
+            <div class="role-check-name">Сотрудник</div>
+            <div class="role-check-desc">Заполняет самооценку, участвует в 360° оценке коллег</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <div class="delegate-banner">
+      <span class="delegate-icon">⚠️</span>
+      <div class="delegate-text">
+        <strong>Делегирование:</strong> временно передать роль другому пользователю можно через настройки конкретного цикла. Это удобно при отпусках или замещении.
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-danger btn-sm" onclick="alert('Удалить пользователя')" id="del-btn" style="display:none">🗑 Удалить</button>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button class="btn" onclick="closeEditModal()">Отмена</button>
+        <button class="btn btn-primary" onclick="saveUser()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const users = [
+  { id:1, name:'Сидорова Анна Николаевна', email:'a.sidorova@company.com', initials:'АС', color:'#6c7bff', roles:['hr'], dir:'HR / Управление', status:'active', lastLogin:'Сегодня, 09:14' },
+  { id:2, name:'Козлов Алексей Иванович', email:'a.kozlov@company.com', initials:'АК', color:'#34d399', roles:['lead','emp'], dir:'Frontend', status:'active', lastLogin:'Сегодня, 11:45' },
+  { id:3, name:'Иванова Мария Сергеевна', email:'m.ivanova@company.com', initials:'МИ', color:'#34d399', roles:['emp'], dir:'Frontend', status:'active', lastLogin:'Сегодня, 10:22' },
+  { id:4, name:'Иванов Дмитрий Константинович', email:'d.ivanov@company.com', initials:'ДИ', color:'#f472b6', roles:['po'], dir:'Frontend', status:'active', lastLogin:'Вчера, 18:30' },
+  { id:5, name:'Петров Сергей Александрович', email:'s.petrov@company.com', initials:'СП', color:'#2dd4bf', roles:['lead','emp'], dir:'.NET Backend', status:'active', lastLogin:'Сегодня, 08:50' },
+  { id:6, name:'Смирнова Ольга Васильевна', email:'o.smirnova@company.com', initials:'ОС', color:'#a78bfa', roles:['lead','emp'], dir:'QA', status:'active', lastLogin:'Сегодня, 12:05' },
+  { id:7, name:'Волков Сергей Павлович', email:'s.volkov@company.com', initials:'СВ', color:'#2dd4bf', roles:['lead','emp'], dir:'Data', status:'active', lastLogin:'2 дня назад' },
+  { id:8, name:'Сидоров Кирилл Леонидович', email:'k.sidorov@company.com', initials:'КС', color:'#f472b6', roles:['po'], dir:'Mobile', status:'active', lastLogin:'Вчера, 15:00' },
+  { id:9, name:'Ли Дмитрий Олегович', email:'d.li@company.com', initials:'ДЛ', color:'#f472b6', roles:['emp'], dir:'QA', status:'active', lastLogin:'Сегодня, 09:55' },
+  { id:10, name:'Петрова Анна Викторовна', email:'a.petrova@company.com', initials:'АП', color:'#fbbf24', roles:['emp'], dir:'Data', status:'active', lastLogin:'3 дня назад' },
+  { id:11, name:'Новиков Игорь Андреевич', email:'i.novikov@company.com', initials:'ИН', color:'#f87171', roles:['emp'], dir:'.NET Backend', status:'active', lastLogin:'Сегодня, 11:00' },
+  { id:12, name:'Белова Татьяна Николаевна', email:'t.belova@company.com', initials:'ТБ', color:'#fb923c', roles:['emp'], dir:'QA', status:'pending', lastLogin:'Не входил' },
+  { id:13, name:'Морозов Павел Дмитриевич', email:'p.morozov@company.com', initials:'ПМ', color:'#4ade80', roles:['lead','emp'], dir:'.NET Backend', status:'active', lastLogin:'Вчера, 22:00' },
+  { id:14, name:'Кузнецов Иван Сергеевич', email:'i.kuznetsov@company.com', initials:'ИК', color:'#7a7f94', roles:['emp'], dir:'Mobile', status:'inactive', lastLogin:'Месяц назад' },
+];
+
+const roleConfig = {
+  hr: { label: 'HR-админ', cls: 'role-hr' },
+  lead: { label: 'Руководитель', cls: 'role-lead' },
+  po: { label: 'Продакт-оунер', cls: 'role-po' },
+  emp: { label: 'Сотрудник', cls: 'role-emp' },
+};
+
+const statusConfig = {
+  active: { label: 'Активный', cls: 'active' },
+  inactive: { label: 'Неактивный', cls: 'inactive' },
+  pending: { label: 'Ожидает', cls: 'pending' },
+};
+
+let currentFilter = 'all';
+let currentSearch = '';
+
+function renderUsers() {
+  const tbody = document.getElementById('users-body');
+  let list = users;
+  if (currentFilter !== 'all') list = list.filter(u => u.roles.includes(currentFilter));
+  if (currentSearch) list = list.filter(u => u.name.toLowerCase().includes(currentSearch.toLowerCase()) || u.email.toLowerCase().includes(currentSearch.toLowerCase()));
+
+  if (list.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--muted)">Пользователи не найдены</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(u => {
+    const st = statusConfig[u.status];
+    return `<tr onclick="openEditModal(${u.id})">
+      <td>
+        <div class="user-cell">
+          <div class="user-avatar" style="background:${u.color}22;color:${u.color};border:1px solid ${u.color}33">${u.initials}</div>
+          <div>
+            <div class="user-name">${u.name}</div>
+            <div class="user-email">${u.email}</div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="roles-cell">
+          ${u.roles.map(r => `<span class="role-badge ${roleConfig[r].cls}">${roleConfig[r].label}</span>`).join('')}
+        </div>
+      </td>
+      <td style="color:var(--muted)">${u.dir}</td>
+      <td><span class="status-dot ${st.cls}"></span><span class="status-text ${st.cls}">${st.label}</span></td>
+      <td style="color:var(--muted)">${u.lastLogin}</td>
+      <td style="text-align:right">
+        <button class="action-btn" onclick="event.stopPropagation();alert('Сбросить пароль для ${u.name}')" title="Сбросить пароль">🔑</button>
+        <button class="action-btn" onclick="event.stopPropagation();openEditModal(${u.id})" title="Редактировать">✎</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function setFilter(btn, filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderUsers();
+}
+
+function searchUsers(val) {
+  currentSearch = val;
+  renderUsers();
+}
+
+function openEditModal(id) {
+  const isNew = id === null;
+  document.getElementById('modal-title').textContent = isNew ? 'Добавить пользователя' : 'Редактировать пользователя';
+  document.getElementById('modal-subtitle').textContent = isNew ? 'Заполните данные и назначьте роли' : 'Изменения вступят в силу немедленно';
+  document.getElementById('del-btn').style.display = isNew ? 'none' : 'inline-flex';
+
+  if (!isNew) {
+    const u = users.find(x => x.id === id);
+    if (u) {
+      document.getElementById('m-name').value = u.name;
+      document.getElementById('m-email').value = u.email;
+      document.getElementById('r-hr').checked = u.roles.includes('hr');
+      document.getElementById('r-lead').checked = u.roles.includes('lead');
+      document.getElementById('r-po').checked = u.roles.includes('po');
+      document.getElementById('r-emp').checked = u.roles.includes('emp');
+    }
+  } else {
+    document.getElementById('m-name').value = '';
+    document.getElementById('m-email').value = '';
+    document.getElementById('r-hr').checked = false;
+    document.getElementById('r-lead').checked = false;
+    document.getElementById('r-po').checked = false;
+    document.getElementById('r-emp').checked = true;
+  }
+
+  document.getElementById('edit-modal').classList.add('show');
+}
+
+function closeEditModal() { document.getElementById('edit-modal').classList.remove('show'); }
+function saveUser() { closeEditModal(); alert('Пользователь сохранён!'); }
+
+renderUsers();
+</script>
+</body>
+</html>

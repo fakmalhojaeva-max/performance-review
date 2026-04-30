@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Компетенции</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --sidebar-w: 240px;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: flex; }
+
+  /* SIDEBAR */
+  .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: var(--muted); font-size: 13px; font-weight: 400; text-decoration: none; border: none; background: none; width: 100%; font-family: var(--font-body); }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .sidebar-user-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(108,123,255,0.15); color: var(--accent2); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+
+  /* MAIN */
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+  .content { padding: 24px 28px; }
+
+  .btn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #7b8aff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-danger { color: var(--red); border-color: rgba(248,113,113,0.3); }
+  .btn-danger:hover { background: rgba(248,113,113,0.08); }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+  .stat-value { font-family: var(--font-head); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-top: 4px; }
+
+  /* TABS */
+  .tabs-row { display: flex; gap: 4px; margin-bottom: 20px; }
+  .tab-btn {
+    font-family: var(--font-body); font-size: 13px; font-weight: 500;
+    padding: 9px 20px; border-radius: 10px; cursor: pointer;
+    transition: all 0.15s; border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+  }
+  .tab-btn:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .tab-btn.active { background: rgba(108,123,255,0.12); color: var(--accent2); border-color: rgba(108,123,255,0.25); font-weight: 600; }
+  .tab-count { font-size: 10px; background: var(--bg4); padding: 1px 6px; border-radius: 10px; margin-left: 4px; }
+  .tab-btn.active .tab-count { background: rgba(108,123,255,0.2); }
+
+  /* DIRECTION FILTER */
+  .dir-filter { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .dir-filter-label { font-size: 12px; color: var(--muted); }
+  .dir-chip {
+    font-size: 11px; padding: 4px 12px; border-radius: 20px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all 0.12s; font-family: var(--font-body);
+  }
+  .dir-chip:hover, .dir-chip.active { border-color: var(--accent); color: var(--accent2); background: rgba(108,123,255,0.08); }
+
+  /* ACTUALIZE BANNER */
+  .actualize-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 18px; margin-bottom: 16px;
+  }
+  .actualize-status { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .actualize-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .actualize-dot.ok { background: var(--green); }
+  .actualize-dot.warn { background: var(--amber); }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.2px; }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+
+  /* MATRIX TABLE */
+  .matrix-table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; }
+  .matrix-table { width: 100%; border-collapse: collapse; min-width: 800px; }
+  .mat-th-comp { padding: 12px 18px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); width: 260px; }
+  .mat-th-level { padding: 10px 4px; text-align: center; font-size: 10px; font-weight: 700; color: var(--accent2); border-bottom: 1px solid var(--border); background: rgba(108,123,255,0.05); width: 52px; font-family: var(--font-head); letter-spacing: 0.2px; }
+  .mat-th-act { padding: 10px 14px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); width: 70px; }
+  .mat-row { border-bottom: 1px solid var(--border); transition: background 0.1s; cursor: pointer; }
+  .mat-row:last-child { border-bottom: none; }
+  .mat-row:hover { background: rgba(255,255,255,0.02); }
+  .mat-td-comp { padding: 14px 18px; vertical-align: middle; }
+  .mat-comp-name { font-family: var(--font-head); font-size: 13px; font-weight: 700; letter-spacing: -0.1px; }
+  .mat-comp-desc { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+  .mat-td-score { padding: 10px 4px; text-align: center; vertical-align: middle; }
+  .mat-td-total { padding: 10px 8px; text-align: center; vertical-align: middle; background: rgba(108,123,255,0.03); }
+  .mat-total { font-family: var(--font-head); font-size: 12px; font-weight: 700; color: var(--accent2); }
+  .mat-td-actions { padding: 10px 14px; vertical-align: middle; }
+  .mat-td-actions .action-btn { margin: 0 2px; }
+
+  .score-desc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .score-desc-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+  .score-desc-num { font-family: var(--font-head); font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .score-desc-num.n0 { color: var(--red); }
+  .score-desc-num.n1 { color: var(--amber); }
+  .score-desc-num.n2 { color: var(--teal); }
+  .score-desc-num.n3 { color: var(--green); }
+  .score-desc-text { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  .levels-table { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .levels-table table { width: 100%; }
+
+  /* IMPORT ITEMS */
+  .import-item {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px; cursor: pointer;
+    transition: all 0.12s;
+  }
+  .import-item:hover { border-color: var(--border2); background: var(--bg4); }
+
+  .chevron { width: 18px; height: 18px; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+
+  .action-btn { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; transition: all 0.12s; font-family: var(--font-body); }
+  .action-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; max-width: 640px; width: 90%; max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .field-input, .field-textarea {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 9px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 13px; outline: none; transition: border-color 0.15s;
+  }
+  .field-input:focus, .field-textarea:focus { border-color: var(--accent); }
+  .field-textarea { resize: vertical; line-height: 1.5; }
+  .field-select { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; appearance: none; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .score-input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .score-input-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .score-input-label { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .score-input-label.n0 { color: var(--red); }
+  .score-input-label.n1 { color: var(--amber); }
+  .score-input-label.n2 { color: var(--teal); }
+  .score-input-label.n3 { color: var(--green); }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar .nav-text, .sidebar-logo small { display: none; }
+    .main { margin-left: 60px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .score-desc-grid, .score-input-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">Review<span>OS</span><small>Админ-панель</small></div>
+  <div class="sidebar-nav">
+    <a class="nav-item" href="admin.html" style="text-decoration:none"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span class="nav-text">Дашборд</span></a>
+    <a class="nav-item" href="admin.html" style="text-decoration:none"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg><span class="nav-text">Циклы оценки</span></a>
+    <a class="nav-item" href="admin-employees.html" style="text-decoration:none"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg><span class="nav-text">Сотрудники</span></a>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span class="nav-text">Справочники</span></button>
+    <button class="nav-item active"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg><span class="nav-text">Компетенции</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg><span class="nav-text">Конструктор форм</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg><span class="nav-text">Аудит</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg><span class="nav-text">Шаблоны писем</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg><span class="nav-text">Журнал писем</span></button>
+  </div>
+  <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Компетенции</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="openAddModal()">+ Добавить компетенцию</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- TABS -->
+    <div class="tabs-row">
+      <button class="tab-btn active" onclick="setTab(this,'hard')">Hard Skills<span class="tab-count">12</span></button>
+      <button class="tab-btn" onclick="setTab(this,'soft')">Soft Skills<span class="tab-count">8</span></button>
+      <button class="tab-btn" onclick="setTab(this,'srv')">СРВ<span class="tab-count">6</span></button>
+    </div>
+
+    <!-- DIRECTION FILTER -->
+    <div class="dir-filter">
+      <span class="dir-filter-label">Направление:</span>
+      <button class="dir-chip active" onclick="setDir(this,'backend')">.NET Backend</button>
+      <button class="dir-chip" onclick="setDir(this,'frontend')">Frontend</button>
+      <button class="dir-chip" onclick="setDir(this,'qa')">QA</button>
+      <button class="dir-chip" onclick="setDir(this,'data')">Data</button>
+      <button class="dir-chip" onclick="setDir(this,'mobile')">Mobile</button>
+    </div>
+
+    <!-- ACTUALIZE BAR -->
+    <div class="actualize-bar" id="actualize-bar">
+      <div class="actualize-status">
+        <div class="actualize-dot ok" id="act-dot"></div>
+        <span id="act-text">Матрица актуализирована для выбранного направления</span>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
+        <input type="checkbox" id="act-check" checked style="width:14px;height:14px;accent-color:var(--green)" onchange="toggleActualize()">
+        <span>Актуализирована</span>
+      </label>
+    </div>
+
+    <!-- COMPETENCY LIST -->
+    <div class="comp-list" id="comp-list"></div>
+  </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Добавить компетенцию</div>
+
+    <div class="field-group">
+      <div style="display:flex;gap:6px;margin-bottom:16px">
+        <button class="tab-btn active" id="mode-new" onclick="setAddMode('new')" style="flex:1;padding:8px">Создать новую</button>
+        <button class="tab-btn" id="mode-import" onclick="setAddMode('import')" style="flex:1;padding:8px">Выбрать из другой матрицы</button>
+      </div>
+    </div>
+
+    <!-- IMPORT MODE -->
+    <div id="import-section" style="display:none">
+      <div class="field-group">
+        <label class="field-label">Направление-источник</label>
+        <select class="field-select" id="import-dir" onchange="renderImportList()">
+          <option value="backend">.NET Backend</option>
+          <option value="frontend">Frontend</option>
+          <option value="qa">QA</option>
+          <option value="data">Data</option>
+          <option value="mobile">Mobile</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Доступные компетенции</label>
+        <div id="import-list" style="display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto">
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">Выбранные компетенции будут скопированы в текущее направление. Вы сможете отредактировать описания баллов после добавления.</div>
+    </div>
+
+    <!-- NEW MODE -->
+    <div id="new-section">
+
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Тип</label>
+        <select class="field-select" id="m-type">
+          <option value="hard">Hard Skill</option>
+          <option value="soft">Soft Skill</option>
+          <option value="srv">СРВ</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Направление</label>
+        <select class="field-select" id="m-dir">
+          <option>.NET Backend</option>
+          <option>Frontend</option>
+          <option>QA</option>
+          <option>Data</option>
+          <option>Mobile</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Название компетенции</label>
+      <input class="field-input" type="text" placeholder="Например: JavaScript / TypeScript" id="m-name">
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Описание компетенции</label>
+      <textarea class="field-textarea" rows="2" placeholder="Краткое описание что оценивается..." id="m-desc"></textarea>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Описания по шкале 0–3</label>
+      <div class="score-input-grid">
+        <div class="score-input-card">
+          <div class="score-input-label n0">0 баллов</div>
+          <textarea class="field-textarea" rows="3" placeholder="Описание для оценки 0..." id="m-s0"></textarea>
+        </div>
+        <div class="score-input-card">
+          <div class="score-input-label n1">1 балл</div>
+          <textarea class="field-textarea" rows="3" placeholder="Описание для оценки 1..." id="m-s1"></textarea>
+        </div>
+        <div class="score-input-card">
+          <div class="score-input-label n2">2 балла</div>
+          <textarea class="field-textarea" rows="3" placeholder="Описание для оценки 2..." id="m-s2"></textarea>
+        </div>
+        <div class="score-input-card">
+          <div class="score-input-label n3">3 балла</div>
+          <textarea class="field-textarea" rows="3" placeholder="Описание для оценки 3..." id="m-s3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="field-group" id="levels-section">
+      <label class="field-label">Требуемый балл по уровням (только Hard Skills)</label>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+        <div style="display:grid;grid-template-columns:repeat(9,1fr);gap:6px;text-align:center">
+          <div style="font-size:9px;color:var(--muted);font-weight:600;padding-bottom:6px">Jun1</div>
+          <div style="font-size:9px;color:var(--muted);font-weight:600;padding-bottom:6px">Jun2</div>
+          <div style="font-size:9px;color:var(--muted);font-weight:600;padding-bottom:6px">Jun3</div>
+          <div style="font-size:9px;color:var(--muted);font-weight:600;padding-bottom:6px">Mid1</div>
+          <div style="font-size:9px;color:var(--muted);font-weight:600;padding-bottom:6px">Mid2</div>
+          <div style="font-size:9px;color:var(--muted);font-weight:600;padding-bottom:6px">Mid3</div>
+          <div style="font-size:9px;color:var(--muted);font-weight:600;padding-bottom:6px">Sen1</div>
+          <div style="font-size:9px;color:var(--muted);font-weight:600;padding-bottom:6px">Sen2</div>
+          <div style="font-size:9px;color:var(--muted);font-weight:600;padding-bottom:6px">Sen3</div>
+          <select class="field-select" style="padding:6px 2px;font-size:12px;text-align:center;font-weight:700"><option>0</option><option>1</option><option>2</option><option>3</option></select>
+          <select class="field-select" style="padding:6px 2px;font-size:12px;text-align:center;font-weight:700"><option>0</option><option selected>1</option><option>2</option><option>3</option></select>
+          <select class="field-select" style="padding:6px 2px;font-size:12px;text-align:center;font-weight:700"><option>0</option><option selected>1</option><option>2</option><option>3</option></select>
+          <select class="field-select" style="padding:6px 2px;font-size:12px;text-align:center;font-weight:700"><option>0</option><option>1</option><option selected>2</option><option>3</option></select>
+          <select class="field-select" style="padding:6px 2px;font-size:12px;text-align:center;font-weight:700"><option>0</option><option>1</option><option selected>2</option><option>3</option></select>
+          <select class="field-select" style="padding:6px 2px;font-size:12px;text-align:center;font-weight:700"><option>0</option><option>1</option><option selected>2</option><option>3</option></select>
+          <select class="field-select" style="padding:6px 2px;font-size:12px;text-align:center;font-weight:700"><option>0</option><option>1</option><option>2</option><option selected>3</option></select>
+          <select class="field-select" style="padding:6px 2px;font-size:12px;text-align:center;font-weight:700"><option>0</option><option>1</option><option>2</option><option selected>3</option></select>
+          <select class="field-select" style="padding:6px 2px;font-size:12px;text-align:center;font-weight:700"><option>0</option><option>1</option><option>2</option><option selected>3</option></select>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:8px">Выберите минимальный требуемый балл для каждого подуровня</div>
+      </div>
+    </div><!-- end levels-section -->
+
+    </div><!-- end new-section -->
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddModal()">Отмена</button>
+      <button class="btn btn-primary" id="save-btn" onclick="saveComp()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-title" id="detail-title"></div>
+    <div id="detail-content"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeDetailModal()">Закрыть</button>
+      <button class="btn btn-primary" onclick="closeDetailModal();alert('Редактировать')">✎ Редактировать</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const comps = {
+  hard: [
+    { id:1, name:'HTML / CSS', desc:'Семантичная, адаптивная и доступная вёрстка', dir:'frontend', scores:['Не владеет базовыми знаниями','Верстает простые страницы, допускает ошибки','Уверенно верстает сложные макеты, Flexbox/Grid','Эксперт в CSS-архитектуре, дизайн-системы'], levels:{Jun1:1,Jun2:1,Jun3:2,Mid1:2,Mid2:2,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:2, name:'JavaScript / TypeScript', desc:'Владение языком, паттернами, асинхронностью', dir:'frontend', scores:['Не понимает основ языка','Пишет рабочий код без современных паттернов','Уверенно владеет ES6+, TypeScript, паттерны','Глубокое знание движка, архитектурные решения'], levels:{Jun1:1,Jun2:1,Jun3:2,Mid1:2,Mid2:3,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:3, name:'React / Фреймворк', desc:'Проектирование компонентных приложений на React', dir:'frontend', scores:['Не работал с фреймворком','Простые компоненты, базовые хуки','Сложные приложения, кастомные хуки','Архитектура приложений, лидерство'], levels:{Jun1:0,Jun2:1,Jun3:1,Mid1:2,Mid2:2,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:4, name:'Web Performance', desc:'Оптимизация производительности, Core Web Vitals', dir:'frontend', scores:['Не знаком с метриками','Базовые оптимизации','Профилирует и оптимизирует бандлы','Проектирует высокопроизводительные системы'], levels:{Jun1:0,Jun2:0,Jun3:1,Mid1:1,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+    { id:5, name:'C# / .NET Core', desc:'Разработка серверных приложений на .NET', dir:'backend', scores:['Не владеет C#','Базовый синтаксис, простые CRUD','Асинхронность, DI, паттерны, middleware','Архитектура микросервисов, performance tuning'], levels:{Jun1:1,Jun2:2,Jun3:2,Mid1:2,Mid2:3,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:6, name:'SQL / Базы данных', desc:'Проектирование схем, запросы, оптимизация', dir:'backend', scores:['Не пишет SQL-запросы','Простые SELECT/INSERT, базовые JOIN','Сложные запросы, индексы, оптимизация','Проектирование схем, шардинг, репликация'], levels:{Jun1:0,Jun2:1,Jun3:1,Mid1:2,Mid2:2,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:7, name:'API Design / REST', desc:'Проектирование и разработка REST API', dir:'backend', scores:['Не понимает принципов API','Использует готовые эндпоинты','Проектирует API, версионирование','Проектирует API-платформу, стандарты'], levels:{Jun1:0,Jun2:0,Jun3:1,Mid1:2,Mid2:2,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:8, name:'Тестирование ПО', desc:'Методологии тестирования, тест-кейсы, автоматизация', dir:'qa', scores:['Не понимает процесс','Ручное тестирование по готовым кейсам','Пишет тест-кейсы, автотесты, CI','Стратегия тестирования, фреймворки'], levels:{Jun1:1,Jun2:1,Jun3:2,Mid1:2,Mid2:3,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:9, name:'Автоматизация тестирования', desc:'Selenium, Playwright, API-тесты', dir:'qa', scores:['Не пишет автотесты','Простые UI-тесты по шаблону','Пишет стабильные E2E и API тесты','Архитектура тест-фреймворка, CI/CD'], levels:{Jun1:0,Jun2:0,Jun3:1,Mid1:1,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+  ],
+  soft: [
+    { id:10, name:'Коммуникация', desc:'Умение доносить мысли и воспринимать обратную связь', dir:'all', scores:['Не может донести мысль','Иногда путано объясняет','Обычно чётко и структурировано','Адаптирует стиль под аудиторию'], levels:{Jun1:1,Jun2:1,Jun3:2,Mid1:2,Mid2:2,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:11, name:'Командная работа', desc:'Готовность помогать коллегам и работать в команде', dir:'all', scores:['Работает изолированно','Помогает если попросят','Активно участвует в команде','Драйвит команду, разрешает конфликты'], levels:{Jun1:1,Jun2:1,Jun3:1,Mid1:2,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+    { id:12, name:'Ответственность', desc:'Принятие ответственности за решения и результат', dir:'all', scores:['Перекладывает ответственность','Избегает сложных решений','Обычно берёт ответственность','Всегда несёт полную ответственность'], levels:{Jun1:1,Jun2:1,Jun3:2,Mid1:2,Mid2:2,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:13, name:'Инициативность', desc:'Предложение улучшений, готовность к сложным задачам', dir:'all', scores:['Не проявляет инициативу','Крайне редко предлагает','Периодически предлагает','Регулярно драйвит изменения'], levels:{Jun1:0,Jun2:1,Jun3:1,Mid1:1,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+  ],
+  srv: [
+    { id:14, name:'Автономность решений', desc:'Способность принимать решения без эскалации', dir:'all', scores:['Требуется постоянное руководство','Решает типовые, эскалирует нестандартные','Самостоятельно решает большинство','Принимает сложные решения автономно'], levels:{Jun1:0,Jun2:1,Jun3:1,Mid1:2,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+    { id:15, name:'Сложность задач', desc:'Уровень сложности задач, которые берёт', dir:'all', scores:['Только простые задачи','Средняя сложность','Сложные с неопределённостью','Максимальная сложность, архитектура'], levels:{Jun1:0,Jun2:0,Jun3:1,Mid1:1,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+    { id:16, name:'Масштаб влияния', desc:'Объём процессов, на которые влияют решения', dir:'all', scores:['Влияет на свои задачи','Влияет на коллег','Влияет на команду','Влияет на продукт'], levels:{Jun1:0,Jun2:0,Jun3:1,Mid1:1,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+  ]
+};
+
+const levelNames = ['Jun1','Jun2','Jun3','Mid1','Mid2','Mid3','Sen1','Sen2','Sen3'];
+let activeTab = 'hard';
+let activeDir = 'backend';
+
+function setTab(btn, tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderComps();
+}
+
+function setDir(btn, dir) {
+  activeDir = dir;
+  document.querySelectorAll('.dir-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderComps();
+}
+
+function scoreCell(val) {
+  const colors = ['var(--red)','var(--amber)','var(--teal)','var(--green)'];
+  const bgs = ['rgba(248,113,113,0.1)','rgba(251,191,36,0.1)','rgba(45,212,191,0.1)','rgba(52,211,153,0.1)'];
+  return `<span style="display:inline-block;width:28px;height:28px;line-height:28px;border-radius:7px;font-family:var(--font-head);font-size:13px;font-weight:700;background:${bgs[val]};color:${colors[val]};text-align:center">${val}</span>`;
+}
+
+function renderComps() {
+  const list = document.getElementById('comp-list');
+  const items = (comps[activeTab] || []).filter(c => c.dir === activeDir || c.dir === 'all');
+
+  if (items.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Нет компетенций для выбранного направления.<br><button class="btn btn-primary" style="margin-top:12px" onclick="openAddModal()">+ Добавить компетенцию</button></div>';
+    return;
+  }
+
+  let html = `<div class="matrix-table-wrap"><table class="matrix-table">
+    <thead><tr>
+      <th class="mat-th-comp">Компетенция</th>
+      ${levelNames.map(lv => `<th class="mat-th-level">${lv}</th>`).join('')}
+      <th class="mat-th-act"></th>
+    </tr></thead>
+    <tbody>`;
+
+  // Calculate totals per level
+  const levelTotals = {};
+  levelNames.forEach(lv => { levelTotals[lv] = 0; });
+  items.forEach(c => {
+    if (c.levels) {
+      levelNames.forEach(lv => { levelTotals[lv] += c.levels[lv]; });
+    }
+  });
+
+  items.forEach((c, idx) => {
+    let levelCells = '';
+    if (c.levels) {
+      levelCells = levelNames.map(lv => {
+        return `<td class="mat-td-score">${scoreCell(c.levels[lv])}</td>`;
+      }).join('');
+    }
+
+    html += `<tr class="mat-row" onclick="openCompDetail(${c.id})">
+      <td class="mat-td-comp">
+        <div class="mat-comp-name">${c.name}</div>
+        <div class="mat-comp-desc">${c.desc}</div>
+      </td>
+      ${levelCells}
+      <td class="mat-td-actions">
+        <button class="action-btn" onclick="event.stopPropagation();alert('Редактировать: ${c.name}')" title="Редактировать">✎</button>
+        <button class="action-btn" style="color:var(--red)" onclick="event.stopPropagation();alert('Удалить: ${c.name}')" title="Удалить">🗑</button>
+      </td>
+    </tr>`;
+  });
+
+  // Totals row
+  const maxTotal = items.length * 3;
+  html += `<tr class="mat-row-total">
+    <td class="mat-td-comp" style="font-family:var(--font-head);font-size:12px;font-weight:700;color:var(--accent2);padding:14px 18px">Итого по уровню</td>
+    ${levelNames.map(lv => {
+      const val = levelTotals[lv];
+      const pct = maxTotal > 0 ? val / maxTotal : 0;
+      let color = 'var(--red)';
+      if (pct >= 0.75) color = 'var(--green)';
+      else if (pct >= 0.5) color = 'var(--teal)';
+      else if (pct >= 0.3) color = 'var(--amber)';
+      return `<td class="mat-td-score" style="background:rgba(108,123,255,0.04);border-top:2px solid var(--border2)">
+        <span style="font-family:var(--font-head);font-size:14px;font-weight:800;color:${color}">${val}</span>
+        <div style="font-size:9px;color:var(--muted)">/ ${maxTotal}</div>
+      </td>`;
+    }).join('')}
+    <td style="border-top:2px solid var(--border2)"></td>
+  </tr>`;
+
+  html += '</tbody></table></div>';
+  list.innerHTML = html;
+}
+
+function openCompDetail(id) {
+  const allComps = [...comps.hard, ...comps.soft, ...comps.srv];
+  const c = allComps.find(x => x.id === id);
+  if (!c) return;
+
+  let detailHtml = `
+    <div style="margin-bottom:16px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Описание</div>
+      <div style="font-size:13px">${c.desc}</div>
+    </div>
+    <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Описания по шкале 0–3</div>
+    <div class="score-desc-grid">
+      ${c.scores.map((s, i) => `
+        <div class="score-desc-card">
+          <div class="score-desc-num n${i}">${i}</div>
+          <div class="score-desc-text">${s}</div>
+        </div>
+      `).join('')}
+    </div>`;
+
+  if (c.levels) {
+    detailHtml += `
+    <div style="margin-top:16px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Требования по уровням</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      ${levelNames.map(lv => `
+        <div style="text-align:center;flex:1;min-width:50px">
+          <div style="font-size:9px;color:var(--muted);font-weight:600;margin-bottom:4px">${lv}</div>
+          ${scoreCell(c.levels[lv])}
+        </div>
+      `).join('')}
+    </div>`;
+  }
+
+  document.getElementById('detail-content').innerHTML = detailHtml;
+  document.getElementById('detail-title').textContent = c.name;
+  document.getElementById('detail-modal').classList.add('show');
+}
+
+function closeDetailModal() { document.getElementById('detail-modal').classList.remove('show'); }
+
+function toggleActualize() {
+  const checked = document.getElementById('act-check').checked;
+  const dot = document.getElementById('act-dot');
+  const text = document.getElementById('act-text');
+  if (checked) {
+    dot.className = 'actualize-dot ok';
+    text.textContent = 'Матрица актуализирована для выбранного направления';
+    text.style.color = 'var(--green)';
+  } else {
+    dot.className = 'actualize-dot warn';
+    text.textContent = 'Матрица НЕ актуализирована — при запуске цикла будет предупреждение';
+    text.style.color = 'var(--amber)';
+  }
+}
+
+function openAddModal() {
+  setAddMode('new');
+  document.getElementById('add-modal').classList.add('show');
+}
+function closeAddModal() { document.getElementById('add-modal').classList.remove('show'); }
+function saveComp() { closeAddModal(); alert('Компетенция сохранена!'); }
+
+function setAddMode(mode) {
+  document.getElementById('mode-new').classList.toggle('active', mode === 'new');
+  document.getElementById('mode-import').classList.toggle('active', mode === 'import');
+  document.getElementById('new-section').style.display = mode === 'new' ? 'block' : 'none';
+  document.getElementById('import-section').style.display = mode === 'import' ? 'block' : 'none';
+  document.getElementById('save-btn').textContent = mode === 'new' ? 'Сохранить' : 'Добавить выбранные';
+  if (mode === 'import') renderImportList();
+}
+
+function renderImportList() {
+  const sourceDir = document.getElementById('import-dir').value;
+  const list = document.getElementById('import-list');
+
+  // Only show comps matching the current tab type
+  const filteredComps = (comps[activeTab] || []).filter(c => c.dir === sourceDir || c.dir === 'all');
+
+  if (filteredComps.length === 0) {
+    const typeLabels = { hard: 'Hard Skills', soft: 'Soft Skills', srv: 'СРВ' };
+    list.innerHTML = `<div style="padding:20px;text-align:center;color:var(--muted)">Нет компетенций типа «${typeLabels[activeTab]}» в этом направлении</div>`;
+    return;
+  }
+
+  list.innerHTML = filteredComps.map(c => `
+    <label class="import-item">
+      <input type="checkbox" style="width:16px;height:16px;accent-color:var(--accent);flex-shrink:0">
+      <div style="flex:1">
+        <div style="font-size:12px;font-weight:500;color:var(--text)">${c.name}</div>
+        <div style="font-size:11px;color:var(--muted)">${c.desc}</div>
+      </div>
+    </label>
+  `).join('');
+}
+
+renderComps();
+</script>
+</body>
+</html>

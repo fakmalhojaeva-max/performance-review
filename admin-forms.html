@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Конструктор форм</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --sidebar-w: 240px;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: flex; }
+  .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: var(--muted); font-size: 13px; border: none; background: none; width: 100%; font-family: var(--font-body); text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .sidebar-user-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(108,123,255,0.15); color: var(--accent2); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+  .content { padding: 24px 28px; }
+  .btn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-green { background: var(--green); border-color: var(--green); color: #0f1117; font-weight: 600; }
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-gray { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+  .table-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .table-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .table-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; }
+  .search-input { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; color: var(--text); font-family: var(--font-body); font-size: 12px; outline: none; width: 180px; }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; cursor: pointer; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 12px 16px; vertical-align: middle; font-size: 12px; }
+  .form-name { font-weight: 500; color: var(--text); font-size: 13px; }
+  .form-desc { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .form-fields-count { font-family: var(--font-head); font-weight: 700; color: var(--accent2); }
+  .action-btn { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; transition: all 0.12s; font-family: var(--font-body); }
+  .action-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  /* EDITOR */
+  .editor-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 100; flex-direction: column; }
+  .editor-overlay.show { display: flex; }
+  .editor-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px; border-bottom: 1px solid var(--border); background: var(--bg2); flex-shrink: 0; }
+  .editor-topbar-left { display: flex; align-items: center; gap: 12px; }
+  .editor-back { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 18px; padding: 4px; }
+  .editor-back:hover { color: var(--text); }
+  .editor-title-input { background: transparent; border: none; border-bottom: 1px solid transparent; color: var(--text); font-family: var(--font-head); font-size: 16px; font-weight: 700; outline: none; padding: 2px 0; }
+  .editor-title-input:focus { border-bottom-color: var(--accent); }
+  .editor-body { flex: 1; display: flex; overflow: hidden; }
+  .editor-main { flex: 1; padding: 24px; overflow-y: auto; }
+  .editor-sidebar { width: 280px; background: var(--bg2); border-left: 1px solid var(--border); padding: 20px; overflow-y: auto; flex-shrink: 0; }
+  .editor-sidebar-title { font-family: var(--font-head); font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+
+  .field-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: flex-start; gap: 12px; }
+  .field-card:hover { border-color: var(--border2); }
+  .field-drag { color: var(--muted); cursor: grab; font-size: 14px; padding: 2px; flex-shrink: 0; margin-top: 2px; }
+  .field-content { flex: 1; }
+  .field-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .field-label-text { font-size: 13px; font-weight: 500; }
+  .field-type-badge { font-size: 9px; font-weight: 600; padding: 2px 8px; border-radius: 12px; }
+  .field-preview { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .field-actions { display: flex; gap: 4px; flex-shrink: 0; margin-top: 2px; }
+  .field-required { color: var(--red); font-size: 11px; margin-left: 4px; }
+  .field-type-text { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .field-type-textarea { background: rgba(167,139,250,0.12); color: var(--accent2); border: 1px solid rgba(167,139,250,0.2); }
+  .field-type-scale { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .field-type-select { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .field-type-checkbox { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .field-type-table { background: rgba(244,114,182,0.12); color: #f472b6; border: 1px solid rgba(244,114,182,0.2); }
+  .field-type-heading { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+  .field-type-question { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+
+  .add-field-grid { display: flex; flex-direction: column; gap: 6px; }
+  .add-field-btn { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg3); cursor: pointer; transition: all 0.12s; width: 100%; font-family: var(--font-body); font-size: 12px; color: var(--text); }
+  .add-field-btn:hover { border-color: var(--accent); background: rgba(108,123,255,0.06); }
+  .add-field-icon { font-size: 16px; width: 24px; text-align: center; }
+  .add-field-label { font-weight: 500; }
+  .add-field-desc { font-size: 10px; color: var(--muted); }
+
+  .settings-section { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+  .settings-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; }
+  .settings-label { font-size: 12px; color: var(--muted); }
+  .field-select { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; appearance: none; }
+  .field-input { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; }
+  .field-input:focus { border-color: var(--accent); }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; max-width: 480px; width: 90%; }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar .nav-text, .sidebar-logo small { display: none; }
+    .main { margin-left: 60px; }
+    .editor-sidebar { width: 200px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">Review<span>OS</span><small>Админ-панель</small></div>
+  <div class="sidebar-nav">
+    <a class="nav-item" href="admin.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span class="nav-text">Дашборд</span></a>
+    <a class="nav-item" href="admin.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg><span class="nav-text">Циклы оценки</span></a>
+    <a class="nav-item" href="admin-employees.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg><span class="nav-text">Сотрудники</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span class="nav-text">Справочники</span></a>
+    <a class="nav-item" href="admin-competencies.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg><span class="nav-text">Компетенции</span></a>
+    <button class="nav-item active"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg><span class="nav-text">Конструктор форм</span></button>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg><span class="nav-text">Аудит</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg><span class="nav-text">Шаблоны писем</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg><span class="nav-text">Журнал писем</span></a>
+  </div>
+  <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
+</div>
+
+<!-- MAIN: LIST -->
+<div class="main" id="main-list">
+  <div class="topbar">
+    <div class="topbar-title">Конструктор форм</div>
+    <button class="btn btn-primary" onclick="openCreateModal()">+ Создать шаблон</button>
+  </div>
+  <div class="content">
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">Шаблоны форм</div>
+        <input class="search-input" placeholder="🔍 Поиск..." oninput="searchForms(this.value)">
+      </div>
+      <table>
+        <thead><tr><th>Название</th><th>Тип этапа</th><th>Полей</th><th>Статус</th><th>Изменён</th><th></th></tr></thead>
+        <tbody id="forms-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- EDITOR -->
+<div class="editor-overlay" id="editor">
+  <div class="editor-topbar">
+    <div class="editor-topbar-left">
+      <button class="editor-back" onclick="closeEditor()">←</button>
+      <input class="editor-title-input" id="editor-title" value="">
+      <span class="badge badge-blue" id="editor-type-badge"></span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" onclick="openPreview()">👁 Предпросмотр</button>
+      <button class="btn btn-green btn-sm" onclick="closeEditor();alert('Сохранено')">💾 Сохранить</button>
+    </div>
+  </div>
+  <div class="editor-body">
+    <div class="editor-main" id="editor-fields"></div>
+    <div class="editor-sidebar" id="editor-sidebar-content"></div>
+  </div>
+</div>
+
+<!-- PREVIEW -->
+<div class="editor-overlay" id="preview" style="z-index:150">
+  <div class="editor-topbar" style="background:var(--bg)">
+    <div class="editor-topbar-left">
+      <button class="editor-back" onclick="closePreview()">←</button>
+      <span style="font-family:var(--font-head);font-size:14px;font-weight:700">Предпросмотр формы</span>
+      <span class="badge badge-amber">Глазами заполняющего</span>
+    </div>
+  </div>
+  <div style="flex:1;overflow-y:auto;display:flex;justify-content:center;padding:32px 20px;background:var(--bg)">
+    <div id="preview-content" style="max-width:680px;width:100%"></div>
+  </div>
+</div>
+
+<!-- CREATE MODAL -->
+<div class="modal-overlay" id="create-modal">
+  <div class="modal">
+    <div class="modal-title">Создать шаблон формы</div>
+    <div class="field-group">
+      <label class="field-label">Название</label>
+      <input class="field-input" placeholder="Например: Самооценка v4" id="new-form-name">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Тип этапа</label>
+      <select class="field-select" id="new-form-type">
+        <option>Самооценка</option><option>Performance</option><option>Hard Skills</option>
+        <option>Soft Skills 360°</option><option>СРВ</option><option>Итоговый 1-on-1</option><option>Универсальный</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <label class="field-label">На основе</label>
+      <select class="field-select">
+        <option>— Пустой шаблон —</option><option>Самооценка v3</option><option>Оценка эффективности v2</option><option>360° Опросник v2</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeCreateModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="createAndOpen()">Создать и открыть</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const forms = [
+  { id:1, name:'Самооценка v3', desc:'3 шага: достижения, план, уровень', type:'Самооценка', fields:12, status:'active', date:'15.04.2026' },
+  { id:2, name:'Оценка эффективности v2', desc:'5 критериев, свободное описание', type:'Performance', fields:7, status:'active', date:'12.04.2026' },
+  { id:3, name:'360° Опросник v2', desc:'12 вопросов, шкала 1-5, анонимный', type:'Soft Skills 360°', fields:12, status:'active', date:'14.04.2026' },
+  { id:4, name:'360° Опросник — сокращённый', desc:'6 вопросов для быстрой оценки', type:'Soft Skills 360°', fields:6, status:'draft', date:'20.04.2026' },
+  { id:5, name:'Итоговая форма v2', desc:'Gap-анализ, план развития, грейд', type:'Итоговый 1-on-1', fields:10, status:'active', date:'13.04.2026' },
+  { id:6, name:'Самооценка v2', desc:'Без плана развития', type:'Самооценка', fields:8, status:'archive', date:'10.01.2026' },
+];
+
+const statusMap = { active:{ l:'Активный',c:'badge-green' }, draft:{ l:'Черновик',c:'badge-amber' }, archive:{ l:'Архивный',c:'badge-gray' } };
+
+const sampleFields = {
+  1: [
+    { type:'heading', label:'Достижения за период' },
+    { type:'textarea', label:'Внедрение значимых проектов', required:true, preview:'Опишите ключевые проекты...' },
+    { type:'textarea', label:'Нововведения и идеи', required:true, preview:'Какие идеи вы предложили...' },
+    { type:'text', label:'Достижение №1', preview:'Короткий текст' },
+    { type:'text', label:'Достижение №2', preview:'Короткий текст' },
+    { type:'text', label:'Достижение №3', preview:'Короткий текст' },
+    { type:'heading', label:'Выполнение плана развития' },
+    { type:'table', label:'Навыки и результаты', required:true, preview:'Навык | Комментарий' },
+    { type:'heading', label:'Самооценка уровня' },
+    { type:'select', label:'Текущий уровень', required:true, preview:'Jun1 / Jun2 / ... / Sen3' },
+    { type:'textarea', label:'Обоснование', required:true, preview:'Обоснуйте позицию...' },
+    { type:'checkbox', label:'Готов к повышению', preview:'Да / Нет' },
+  ],
+  3: [
+    { type:'question', label:'Насколько чётко коллега доносит свои мысли?', required:true, competency:'Коммуникация' },
+    { type:'question', label:'Как коллега воспринимает обратную связь?', required:true, competency:'Коммуникация' },
+    { type:'question', label:'Готов ли помогать другим членам команды?', required:true, competency:'Командная работа', hasComment:true },
+    { type:'question', label:'Как ведёт себя при разногласиях?', required:true, competency:'Командная работа' },
+    { type:'question', label:'Делится ли знаниями и опытом?', competency:'Командная работа' },
+    { type:'question', label:'Берёт ли ответственность за результат?', required:true, competency:'Ответственность' },
+    { type:'question', label:'Доводит ли задачи до конца?', required:true, competency:'Ответственность', hasComment:true },
+    { type:'question', label:'Предлагает ли улучшения процессов?', required:true, competency:'Инициативность' },
+    { type:'question', label:'Берётся ли за сложные задачи?', required:true, competency:'Инициативность' },
+    { type:'question', label:'Как реагирует на изменения приоритетов?', required:true, competency:'Адаптивность', hasComment:true },
+    { type:'question', label:'Готов ли осваивать новые технологии?', required:true, competency:'Адаптивность' },
+    { type:'question', label:'Способен ли мотивировать коллег?', competency:'Лидерство', hasComment:true },
+  ]
+};
+
+const typeLabels = { heading:'Заголовок', text:'Текст', textarea:'Развёрнутый', scale:'Шкала', select:'Выбор', checkbox:'Чекбокс', table:'Таблица', question:'Вопрос 1-5' };
+let editorFields = [];
+let currentFormType = '';
+
+function renderForms(search) {
+  const tbody = document.getElementById('forms-body');
+  const list = search ? forms.filter(f => f.name.toLowerCase().includes(search.toLowerCase())) : forms;
+  tbody.innerHTML = list.map(f => {
+    const st = statusMap[f.status];
+    return `<tr onclick="openEditor(${f.id})">
+      <td><div class="form-name">${f.name}</div><div class="form-desc">${f.desc}</div></td>
+      <td><span class="badge badge-blue" style="font-size:9px">${f.type}</span></td>
+      <td><span class="form-fields-count">${f.fields}</span></td>
+      <td><span class="badge ${st.c}">${st.l}</span></td>
+      <td style="color:var(--muted)">${f.date}</td>
+      <td><button class="action-btn" onclick="event.stopPropagation();alert('Дублировать')">⧉</button>
+          <button class="action-btn" onclick="event.stopPropagation();alert('Удалить')" style="color:var(--red)">🗑</button></td>
+    </tr>`;
+  }).join('');
+}
+function searchForms(v) { renderForms(v); }
+
+function openEditor(id) {
+  const f = forms.find(x => x.id === id);
+  if (!f) return;
+  document.getElementById('editor-title').value = f.name;
+  document.getElementById('editor-type-badge').textContent = f.type;
+  currentFormType = f.type;
+  editorFields = sampleFields[id] ? [...sampleFields[id]] : [{ type:'heading', label:'Новая секция' }];
+  renderEditorFields();
+  renderEditorSidebar();
+  document.getElementById('editor').classList.add('show');
+}
+
+function closeEditor() { document.getElementById('editor').classList.remove('show'); }
+
+function renderEditorFields() {
+  const c = document.getElementById('editor-fields');
+  if (!editorFields.length) {
+    c.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--muted)"><div style="font-size:40px;margin-bottom:12px">📋</div><div style="font-family:var(--font-head);font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">Форма пуста</div><div>Добавьте поля из панели справа</div></div>';
+    return;
+  }
+  c.innerHTML = editorFields.map((f, i) => {
+    const is360 = f.type === 'question';
+    return `<div class="field-card">
+      <div class="field-drag">⋮⋮</div>
+      <div class="field-content">
+        <div class="field-top">
+          <div><span class="field-label-text">${f.label}</span>${f.required ? '<span class="field-required">*</span>' : ''}</div>
+          <span class="field-type-badge field-type-${f.type}">${typeLabels[f.type] || f.type}</span>
+        </div>
+        ${is360 ? '<div class="field-preview" style="display:flex;align-items:center;gap:8px;margin-top:2px"><span style="font-size:11px;color:var(--accent2)">📎 ' + (f.competency||'') + '</span>' + (f.hasComment ? '<span style="font-size:10px;color:var(--muted)">· 💬 комментарий</span>' : '') + '</div>' : ''}
+        ${!is360 && f.preview ? '<div class="field-preview">' + f.preview + '</div>' : ''}
+      </div>
+      <div class="field-actions">
+        <button class="action-btn" onclick="alert('Редактировать поле')">✎</button>
+        <button class="action-btn" style="color:var(--red)" onclick="removeField(${i})">✕</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderEditorSidebar() {
+  const sb = document.getElementById('editor-sidebar-content');
+  const is360 = currentFormType === 'Soft Skills 360°';
+
+  if (is360) {
+    const comps = ['Коммуникация','Командная работа','Ответственность','Инициативность','Адаптивность','Лидерство'];
+    sb.innerHTML = `
+      <div class="editor-sidebar-title">Добавить вопрос</div>
+      <div class="field-group"><label class="field-label">Текст вопроса</label>
+        <textarea id="nq-text" class="field-input" style="resize:vertical;min-height:60px" placeholder="Напишите вопрос..."></textarea></div>
+      <div class="field-group"><label class="field-label">Компетенция</label>
+        <select class="field-select" id="nq-comp">${comps.map(c => '<option>'+c+'</option>').join('')}</select></div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="nq-req" checked style="accent-color:var(--accent)"> Обязательный</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" id="nq-com" style="accent-color:var(--accent)"> Комментарий</label>
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="add360Q()">+ Добавить вопрос</button>
+      <div style="margin-top:16px;font-size:11px;color:var(--muted);line-height:1.5;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+        <strong style="color:var(--text)">Важно:</strong> респондент не видит привязку к компетенции. Он видит только текст вопроса и шкалу 1–5.
+      </div>
+      <div class="settings-section">
+        <div class="editor-sidebar-title">Настройки</div>
+        <div class="settings-row"><span class="settings-label">Шкала</span><span style="font-size:12px;color:var(--text);font-weight:500">1–5 (фиксированная)</span></div>
+        <div class="settings-row"><span class="settings-label">Анонимность</span><span style="font-size:12px;color:var(--green);font-weight:500">Да</span></div>
+      </div>`;
+  } else {
+    sb.innerHTML = `
+      <div class="editor-sidebar-title">Добавить поле</div>
+      <div class="add-field-grid">
+        <button class="add-field-btn" onclick="addField('heading')"><span class="add-field-icon">𝐇</span><div><div class="add-field-label">Заголовок</div><div class="add-field-desc">Разделитель секций</div></div></button>
+        <button class="add-field-btn" onclick="addField('text')"><span class="add-field-icon">Aa</span><div><div class="add-field-label">Текстовое поле</div><div class="add-field-desc">Короткий ответ</div></div></button>
+        <button class="add-field-btn" onclick="addField('textarea')"><span class="add-field-icon">¶</span><div><div class="add-field-label">Развёрнутый ответ</div><div class="add-field-desc">Многострочное поле</div></div></button>
+        <button class="add-field-btn" onclick="addField('scale')"><span class="add-field-icon">⊞</span><div><div class="add-field-label">Шкала</div><div class="add-field-desc">Оценка от 1 до N</div></div></button>
+        <button class="add-field-btn" onclick="addField('select')"><span class="add-field-icon">☰</span><div><div class="add-field-label">Выбор из списка</div><div class="add-field-desc">Один из вариантов</div></div></button>
+        <button class="add-field-btn" onclick="addField('checkbox')"><span class="add-field-icon">☑</span><div><div class="add-field-label">Чекбокс</div><div class="add-field-desc">Да / Нет</div></div></button>
+        <button class="add-field-btn" onclick="addField('table')"><span class="add-field-icon">⊞</span><div><div class="add-field-label">Таблица</div><div class="add-field-desc">Строки и колонки</div></div></button>
+      </div>
+      <div class="settings-section">
+        <div class="editor-sidebar-title">Настройки шаблона</div>
+        <div class="settings-row"><span class="settings-label">Тип этапа</span>
+          <select class="field-select" style="width:140px;font-size:11px;padding:5px 8px">
+            <option>Самооценка</option><option>Performance</option><option>Hard Skills</option>
+            <option>Soft Skills 360°</option><option>СРВ</option><option>Итоговый 1-on-1</option><option>Универсальный</option>
+          </select></div>
+        <div class="settings-row"><span class="settings-label">Статус</span>
+          <select class="field-select" style="width:140px;font-size:11px;padding:5px 8px">
+            <option>Активный</option><option>Черновик</option><option>Архивный</option>
+          </select></div>
+      </div>`;
+  }
+}
+
+function addField(type) {
+  const labels = { heading:'Новый заголовок', text:'Новое текстовое поле', textarea:'Новый развёрнутый ответ', scale:'Новая шкала', select:'Новый выбор', checkbox:'Новый чекбокс', table:'Новая таблица' };
+  const previews = { text:'Короткий текст', textarea:'Многострочный ответ...', scale:'Шкала 1–5', select:'Вариант 1 / Вариант 2', checkbox:'Да / Нет', table:'Колонка 1 | Колонка 2' };
+  editorFields.push({ type, label:labels[type], required:false, preview:previews[type]||'' });
+  renderEditorFields();
+  document.getElementById('editor-fields').scrollTop = 99999;
+}
+
+function add360Q() {
+  const text = document.getElementById('nq-text').value.trim();
+  if (!text) { alert('Введите текст вопроса'); return; }
+  editorFields.push({
+    type:'question', label:text,
+    required: document.getElementById('nq-req').checked,
+    competency: document.getElementById('nq-comp').value,
+    hasComment: document.getElementById('nq-com').checked
+  });
+  document.getElementById('nq-text').value = '';
+  renderEditorFields();
+  document.getElementById('editor-fields').scrollTop = 99999;
+}
+
+function removeField(i) { editorFields.splice(i,1); renderEditorFields(); }
+
+function openCreateModal() { document.getElementById('create-modal').classList.add('show'); }
+function closeCreateModal() { document.getElementById('create-modal').classList.remove('show'); }
+function createAndOpen() {
+  closeCreateModal();
+  currentFormType = document.getElementById('new-form-type').value;
+  editorFields = [];
+  document.getElementById('editor-title').value = document.getElementById('new-form-name').value || 'Новый шаблон';
+  document.getElementById('editor-type-badge').textContent = currentFormType;
+  renderEditorFields();
+  renderEditorSidebar();
+  document.getElementById('editor').classList.add('show');
+}
+
+function openPreview() {
+  const c = document.getElementById('preview-content');
+  const title = document.getElementById('editor-title').value;
+  const type = document.getElementById('editor-type-badge').textContent;
+  const is360 = currentFormType === 'Soft Skills 360°';
+
+  let html = `
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px">
+      <div style="font-family:var(--font-head);font-size:20px;font-weight:800;margin-bottom:4px">${title}</div>
+      <div style="font-size:12px;color:var(--muted)">${type}</div>
+      ${is360 ? '<div style="margin-top:8px"><span class="badge badge-green" style="font-size:10px">🔒 Ваши ответы анонимны</span></div>' : ''}
+    </div>`;
+
+  editorFields.forEach((f, i) => {
+    if (f.type === 'heading') {
+      html += `<div style="font-family:var(--font-head);font-size:15px;font-weight:700;margin:24px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)">${f.label}</div>`;
+    } else if (f.type === 'text') {
+      html += `<div style="margin-bottom:18px">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px">${f.label}${f.required ? ' <span style="color:var(--red)">*</span>' : ''}</label>
+        <input type="text" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none" placeholder="${f.preview || ''}">
+      </div>`;
+    } else if (f.type === 'textarea') {
+      html += `<div style="margin-bottom:18px">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px">${f.label}${f.required ? ' <span style="color:var(--red)">*</span>' : ''}</label>
+        <textarea rows="3" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none;resize:vertical" placeholder="${f.preview || ''}"></textarea>
+      </div>`;
+    } else if (f.type === 'select') {
+      const opts = (f.preview || 'Вариант 1 / Вариант 2').split(' / ');
+      html += `<div style="margin-bottom:18px">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px">${f.label}${f.required ? ' <span style="color:var(--red)">*</span>' : ''}</label>
+        <select style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-family:var(--font-body);font-size:13px;outline:none;appearance:none">
+          <option value="">Выберите...</option>${opts.map(o => '<option>'+o.trim()+'</option>').join('')}
+        </select>
+      </div>`;
+    } else if (f.type === 'checkbox') {
+      html += `<div style="margin-bottom:18px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px">
+          <input type="checkbox" style="width:16px;height:16px;accent-color:var(--accent)">
+          <span style="font-size:13px">${f.label}</span>
+        </label>
+      </div>`;
+    } else if (f.type === 'scale') {
+      html += `<div style="margin-bottom:18px">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px">${f.label}${f.required ? ' <span style="color:var(--red)">*</span>' : ''}</label>
+        <div style="display:flex;gap:6px;justify-content:center">
+          ${[1,2,3,4,5].map(v => `<button style="width:44px;height:44px;border-radius:10px;border:2px solid var(--border2);background:var(--bg3);color:var(--muted);font-family:var(--font-head);font-size:16px;font-weight:700;cursor:pointer">${v}</button>`).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)"><span>1 — низкая</span><span>5 — высокая</span></div>
+      </div>`;
+    } else if (f.type === 'table') {
+      const cols = (f.preview || 'Колонка 1 | Колонка 2').split(' | ');
+      html += `<div style="margin-bottom:18px">
+        <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px">${f.label}${f.required ? ' <span style="color:var(--red)">*</span>' : ''}</label>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden">
+          <table style="width:100%;border-collapse:collapse">
+            <thead><tr>${cols.map(c => `<th style="padding:8px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:var(--bg4)">${c.trim()}</th>`).join('')}</tr></thead>
+            <tbody>
+              <tr>${cols.map(() => '<td style="padding:8px 10px;border-bottom:1px solid var(--border)"><input type="text" style="width:100%;background:transparent;border:1px solid transparent;border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none" placeholder="..."></td>').join('')}</tr>
+              <tr>${cols.map(() => '<td style="padding:8px 10px"><input type="text" style="width:100%;background:transparent;border:1px solid transparent;border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px;outline:none" placeholder="..."></td>').join('')}</tr>
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+    } else if (f.type === 'question') {
+      html += `<div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <div style="width:24px;height:24px;border-radius:6px;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:10px;font-weight:700;color:var(--muted);flex-shrink:0;margin-top:1px">${i+1}</div>
+          <div style="font-size:14px;font-weight:500;line-height:1.5">${f.label}${f.required ? ' <span style="color:var(--red)">*</span>' : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px;justify-content:center;margin-top:14px">
+          ${[1,2,3,4,5].map(v => `<button style="width:48px;height:48px;border-radius:10px;border:2px solid var(--border2);background:var(--bg3);color:var(--muted);font-family:var(--font-head);font-size:16px;font-weight:700;cursor:pointer">${v}</button>`).join('')}
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:10px;color:var(--muted)"><span>1 — низкая</span><span>5 — высокая</span></div>
+        ${f.hasComment ? '<div style="margin-top:10px"><textarea rows="2" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--font-body);font-size:12px;outline:none;resize:vertical" placeholder="Комментарий (опционально)..."></textarea></div>' : ''}
+      </div>`;
+    }
+  });
+
+  if (!editorFields.length) {
+    html += '<div style="text-align:center;padding:40px;color:var(--muted)">Форма пуста — добавьте поля в редакторе</div>';
+  }
+
+  c.innerHTML = html;
+  document.getElementById('preview').classList.add('show');
+}
+
+function closePreview() {
+  document.getElementById('preview').classList.remove('show');
+}
+
+renderForms();
+</script>
+</body>
+</html>

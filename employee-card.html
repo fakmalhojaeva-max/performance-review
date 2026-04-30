@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Карточка сотрудника</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; }
+
+  /* TOPBAR */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .logo { font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .breadcrumb { font-size: 12px; color: var(--muted); }
+  .breadcrumb a { color: var(--accent2); text-decoration: none; }
+  .topbar-right { display: flex; gap: 8px; }
+
+  .btn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-green { background: var(--green); border-color: var(--green); color: #0f1117; font-weight: 600; }
+
+  /* LAYOUT */
+  .layout { display: grid; grid-template-columns: 280px 1fr; gap: 0; min-height: calc(100vh - 53px); }
+
+  /* LEFT SIDEBAR */
+  .emp-sidebar { background: var(--bg2); border-right: 1px solid var(--border); padding: 24px 20px; position: sticky; top: 53px; height: calc(100vh - 53px); overflow-y: auto; }
+  .emp-avatar { width: 64px; height: 64px; border-radius: 14px; background: rgba(52,211,153,0.15); color: var(--green); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 22px; font-weight: 800; margin-bottom: 14px; border: 1px solid rgba(52,211,153,0.25); }
+  .emp-name { font-family: var(--font-head); font-size: 16px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 2px; }
+  .emp-role { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+
+  .emp-meta { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .emp-meta-row { display: flex; justify-content: space-between; align-items: center; }
+  .emp-meta-label { font-size: 11px; color: var(--muted); }
+  .emp-meta-val { font-size: 12px; font-weight: 500; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .badge-red { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+  .badge-gray { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+  /* NAV ANCHORS */
+  .section-nav { display: flex; flex-direction: column; gap: 2px; margin-bottom: 20px; }
+  .nav-anchor { padding: 8px 10px; border-radius: 8px; font-size: 12px; color: var(--muted); cursor: pointer; transition: all 0.12s; display: flex; align-items: center; gap: 8px; text-decoration: none; }
+  .nav-anchor:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-anchor.active { background: rgba(108,123,255,0.1); color: var(--accent2); }
+  .nav-anchor-num { width: 18px; height: 18px; border-radius: 5px; background: var(--bg4); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; }
+  .nav-anchor.done .nav-anchor-num { background: rgba(52,211,153,0.15); color: var(--green); }
+
+  /* 1-ON-1 MEETING */
+  .meeting-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; }
+  .meeting-card-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
+  .meeting-date { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--text); }
+  .meeting-time { font-size: 11px; color: var(--muted); }
+
+  /* MAIN CONTENT */
+  .main-content { padding: 28px; }
+
+  /* SECTION */
+  .section { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 20px; overflow: hidden; }
+  .section-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .section-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; letter-spacing: -0.2px; display: flex; align-items: center; gap: 10px; }
+  .section-num { width: 24px; height: 24px; border-radius: 7px; background: var(--bg4); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+  .section-num.auto { background: rgba(108,123,255,0.12); color: var(--accent2); }
+  .section-num.fill { background: rgba(251,191,36,0.12); color: var(--amber); }
+  .section-num.done { background: rgba(52,211,153,0.12); color: var(--green); }
+  .section-body { padding: 20px 22px; }
+  .section-badge { font-size: 10px; color: var(--muted); font-weight: 500; }
+
+  /* SCORES TABLE */
+  .scores-table { width: 100%; border-collapse: collapse; }
+  .scores-table th { padding: 8px 12px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  .scores-table td { padding: 12px 12px; vertical-align: middle; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .scores-table tr:last-child td { border-bottom: none; }
+  .score-num { font-family: var(--font-head); font-size: 16px; font-weight: 800; }
+  .total-row td { background: rgba(108,123,255,0.04); font-weight: 600; }
+  .total-score { font-family: var(--font-head); font-size: 20px; font-weight: 800; color: var(--green); }
+  .weight-bar-bg { width: 80px; height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; display: inline-block; vertical-align: middle; margin-left: 6px; }
+  .weight-bar-fill { height: 100%; border-radius: 2px; background: var(--accent); }
+
+  /* SELF-ASSESSMENT VIEW */
+  .self-item { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .self-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .self-item-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
+  .self-item-val { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .achievement-list { display: flex; flex-direction: column; gap: 4px; }
+  .achievement-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12px; }
+  .ach-num { width: 18px; height: 18px; border-radius: 5px; background: var(--bg4); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+
+  /* GAP TABLE */
+  .gap-table { width: 100%; border-collapse: collapse; }
+  .gap-table th { padding: 8px 12px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  .gap-table td { padding: 10px 12px; vertical-align: middle; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .gap-table tr:last-child td { border-bottom: none; }
+  .gap-neg { color: var(--red); font-weight: 700; font-family: var(--font-head); }
+  .gap-ok { color: var(--green); font-weight: 700; font-family: var(--font-head); }
+  .gap-warn { color: var(--amber); font-weight: 700; font-family: var(--font-head); }
+
+  /* DEV PLAN TABLE */
+  .dev-table { width: 100%; border-collapse: collapse; }
+  .dev-table th { padding: 8px 12px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  .dev-table td { padding: 10px 12px; vertical-align: top; border-bottom: 1px solid var(--border); font-size: 12px; }
+  .dev-table tr:last-child td { border-bottom: none; }
+  .dev-table input, .dev-table textarea, .dev-table select {
+    width: 100%; background: var(--bg3); border: 1px solid transparent; border-radius: 7px;
+    padding: 7px 10px; color: var(--text); font-family: var(--font-body); font-size: 12px;
+    outline: none; resize: none; transition: border-color 0.12s;
+  }
+  .dev-table input:focus, .dev-table textarea:focus, .dev-table select:focus { border-color: var(--accent); }
+  .dev-table select { appearance: none; cursor: pointer; }
+  .row-num { text-align: center; font-family: var(--font-head); font-weight: 700; color: var(--muted); }
+
+  /* STATUS CHIP */
+  .status-chip { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
+  .status-done { background: rgba(52,211,153,0.12); color: var(--green); }
+  .status-partial { background: rgba(251,191,36,0.12); color: var(--amber); }
+  .status-no { background: rgba(248,113,113,0.12); color: var(--red); }
+
+  /* COMMENTS BLOCK */
+  .comment-field { margin-bottom: 16px; }
+  .comment-field:last-child { margin-bottom: 0; }
+  .comment-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  textarea.comment-ta {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 10px 14px; color: var(--text);
+    font-family: var(--font-body); font-size: 13px; line-height: 1.5;
+    outline: none; resize: vertical; transition: border-color 0.15s;
+  }
+  textarea.comment-ta:focus { border-color: var(--accent); }
+  textarea.comment-ta::placeholder { color: rgba(122,127,148,0.5); }
+
+  /* DECISION BLOCK */
+  .decision-options { display: flex; gap: 10px; margin-bottom: 16px; }
+  .decision-opt {
+    flex: 1; padding: 16px; border-radius: 12px;
+    border: 2px solid var(--border2); background: var(--bg3);
+    cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .decision-opt .d-icon { font-size: 22px; margin-bottom: 6px; }
+  .decision-opt .d-label { font-family: var(--font-head); font-size: 13px; font-weight: 700; }
+  .decision-opt .d-desc { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .decision-opt.promote.selected { border-color: var(--green); background: rgba(52,211,153,0.06); }
+  .decision-opt.promote.selected .d-label { color: var(--green); }
+  .decision-opt.keep.selected { border-color: var(--accent); background: rgba(108,123,255,0.06); }
+  .decision-opt.keep.selected .d-label { color: var(--accent2); }
+
+  .field-label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .field-select { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; appearance: none; }
+  .field-input { width: 100%; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; padding: 9px 12px; color: var(--text); font-family: var(--font-body); font-size: 13px; outline: none; }
+
+  /* CONDITIONAL BLOCKS */
+  .grade-promote-block, .salary-block { display: none; animation: fadeIn 0.2s ease; }
+  .grade-promote-block.show, .salary-block.show { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:translateY(0); } }
+
+  /* CONFIRM BLOCK */
+  .confirm-block { display: flex; gap: 12px; margin-top: 16px; }
+  .confirm-card { flex: 1; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
+  .confirm-role { font-size: 12px; font-weight: 500; }
+  .confirm-status { font-size: 11px; }
+  .confirm-btn {
+    padding: 6px 14px; border-radius: 8px; font-size: 11px; font-weight: 600;
+    border: none; cursor: pointer; font-family: var(--font-body); transition: all 0.15s;
+  }
+  .confirm-btn.waiting { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+  .confirm-btn.done { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.3); cursor: default; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; max-width: 440px; width: 90%; text-align: center; }
+  .modal-icon { font-size: 36px; margin-bottom: 12px; }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .modal-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .emp-sidebar { position: static; height: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">Review<span>OS</span></span>
+    <span class="breadcrumb"><a href="index.html">Дашборд</a> → Карточка сотрудника</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-sm" onclick="scheduleMeeting()">📅 Назначить 1-on-1</button>
+    <button class="btn btn-sm" onclick="alert('Экспорт PDF')">↓ PDF</button>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="emp-sidebar">
+    <div class="emp-avatar">МИ</div>
+    <div class="emp-name">Мария Иванова</div>
+    <div class="emp-role">Frontend разработчик · Frontend</div>
+
+    <div class="emp-meta">
+      <div class="emp-meta-row"><span class="emp-meta-label">Грейд</span><span class="badge badge-blue">Sen1</span></div>
+      <div class="emp-meta-row"><span class="emp-meta-label">Руководитель</span><span class="emp-meta-val">Козлов А.И.</span></div>
+      <div class="emp-meta-row"><span class="emp-meta-label">Продакт</span><span class="emp-meta-val">Иванов Д.К.</span></div>
+      <div class="emp-meta-row"><span class="emp-meta-label">Цикл</span><span class="badge badge-teal">Q2 2026</span></div>
+    </div>
+
+    <!-- 1-ON-1 MEETING -->
+    <div class="meeting-card">
+      <div class="meeting-card-title">Встреча 1-on-1</div>
+      <div class="meeting-date">15 июня 2026</div>
+      <div class="meeting-time">15:00 · Microsoft Teams</div>
+    </div>
+
+    <!-- SECTION NAV -->
+    <div class="section-nav">
+      <a href="#s1" class="nav-anchor done"><div class="nav-anchor-num">1</div>Результаты оценки</a>
+      <a href="#s2" class="nav-anchor done"><div class="nav-anchor-num">2</div>Самооценка</a>
+      <a href="#s3" class="nav-anchor done"><div class="nav-anchor-num">3</div>Gap-анализ</a>
+      <a href="#s4" class="nav-anchor active"><div class="nav-anchor-num">4</div>План прошлого периода</a>
+      <a href="#s5" class="nav-anchor"><div class="nav-anchor-num">5</div>Комментарии руководителя</a>
+      <a href="#s6" class="nav-anchor"><div class="nav-anchor-num">6</div>Решение по грейду</a>
+      <a href="#s7" class="nav-anchor"><div class="nav-anchor-num">7</div>План развития</a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- BLOCK 1: SCORES -->
+    <div class="section" id="s1">
+      <div class="section-header">
+        <div class="section-title">
+          <div class="section-num auto">1</div>
+          Результаты оценки
+        </div>
+        <span class="section-badge">Заполняется автоматически</span>
+      </div>
+      <div class="section-body">
+        <table class="scores-table">
+          <thead><tr><th>Блок оценки</th><th>Оценщик</th><th>Балл</th><th>Вес</th><th>Взвешенный</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Performance</td>
+              <td style="color:var(--muted)">Продакт-оунер</td>
+              <td><span class="score-num" style="color:var(--teal)">4.2</span></td>
+              <td>25% <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:25%"></div></div></td>
+              <td style="color:var(--teal);font-weight:600">1.05</td>
+            </tr>
+            <tr>
+              <td>Hard Skills</td>
+              <td style="color:var(--muted)">Лид</td>
+              <td><span class="score-num" style="color:var(--green)">19 / 21</span></td>
+              <td>30% <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:30%"></div></div></td>
+              <td style="color:var(--green);font-weight:600">2.71</td>
+            </tr>
+            <tr>
+              <td>Soft Skills 360°</td>
+              <td style="color:var(--muted)">Команда (5 чел.)</td>
+              <td><span class="score-num" style="color:var(--green)">2</span></td>
+              <td>25% <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:25%"></div></div></td>
+              <td style="color:var(--green);font-weight:600">0.50</td>
+            </tr>
+            <tr>
+              <td>СРВ</td>
+              <td style="color:var(--muted)">Руководитель</td>
+              <td><span class="score-num" style="color:var(--teal)">13 / 18</span></td>
+              <td>20% <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:20%"></div></div></td>
+              <td style="color:var(--teal);font-weight:600">1.44</td>
+            </tr>
+            <tr class="total-row">
+              <td colspan="4" style="font-weight:700;font-family:var(--font-head)">Итоговый балл</td>
+              <td><span class="total-score">5.70</span> <span style="font-size:11px;color:var(--muted)">/ 10</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BLOCK 2: SELF-ASSESSMENT -->
+    <div class="section" id="s2">
+      <div class="section-header">
+        <div class="section-title"><div class="section-num auto">2</div>Самооценка сотрудника</div>
+        <span class="section-badge">Только для просмотра</span>
+      </div>
+      <div class="section-body">
+        <div class="self-item">
+          <div class="self-item-label">Внедрение значимых проектов</div>
+          <div class="self-item-val">Разработала новую компонентную библиотеку, которая сократила время разработки фичей на 30%. Провела рефакторинг модуля авторизации — убрали 2000 строк дублирующего кода.</div>
+        </div>
+        <div class="self-item">
+          <div class="self-item-label">Нововведения и идеи</div>
+          <div class="self-item-val">Предложила и внедрила автоматическое тестирование через Playwright — покрытие E2E выросло с 0% до 68%. Инициировала ежемесячные Frontend-ревью для команды.</div>
+        </div>
+        <div class="self-item">
+          <div class="self-item-label">Достижения</div>
+          <div class="achievement-list">
+            <div class="achievement-item"><div class="ach-num">1</div>Создала дизайн-систему на Storybook — 40+ компонентов</div>
+            <div class="achievement-item"><div class="ach-num">2</div>Провела 12 технических интервью, 3 успешных найма</div>
+            <div class="achievement-item"><div class="ach-num">3</div>Менторила 2 junior-разработчиков</div>
+          </div>
+        </div>
+        <div class="self-item">
+          <div class="self-item-label">Самооценка уровня</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="badge badge-blue" style="font-size:12px">Sen1</span>
+            <span style="color:var(--muted);font-size:12px">→</span>
+            <span class="badge badge-green" style="font-size:12px">Sen2</span>
+            <span style="font-size:12px;color:var(--muted)">Готова к повышению</span>
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--muted);line-height:1.5">Считаю, что за этот период вышла на уровень Sen2: самостоятельно веду технические направления, менторю команду, провожу архитектурные ревью. Готова брать больше ответственности.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 3: GAP ANALYSIS -->
+    <div class="section" id="s3">
+      <div class="section-header">
+        <div class="section-title"><div class="section-num auto">3</div>Gap-анализ</div>
+        <span class="section-badge">Заполняется автоматически</span>
+      </div>
+      <div class="section-body">
+        <table class="gap-table">
+          <thead><tr><th>Компетенция</th><th>Тип</th><th>Ожидается (Sen1)</th><th>Факт</th><th>Разрыв</th></tr></thead>
+          <tbody>
+            <tr><td>HTML / CSS</td><td><span class="badge badge-teal" style="font-size:9px">Hard</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
+            <tr><td>JavaScript / TypeScript</td><td><span class="badge badge-teal" style="font-size:9px">Hard</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
+            <tr><td>React / Фреймворк</td><td><span class="badge badge-teal" style="font-size:9px">Hard</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
+            <tr><td>Web Performance</td><td><span class="badge badge-teal" style="font-size:9px">Hard</span></td><td>3</td><td>2</td><td><span class="gap-warn">-1</span></td></tr>
+            <tr><td>Git / Code Review</td><td><span class="badge badge-teal" style="font-size:9px">Hard</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
+            <tr><td>REST API / GraphQL</td><td><span class="badge badge-teal" style="font-size:9px">Hard</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
+            <tr><td>Коммуникация</td><td><span class="badge badge-blue" style="font-size:9px">Soft</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
+            <tr><td>Командная работа</td><td><span class="badge badge-blue" style="font-size:9px">Soft</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
+            <tr><td>Инициативность</td><td><span class="badge badge-blue" style="font-size:9px">Soft</span></td><td>3</td><td>2</td><td><span class="gap-warn">-1</span></td></tr>
+            <tr><td>Автономность решений</td><td><span class="badge badge-amber" style="font-size:9px">СРВ</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
+            <tr><td>Масштаб влияния</td><td><span class="badge badge-amber" style="font-size:9px">СРВ</span></td><td>3</td><td>2</td><td><span class="gap-warn">-1</span></td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px;display:flex;gap:12px;font-size:11px">
+          <span style="color:var(--green)">✓ Соответствует: 8</span>
+          <span style="color:var(--amber)">△ Разрыв -1: 3</span>
+          <span style="color:var(--red)">✕ Критический разрыв: 0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 4: PAST DEV PLAN -->
+    <div class="section" id="s4">
+      <div class="section-header">
+        <div class="section-title"><div class="section-num fill">4</div>Оценка плана развития прошлого периода</div>
+        <span class="section-badge">Руководитель проставляет статус</span>
+      </div>
+      <div class="section-body">
+        <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+          <div style="background:rgba(108,123,255,0.08);border:1px solid rgba(108,123,255,0.2);border-radius:8px;padding:8px 14px;font-size:11px;color:var(--accent2)">
+            📌 <strong>Навык / направление</strong> — из плана развития цикла Q1 2026
+          </div>
+          <div style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:8px;padding:8px 14px;font-size:11px;color:var(--accent2)">
+            ✏️ <strong>Комментарий сотрудника</strong> — из самооценки Q2 2026 (Шаг 2)
+          </div>
+        </div>
+        <table class="dev-table">
+          <thead><tr>
+            <th style="width:30px">№</th>
+            <th>Навык / направление <span style="color:var(--accent2);font-weight:400;text-transform:none;letter-spacing:0">(из плана Q1 2026)</span></th>
+            <th>Комментарий сотрудника <span style="color:var(--accent2);font-weight:400;text-transform:none;letter-spacing:0">(из самооценки)</span></th>
+            <th style="width:160px">Статус выполнения</th>
+            <th>Комментарий Лида</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td class="row-num">1</td>
+              <td>
+                <div style="font-size:12px;color:var(--text);padding:7px 10px;background:rgba(108,123,255,0.06);border-radius:7px;border:1px solid rgba(108,123,255,0.15)">
+                  System Design / Архитектура
+                </div>
+              </td>
+              <td>
+                <div style="font-size:11px;color:var(--muted);padding:7px 10px;background:rgba(167,139,250,0.06);border-radius:7px;border:1px solid rgba(167,139,250,0.15);line-height:1.4">
+                  Прошла курс, провела 2 архитектурных ревью внутри команды
+                </div>
+              </td>
+              <td>
+                <select>
+                  <option>Выполнен ✓</option>
+                  <option>Частично выполнен</option>
+                  <option>Не выполнен</option>
+                </select>
+              </td>
+              <td><textarea rows="2" placeholder="Комментарий..."></textarea></td>
+            </tr>
+            <tr>
+              <td class="row-num">2</td>
+              <td>
+                <div style="font-size:12px;color:var(--text);padding:7px 10px;background:rgba(108,123,255,0.06);border-radius:7px;border:1px solid rgba(108,123,255,0.15)">
+                  Публичные выступления (доклады)
+                </div>
+              </td>
+              <td>
+                <div style="font-size:11px;color:var(--muted);padding:7px 10px;background:rgba(167,139,250,0.06);border-radius:7px;border:1px solid rgba(167,139,250,0.15);line-height:1.4">
+                  Сделала доклад на внутреннем митапе по Storybook
+                </div>
+              </td>
+              <td>
+                <select>
+                  <option>Выполнен ✓</option>
+                  <option selected>Частично выполнен</option>
+                  <option>Не выполнен</option>
+                </select>
+              </td>
+              <td><textarea rows="2" placeholder="Комментарий...">Выступление было, но только внутри команды — не на внешних мероприятиях</textarea></td>
+            </tr>
+            <tr>
+              <td class="row-num">3</td>
+              <td>
+                <div style="font-size:12px;color:var(--text);padding:7px 10px;background:rgba(108,123,255,0.06);border-radius:7px;border:1px solid rgba(108,123,255,0.15)">
+                  Менторинг junior-разработчиков
+                </div>
+              </td>
+              <td>
+                <div style="font-size:11px;color:var(--muted);padding:7px 10px;background:rgba(167,139,250,0.06);border-radius:7px;border:1px solid rgba(167,139,250,0.15);line-height:1.4">
+                  Менторила двух junior'ов, один вырос до Middle
+                </div>
+              </td>
+              <td>
+                <select>
+                  <option>Выполнен ✓</option>
+                  <option>Частично выполнен</option>
+                  <option>Не выполнен</option>
+                </select>
+              </td>
+              <td><textarea rows="2" placeholder="Комментарий..."></textarea></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- BLOCK 5: MANAGER COMMENTS -->
+    <div class="section" id="s5">
+      <div class="section-header">
+        <div class="section-title"><div class="section-num fill">5</div>Комментарии руководителя</div>
+        <span class="section-badge">Заполняет Руководитель</span>
+      </div>
+      <div class="section-body">
+        <div class="comment-field">
+          <div class="comment-label">Общий комментарий по результатам</div>
+          <textarea class="comment-ta" rows="3" placeholder="Опишите общее впечатление от результатов работы сотрудника...">Мария показывает отличную динамику роста. За период существенно вырос масштаб её задач и влияния на команду. Является одним из ключевых специалистов Frontend-направления.</textarea>
+        </div>
+        <div class="comment-field">
+          <div class="comment-label">Сильные стороны</div>
+          <textarea class="comment-ta" rows="2" placeholder="Ключевые сильные стороны сотрудника...">Техническая экспертиза, инициативность в создании инфраструктурных решений, менторинг, качественный код-ревью.</textarea>
+        </div>
+        <div class="comment-field">
+          <div class="comment-label">Зоны роста</div>
+          <textarea class="comment-ta" rows="2" placeholder="Области, которые требуют развития...">Web Performance (профилирование и оптимизация на уровне системы), публичные выступления, кросс-командное взаимодействие.</textarea>
+        </div>
+        <div class="comment-field">
+          <div class="comment-label">Рекомендации по развитию</div>
+          <textarea class="comment-ta" rows="2" placeholder="Конкретные рекомендации...">Рекомендую взять 1-2 задачи с фокусом на Performance, выступить на внешней конференции, начать больше взаимодействовать с Backend-командой.</textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 6: GRADE DECISION -->
+    <div class="section" id="s6">
+      <div class="section-header">
+        <div class="section-title"><div class="section-num fill">6</div>Решение по грейду</div>
+        <span class="section-badge">Руководитель + HR</span>
+      </div>
+      <div class="section-body">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding:12px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:10px">
+          <span style="font-size:12px;color:var(--muted)">Текущий грейд:</span>
+          <span class="badge badge-blue" style="font-size:12px">Sen1</span>
+        </div>
+
+        <div class="decision-options">
+          <div class="decision-opt promote selected" onclick="setDecision('promote')">
+            <div class="d-icon">↑</div>
+            <div class="d-label">Повысить</div>
+            <div class="d-desc">Перевести на следующий грейд</div>
+          </div>
+          <div class="decision-opt keep" onclick="setDecision('keep')">
+            <div class="d-icon">→</div>
+            <div class="d-label">Оставить</div>
+            <div class="d-desc">Сохранить текущий грейд</div>
+          </div>
+        </div>
+
+        <!-- IF PROMOTE -->
+        <div class="grade-promote-block show" id="grade-promote-block">
+          <div class="field-group" style="margin-bottom:14px">
+            <label class="field-label">Целевой грейд</label>
+            <select class="field-select" style="max-width:220px">
+              <option>Sen2</option>
+              <option>Sen3</option>
+            </select>
+          </div>
+          <div class="field-group" style="margin-bottom:0">
+            <label class="field-label">Комментарий к решению (опционально)</label>
+            <textarea class="comment-ta" rows="2" placeholder="Обоснование решения о повышении...">Достигла всех KPI, выросла как ментор, вышла на уровень архитектурных решений.</textarea>
+          </div>
+        </div>
+
+        <!-- IF KEEP — salary decision -->
+        <div class="salary-block" id="salary-block">
+          <div class="field-group" style="margin-bottom:14px">
+            <label class="field-label">Решение по заработной плате</label>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm" onclick="setSalary('raise', this)" style="border-color:var(--green);color:var(--green)">Повысить ЗП</button>
+              <button class="btn btn-sm" onclick="setSalary('keep', this)">Оставить ЗП</button>
+            </div>
+          </div>
+          <div class="field-group" style="margin-bottom:0">
+            <label class="field-label">Комментарий к решению по ЗП (опционально)</label>
+            <textarea class="comment-ta" rows="2" placeholder="Обоснование решения..."></textarea>
+          </div>
+        </div>
+
+        <!-- CONFIRMATIONS -->
+        <div class="confirm-block">
+          <div class="confirm-card">
+            <div>
+              <div class="confirm-role">Руководитель</div>
+              <div class="confirm-status" style="color:var(--muted)">Козлов А.И.</div>
+            </div>
+            <button class="confirm-btn done" onclick="confirmDecision(this, 'Руководитель')">✓ Подтверждено</button>
+          </div>
+          <div class="confirm-card">
+            <div>
+              <div class="confirm-role">HR</div>
+              <div class="confirm-status" style="color:var(--muted)">Сидорова А.Н.</div>
+            </div>
+            <button class="confirm-btn waiting" onclick="confirmDecision(this, 'HR')">Подтвердить</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOCK 7: NEXT DEV PLAN -->
+    <div class="section" id="s7">
+      <div class="section-header">
+        <div class="section-title"><div class="section-num fill">7</div>План развития на следующий период</div>
+        <span class="section-badge">Заполняет Руководитель</span>
+      </div>
+      <div class="section-body">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:14px">Этот план станет входными данными для оценки плана в следующем цикле</div>
+        <table class="dev-table">
+          <thead><tr><th style="width:30px">№</th><th>Навык / направление развития</th><th style="width:130px">Срок</th><th>Комментарий</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="row-num">1</td>
+              <td><input type="text" placeholder="Навык или направление..." value="Web Performance — оптимизация на уровне системы"></td>
+              <td><input type="text" placeholder="Срок..." value="Q3 2026"></td>
+              <td><textarea rows="2" placeholder="Комментарий...">Взять задачу по профилированию, достичь 90+ Lighthouse score</textarea></td>
+            </tr>
+            <tr>
+              <td class="row-num">2</td>
+              <td><input type="text" placeholder="Навык или направление..." value="Публичное выступление (внешняя конференция)"></td>
+              <td><input type="text" placeholder="Срок..." value="Q4 2026"></td>
+              <td><textarea rows="2" placeholder="Комментарий...">Подать заявку на HolyJS или Frontend Conf</textarea></td>
+            </tr>
+            <tr>
+              <td class="row-num">3</td>
+              <td><input type="text" placeholder="Навык или направление..."></td>
+              <td><input type="text" placeholder="Срок..."></td>
+              <td><textarea rows="2" placeholder="Комментарий..."></textarea></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="margin-top:12px">
+          <button class="btn btn-sm" onclick="addDevRow()">+ Добавить пункт</button>
+        </div>
+
+        <div style="margin-top:24px;display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn" onclick="alert('Черновик сохранён')">💾 Сохранить черновик</button>
+          <button class="btn btn-green" onclick="document.getElementById('submit-modal').classList.add('show')">Завершить и отправить</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main-content -->
+</div><!-- end layout -->
+
+<!-- SUBMIT MODAL -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <div class="modal-icon">📋</div>
+    <div class="modal-title">Завершить оценку?</div>
+    <div class="modal-desc">После отправки форма будет доступна сотруднику. Убедитесь, что все блоки заполнены и решение подтверждено обеими сторонами.</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="document.getElementById('submit-modal').classList.remove('show')">Отмена</button>
+      <button class="btn btn-green" onclick="submitForm()">Завершить оценку</button>
+    </div>
+  </div>
+</div>
+
+<!-- MEETING MODAL -->
+<div class="modal-overlay" id="meeting-modal">
+  <div class="modal" style="text-align:left;max-width:400px">
+    <div class="modal-title">Назначить встречу 1-on-1</div>
+    <div style="margin-bottom:14px">
+      <label class="field-label">Дата и время</label>
+      <input class="field-input" type="datetime-local" value="2026-06-15T15:00">
+    </div>
+    <div style="margin-bottom:14px">
+      <label class="field-label">Платформа</label>
+      <select class="field-select">
+        <option>Microsoft Teams</option>
+        <option>Google Meet</option>
+        <option>Zoom</option>
+        <option>Очно</option>
+      </select>
+    </div>
+    <div style="margin-bottom:0">
+      <label class="field-label">Напомнить за</label>
+      <select class="field-select">
+        <option>30 минут</option>
+        <option>1 час</option>
+        <option selected>1 день</option>
+      </select>
+    </div>
+    <div class="modal-actions" style="text-align:right">
+      <button class="btn" onclick="document.getElementById('meeting-modal').classList.remove('show')">Отмена</button>
+      <button class="btn btn-primary" onclick="document.getElementById('meeting-modal').classList.remove('show');alert('Встреча назначена! Приглашение отправлено.')">Назначить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentDecision = 'promote';
+
+function setDecision(d) {
+  currentDecision = d;
+  document.querySelectorAll('.decision-opt').forEach(o => o.classList.remove('selected'));
+  document.querySelector('.decision-opt.' + d).classList.add('selected');
+  document.getElementById('grade-promote-block').classList.toggle('show', d === 'promote');
+  document.getElementById('salary-block').classList.toggle('show', d === 'keep');
+}
+
+function setSalary(type, btn) {
+  document.querySelectorAll('#salary-block .btn-sm').forEach(b => {
+    b.style.borderColor = ''; b.style.color = '';
+  });
+  if (type === 'raise') { btn.style.borderColor = 'var(--green)'; btn.style.color = 'var(--green)'; }
+  else { btn.style.borderColor = 'var(--accent)'; btn.style.color = 'var(--accent2)'; }
+}
+
+function confirmDecision(btn, role) {
+  btn.textContent = '✓ Подтверждено';
+  btn.className = 'confirm-btn done';
+  btn.onclick = null;
+}
+
+function addDevRow() {
+  const tbody = document.querySelector('#s7 .dev-table tbody');
+  const num = tbody.children.length + 1;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td class="row-num">${num}</td>
+    <td><input type="text" placeholder="Навык или направление..."></td>
+    <td><input type="text" placeholder="Срок..."></td>
+    <td><textarea rows="2" placeholder="Комментарий..."></textarea></td>`;
+  tbody.appendChild(tr);
+}
+
+function scheduleMeeting() {
+  document.getElementById('meeting-modal').classList.add('show');
+}
+
+function submitForm() {
+  document.getElementById('submit-modal').classList.remove('show');
+  document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;font-family:var(--font-body);background:var(--bg);color:var(--text)">
+    <div>
+      <div style="font-size:56px;margin-bottom:16px">✅</div>
+      <div style="font-family:var(--font-head);font-size:22px;font-weight:800;color:var(--green);margin-bottom:8px">Оценка завершена!</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.6">Форма 1-on-1 для Марии Ивановой успешно отправлена.<br>Сотрудник получит доступ к результатам.<br><br><a href="index.html" style="color:var(--accent2)">← Вернуться на дашборд</a></div>
+    </div>
+  </div>`;
+}
+</script>
+</body>
+</html>

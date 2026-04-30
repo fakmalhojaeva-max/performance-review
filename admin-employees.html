@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Сотрудники</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --sidebar-w: 240px;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: flex; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: var(--sidebar-w); min-height: 100vh; background: var(--bg2);
+    border-right: 1px solid var(--border); display: flex; flex-direction: column;
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 50;
+  }
+  .sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px; cursor: pointer;
+    transition: all 0.15s; color: var(--muted); font-size: 13px; font-weight: 400;
+    text-decoration: none; border: none; background: none; width: 100%; font-family: var(--font-body);
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); }
+  .sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .sidebar-user-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(108,123,255,0.15); color: var(--accent2); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+
+  /* MAIN */
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+  .content { padding: 24px 28px; }
+
+  .btn {
+    font-family: var(--font-body); font-size: 12px; font-weight: 500;
+    padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s; border: 1px solid var(--border2);
+    background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #7b8aff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-danger { color: var(--red); border-color: rgba(248,113,113,0.3); }
+  .btn-danger:hover { background: rgba(248,113,113,0.08); }
+  .btn-green { background: var(--green); border-color: var(--green); color: #0f1117; font-weight: 600; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+  .stat-value { font-family: var(--font-head); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-top: 4px; }
+
+  /* UPLOAD ZONE */
+  .upload-section {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; margin-bottom: 20px;
+  }
+  .upload-section-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .upload-section-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+
+  .template-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 18px; margin-bottom: 14px;
+  }
+  .template-info { flex: 1; }
+  .template-name { font-size: 13px; font-weight: 500; }
+  .template-cols { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .upload-zone {
+    border: 2px dashed var(--border2); border-radius: 12px;
+    padding: 32px 24px; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: transparent;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent); background: rgba(108,123,255,0.04);
+  }
+  .upload-icon { font-size: 32px; margin-bottom: 8px; }
+  .upload-text { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .upload-hint { font-size: 11px; color: var(--muted); }
+
+  /* UPLOAD RESULT */
+  .upload-result {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px; margin-top: 14px;
+  }
+  .upload-result-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .upload-result-icon { font-size: 20px; }
+  .upload-result-title { font-size: 13px; font-weight: 600; }
+  .upload-result-stats { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
+  .upload-result-stat strong { color: var(--text); }
+
+  /* TABLE */
+  .table-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .table-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .table-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; }
+  .search-input {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 6px 12px; color: var(--text); font-family: var(--font-body);
+    font-size: 12px; outline: none; width: 200px; transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 14px; text-align: left; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted);
+    font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 10px 14px; vertical-align: middle; font-size: 12px; }
+
+  .badge {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px; letter-spacing: 0.2px;
+  }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+
+  .action-btn {
+    padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer;
+    font-size: 11px; transition: all 0.12s; font-family: var(--font-body);
+  }
+  .action-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 200;
+    align-items: center; justify-content: center; backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; max-width: 520px; width: 90%; }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .field-input {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 9px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 13px; outline: none;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .field-select {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 9px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 13px; outline: none; appearance: none;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar .nav-text, .sidebar-logo small { display: none; }
+    .main { margin-left: 60px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    table { min-width: 700px; }
+    .table-card { overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">Review<span>OS</span><small>Админ-панель</small></div>
+  <div class="sidebar-nav">
+    <a class="nav-item" href="admin.html" style="text-decoration:none">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+      <span class="nav-text">Дашборд</span>
+    </a>
+    <a class="nav-item" href="admin.html" style="text-decoration:none">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg>
+      <span class="nav-text">Циклы оценки</span>
+    </a>
+    <button class="nav-item active">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+      <span class="nav-text">Сотрудники</span>
+    </button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span class="nav-text">Справочники</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg><span class="nav-text">Компетенции</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg><span class="nav-text">Конструктор форм</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg><span class="nav-text">Аудит</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg><span class="nav-text">Шаблоны писем</span></button>
+    <button class="nav-item"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg><span class="nav-text">Журнал писем</span></button>
+  </div>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">HR</div>
+      <div>
+        <div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div>
+        <div style="font-size:10px;color:var(--muted)">HR-администратор</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Сотрудники</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="alert('Экспорт текущего списка в Excel')">↓ Экспорт</button>
+      <button class="btn btn-primary" onclick="openAddModal()">+ Добавить вручную</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Всего сотрудников</div>
+        <div class="stat-value">24</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Направлений</div>
+        <div class="stat-value" style="color:var(--accent2)">5</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Команд</div>
+        <div class="stat-value" style="color:var(--teal)">7</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Последняя загрузка</div>
+        <div class="stat-value" style="font-size:14px;margin-top:8px;color:var(--muted)">15.04.2026</div>
+      </div>
+    </div>
+
+    <!-- UPLOAD SECTION -->
+    <div class="upload-section">
+      <div class="upload-section-title">Загрузка списка сотрудников</div>
+      <div class="upload-section-desc">Скачайте шаблон, заполните его и загрузите обратно. Новые сотрудники будут добавлены, существующие — обновлены по ФИО.</div>
+
+      <div class="template-row">
+        <div class="template-info">
+          <div class="template-name">📗 Шаблон_сотрудники.xlsx</div>
+          <div class="template-cols">Колонки: ФИО · Email · Должность · Направление · Руководитель · Продакт-оунер · Текущий уровень · Команда</div>
+        </div>
+        <button class="btn btn-green" onclick="alert('Скачивание шаблона template_employees.xlsx')">↓ Скачать шаблон</button>
+      </div>
+
+      <div class="upload-zone" id="upload-zone"
+        onclick="document.getElementById('file-input').click()"
+        ondragover="event.preventDefault();this.classList.add('dragover')"
+        ondragleave="this.classList.remove('dragover')"
+        ondrop="event.preventDefault();this.classList.remove('dragover');simulateUpload()">
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="simulateUpload()">
+        <div class="upload-icon">📄</div>
+        <div class="upload-text">Перетащите файл сюда или нажмите для выбора</div>
+        <div class="upload-hint">Форматы: .xlsx, .xls, .csv</div>
+      </div>
+
+      <div class="upload-result" id="upload-result" style="display:none">
+        <div class="upload-result-header">
+          <span class="upload-result-icon">✅</span>
+          <span class="upload-result-title">Файл успешно обработан</span>
+        </div>
+        <div class="upload-result-stats">
+          <span>Добавлено: <strong style="color:var(--green)">3</strong></span>
+          <span>Обновлено: <strong style="color:var(--amber)">5</strong></span>
+          <span>Без изменений: <strong>16</strong></span>
+          <span>Ошибок: <strong style="color:var(--red)">0</strong></span>
+        </div>
+        <label style="display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer">
+          <input type="checkbox" checked style="width:16px;height:16px;accent-color:var(--accent)">
+          <div>
+            <div style="font-size:12px;font-weight:500;color:var(--text)">Создать учётные записи для новых сотрудников</div>
+            <div style="font-size:11px;color:var(--muted)">Пароль будет автоматически сгенерирован и отправлен на email каждого нового сотрудника</div>
+          </div>
+        </label>
+      </div>
+    </div>
+
+    <!-- EMPLOYEES TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">Все сотрудники</div>
+        <input class="search-input" type="text" placeholder="🔍 Поиск по ФИО..." oninput="searchEmployees(this.value)">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>ФИО</th>
+            <th>Email</th>
+            <th>Должность</th>
+            <th>Направление</th>
+            <th>Руководитель</th>
+            <th>Продакт-оунер</th>
+            <th>Уровень</th>
+            <th>Команда</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="emp-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD EMPLOYEE MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-title">Добавить сотрудника</div>
+    <div class="field-group">
+      <label class="field-label">ФИО</label>
+      <input class="field-input" type="text" placeholder="Фамилия Имя Отчество">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Email</label>
+      <input class="field-input" type="email" placeholder="employee@company.com">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Должность</label>
+      <input class="field-input" type="text" placeholder="Например: Frontend разработчик">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field-group">
+        <label class="field-label">Направление</label>
+        <select class="field-select">
+          <option>.NET Backend</option><option>Frontend</option><option>QA</option><option>Data</option><option>Mobile</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Команда</label>
+        <input class="field-input" type="text" placeholder="Например: Platform">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field-group">
+        <label class="field-label">Руководитель</label>
+        <input class="field-input" type="text" placeholder="ФИО руководителя">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Продакт-оунер</label>
+        <input class="field-input" type="text" placeholder="ФИО продакт-оунера">
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Текущий уровень</label>
+      <select class="field-select">
+        <option>Jun1</option><option>Jun2</option><option>Jun3</option>
+        <option>Mid1</option><option selected>Mid2</option><option>Mid3</option>
+        <option>Sen1</option><option>Sen2</option><option>Sen3</option>
+      </select>
+    </div>
+    <label style="display:flex;align-items:center;gap:10px;margin-top:4px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer">
+      <input type="checkbox" checked style="width:16px;height:16px;accent-color:var(--accent)">
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--text)">Создать учётную запись</div>
+        <div style="font-size:11px;color:var(--muted)">Пароль будет отправлен на указанный email</div>
+      </div>
+    </label>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="closeAddModal();alert('Сотрудник добавлен')">Добавить</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const employees = [
+  { name:'Козлов Алексей Иванович', email:'a.kozlov@company.com', role:'.NET разработчик', dir:'.NET Backend', manager:'Петров С.А.', po:'Иванов Д.К.', level:'Mid2', team:'Platform' },
+  { name:'Иванова Мария Сергеевна', email:'m.ivanova@company.com', role:'Frontend разработчик', dir:'Frontend', manager:'Козлов А.И.', po:'Иванов Д.К.', level:'Sen1', team:'Web App' },
+  { name:'Ли Дмитрий Олегович', email:'d.li@company.com', role:'QA инженер', dir:'QA', manager:'Смирнова О.В.', po:'Иванов Д.К.', level:'Jun3', team:'Testing' },
+  { name:'Петрова Анна Викторовна', email:'a.petrova@company.com', role:'Data Engineer', dir:'Data', manager:'Волков С.П.', po:'Сидоров К.Л.', level:'Mid1', team:'Analytics' },
+  { name:'Волков Сергей Павлович', email:'s.volkov@company.com', role:'Mobile разработчик', dir:'Mobile', manager:'Петров С.А.', po:'Сидоров К.Л.', level:'Mid3', team:'Apps' },
+  { name:'Смирнова Ольга Васильевна', email:'o.smirnova@company.com', role:'Frontend разработчик', dir:'Frontend', manager:'Козлов А.И.', po:'Иванов Д.К.', level:'Jun2', team:'Web App' },
+  { name:'Новиков Игорь Андреевич', email:'i.novikov@company.com', role:'.NET разработчик', dir:'.NET Backend', manager:'Петров С.А.', po:'Иванов Д.К.', level:'Sen2', team:'Platform' },
+  { name:'Белова Татьяна Николаевна', email:'t.belova@company.com', role:'QA инженер', dir:'QA', manager:'Смирнова О.В.', po:'Иванов Д.К.', level:'Mid2', team:'Testing' },
+  { name:'Морозов Павел Дмитриевич', email:'p.morozov@company.com', role:'DevOps инженер', dir:'.NET Backend', manager:'Петров С.А.', po:'Иванов Д.К.', level:'Mid1', team:'Infrastructure' },
+  { name:'Зайцева Екатерина Олеговна', email:'e.zaytseva@company.com', role:'Data Analyst', dir:'Data', manager:'Волков С.П.', po:'Сидоров К.Л.', level:'Jun1', team:'Analytics' },
+];
+
+function renderEmployees(search = '') {
+  const tbody = document.getElementById('emp-body');
+  const filtered = employees.filter(e => !search || e.name.toLowerCase().includes(search.toLowerCase()));
+  tbody.innerHTML = filtered.map(e => `
+    <tr>
+      <td style="font-weight:500">${e.name}</td>
+      <td style="color:var(--muted);font-size:11px">${e.email}</td>
+      <td style="color:var(--muted)">${e.role}</td>
+      <td><span class="badge badge-teal">${e.dir}</span></td>
+      <td style="color:var(--muted)">${e.manager}</td>
+      <td style="color:var(--muted)">${e.po}</td>
+      <td><span class="badge badge-blue">${e.level}</span></td>
+      <td style="color:var(--muted)">${e.team}</td>
+      <td><button class="action-btn" onclick="alert('Редактировать: ${e.name}')">✎</button></td>
+    </tr>
+  `).join('');
+}
+
+function searchEmployees(val) { renderEmployees(val); }
+function simulateUpload() {
+  document.getElementById('upload-result').style.display = 'block';
+}
+function openAddModal() { document.getElementById('add-modal').classList.add('show'); }
+function closeAddModal() { document.getElementById('add-modal').classList.remove('show'); }
+
+renderEmployees();
+</script>
+</body>
+</html>

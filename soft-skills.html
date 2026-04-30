@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Оценка Soft Skills 360°</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #171b26;
+    --bg3: #1e2333;
+    --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --border3: rgba(255,255,255,0.18);
+    --text: #e8eaf0;
+    --muted: #7a7f94;
+    --accent: #6c7bff;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --teal: #2dd4bf;
+    --pink: #f472b6;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--font-body); font-size: 13px;
+    line-height: 1.5; min-height: 100vh;
+  }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .logo { font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .breadcrumb { font-size: 12px; color: var(--muted); }
+  .breadcrumb a { color: var(--accent2); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  .container { max-width: 720px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  /* EMPLOYEE HEADER */
+  .emp-header {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 24px;
+  }
+  .emp-avatar {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-size: 16px; font-weight: 800; flex-shrink: 0;
+  }
+  .emp-info { flex: 1; }
+  .emp-name { font-family: var(--font-head); font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+  .emp-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .emp-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .tag { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.3px; }
+  .tag-cycle { background: rgba(108,123,255,0.12); color: var(--accent); border: 1px solid rgba(108,123,255,0.25); }
+  .tag-360 { background: rgba(244,114,182,0.12); color: var(--pink); border: 1px solid rgba(244,114,182,0.25); }
+  .tag-anon { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.25); }
+
+  .section-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 4px; }
+  .section-desc { font-size: 12px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+
+  /* PROGRESS */
+  .progress-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .progress-text { font-size: 12px; color: var(--muted); }
+  .progress-count { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--accent2); }
+  .progress-bar { width: 100%; height: 4px; background: var(--border2); border-radius: 2px; margin-bottom: 28px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 2px; transition: width 0.4s; }
+
+  /* QUESTION CARD */
+  .q-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  .q-card.answered { border-color: rgba(52,211,153,0.2); }
+  .q-num-row { display: flex; align-items: flex-start; gap: 12px; }
+  .q-num {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--bg4); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-size: 11px; font-weight: 700;
+    color: var(--muted); flex-shrink: 0; margin-top: 1px;
+    transition: all 0.2s;
+  }
+  .q-card.answered .q-num {
+    background: rgba(52,211,153,0.12); color: var(--green);
+    border-color: rgba(52,211,153,0.25);
+  }
+  .q-text {
+    font-size: 14px; font-weight: 500; color: var(--text); line-height: 1.5; flex: 1;
+  }
+  .q-required { color: var(--red); margin-left: 4px; font-size: 12px; }
+
+  /* 1-5 SCALE */
+  .scale-row {
+    display: flex; align-items: center; gap: 0;
+    margin-top: 16px; justify-content: center;
+  }
+  .scale-labels {
+    display: flex; justify-content: space-between;
+    margin-top: 6px; padding: 0 4px;
+  }
+  .scale-label-text { font-size: 10px; color: var(--muted); }
+
+  .scale-btn {
+    width: 52px; height: 52px; border-radius: 12px;
+    border: 2px solid var(--border2); background: var(--bg3);
+    color: var(--muted); font-family: var(--font-head);
+    font-size: 18px; font-weight: 800; cursor: pointer;
+    transition: all 0.18s; display: flex; align-items: center;
+    justify-content: center; margin: 0 4px;
+  }
+  .scale-btn:hover { border-color: var(--border3); color: var(--text); }
+
+  .scale-btn.selected.v1 { border-color: var(--red); background: rgba(248,113,113,0.1); color: var(--red); }
+  .scale-btn.selected.v2 { border-color: #fb923c; background: rgba(251,146,60,0.1); color: #fb923c; }
+  .scale-btn.selected.v3 { border-color: var(--amber); background: rgba(251,191,36,0.1); color: var(--amber); }
+  .scale-btn.selected.v4 { border-color: var(--teal); background: rgba(45,212,191,0.1); color: var(--teal); }
+  .scale-btn.selected.v5 { border-color: var(--green); background: rgba(52,211,153,0.1); color: var(--green); }
+
+  /* COMMENT */
+  .q-comment { margin-top: 12px; }
+  .q-comment textarea {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 8px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 12px; line-height: 1.5;
+    outline: none; resize: vertical; transition: border-color 0.15s;
+  }
+  .q-comment textarea:focus { border-color: var(--accent); }
+  .q-comment textarea::placeholder { color: rgba(122,127,148,0.5); }
+
+  /* SUMMARY */
+  .summary-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 24px; margin-top: 24px; margin-bottom: 16px;
+    display: none;
+  }
+  .summary-card.show { display: block; }
+  .summary-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .summary-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+  .summary-answered { font-family: var(--font-head); font-size: 14px; font-weight: 700; color: var(--accent2); }
+
+  .summary-note {
+    font-size: 11px; color: var(--muted); line-height: 1.5;
+    background: var(--bg3); border-radius: 8px; padding: 10px 14px;
+    border: 1px solid var(--border);
+  }
+  .summary-note strong { color: var(--text); font-weight: 600; }
+
+  /* BUTTONS */
+  .form-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 28px; gap: 12px; }
+  .btn {
+    font-family: var(--font-body); font-size: 13px; font-weight: 500;
+    padding: 10px 20px; border-radius: 10px; cursor: pointer;
+    transition: all 0.15s; border: 1px solid var(--border2);
+    background: var(--bg3); color: var(--text); text-decoration: none;
+  }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-draft { background: transparent; border: 1px solid rgba(251,191,36,0.3); color: var(--amber); }
+  .btn-draft:hover { background: rgba(251,191,36,0.08); }
+  .btn-submit { background: var(--green); border-color: var(--green); color: #0f1117; font-weight: 600; }
+  .btn-submit:hover { background: #4ae8af; }
+  .btn-group { display: flex; gap: 8px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 200;
+    align-items: center; justify-content: center; backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 16px; padding: 28px; max-width: 420px; width: 90%; text-align: center;
+  }
+  .modal-icon { font-size: 36px; margin-bottom: 12px; }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .modal-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+  /* SUCCESS */
+  .success-screen { display: none; text-align: center; padding: 60px 20px; }
+  .success-screen.show { display: block; }
+  .success-icon { font-size: 56px; margin-bottom: 16px; }
+  .success-title { font-family: var(--font-head); font-size: 22px; font-weight: 800; margin-bottom: 8px; color: var(--green); }
+  .success-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  @media (max-width: 600px) {
+    .container { padding: 16px; }
+    .scale-btn { width: 44px; height: 44px; font-size: 16px; margin: 0 2px; }
+    .emp-header { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">Review<span>OS</span></span>
+    <span class="breadcrumb"><a href="index.html">Дашборд</a> → Оценка Soft Skills 360°</span>
+  </div>
+</div>
+
+<div class="container" id="form-container">
+
+  <div class="emp-header">
+    <div class="emp-avatar" style="background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.25);">МИ</div>
+    <div class="emp-info">
+      <div class="emp-name">Мария Иванова</div>
+      <div class="emp-meta">Вас просят оценить коллегу</div>
+      <div class="emp-tags">
+        <span class="tag tag-cycle">Q2 2026</span>
+        <span class="tag tag-360">Опрос 360°</span>
+        <span class="tag tag-anon">🔒 Анонимно</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Оценка коллеги</div>
+  <div class="section-desc">Ответьте на каждый вопрос, выбрав балл от 1 до 5.<br>Ваши ответы полностью анонимны и будут агрегированы с ответами других участников.</div>
+
+  <div class="progress-info">
+    <span class="progress-text">Прогресс</span>
+    <span class="progress-count" id="progress-count">0 / 12</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+  </div>
+
+  <div id="questions-list"></div>
+
+  <div class="summary-card" id="summary-card">
+    <div class="summary-header">
+      <div class="summary-label">Итого отвечено</div>
+      <div class="summary-answered" id="summary-answered">0 / 12</div>
+    </div>
+    <div class="summary-note">
+      <strong>Как рассчитывается оценка:</strong> после сбора всех ответов система автоматически рассчитает среднее по каждой компетенции и выведет итоговый балл. Вы не видите привязку вопросов к компетенциям — это сделано для объективности оценки.
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <a href="index.html" class="btn">← На дашборд</a>
+    <div class="btn-group">
+      <button class="btn btn-draft" onclick="saveDraft()">💾 Черновик</button>
+      <button class="btn btn-submit" onclick="trySubmit()">Отправить оценку</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <div class="modal-icon">📋</div>
+    <div class="modal-title">Отправить оценку?</div>
+    <div class="modal-desc">После отправки ответы нельзя будет изменить. Результаты будут агрегированы анонимно со всеми респондентами.</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-submit" onclick="submitForm()">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<div class="container success-screen" id="success-screen">
+  <div class="success-icon">✅</div>
+  <div class="success-title">Оценка отправлена!</div>
+  <div class="success-desc">
+    Ваша оценка для Марии Ивановой сохранена анонимно.<br>
+    Спасибо за участие в опросе 360°!<br><br>
+    <a href="index.html" style="color: var(--accent2)">← Вернуться на дашборд</a>
+  </div>
+</div>
+
+<script>
+// Questions — respondent does NOT see which competency they belong to
+// competency field is hidden, used only for backend aggregation
+const questions = [
+  { id: 'q1', text: 'Насколько чётко коллега доносит свои мысли и идеи на встречах?', required: true, hasComment: false },
+  { id: 'q2', text: 'Как коллега воспринимает обратную связь от других?', required: true, hasComment: false },
+  { id: 'q3', text: 'Готов ли коллега помогать другим членам команды, даже если задача не входит в его обязанности?', required: true, hasComment: true },
+  { id: 'q4', text: 'Как коллега ведёт себя при разногласиях в команде?', required: true, hasComment: false },
+  { id: 'q5', text: 'Делится ли коллега знаниями и опытом с другими?', required: false, hasComment: false },
+  { id: 'q6', text: 'Берёт ли коллега ответственность за свои решения и результат?', required: true, hasComment: false },
+  { id: 'q7', text: 'Доводит ли задачи до конца без необходимости напоминаний?', required: true, hasComment: true },
+  { id: 'q8', text: 'Предлагает ли коллега улучшения процессов и инструментов?', required: true, hasComment: false },
+  { id: 'q9', text: 'Берётся ли коллега за сложные задачи добровольно?', required: true, hasComment: false },
+  { id: 'q10', text: 'Как коллега реагирует на изменения в приоритетах или требованиях?', required: true, hasComment: true },
+  { id: 'q11', text: 'Готов ли коллега осваивать новые технологии и подходы?', required: true, hasComment: false },
+  { id: 'q12', text: 'Способен ли коллега мотивировать и поддерживать других членов команды?', required: false, hasComment: true },
+];
+
+const answers = {};
+const totalQ = questions.length;
+
+function renderQuestions() {
+  const list = document.getElementById('questions-list');
+  list.innerHTML = questions.map((q, idx) => `
+    <div class="q-card" id="qcard-${q.id}">
+      <div class="q-num-row">
+        <div class="q-num">${idx + 1}</div>
+        <div class="q-text">
+          ${q.text}
+          ${q.required ? '<span class="q-required">*</span>' : ''}
+        </div>
+      </div>
+      <div class="scale-row">
+        ${[1,2,3,4,5].map(v => `
+          <button class="scale-btn v${v}" onclick="selectAnswer('${q.id}', ${v}, this)">${v}</button>
+        `).join('')}
+      </div>
+      <div class="scale-labels">
+        <span class="scale-label-text">1 — низкая</span>
+        <span class="scale-label-text">5 — высокая</span>
+      </div>
+      ${q.hasComment ? `
+        <div class="q-comment">
+          <textarea rows="2" placeholder="Комментарий (опционально)..."></textarea>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+function selectAnswer(qId, value, btn) {
+  answers[qId] = value;
+
+  const card = document.getElementById('qcard-' + qId);
+  card.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  card.classList.add('answered');
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = Object.keys(answers).length;
+  const pct = (answered / totalQ) * 100;
+
+  document.getElementById('progress-count').textContent = answered + ' / ' + totalQ;
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  const summaryCard = document.getElementById('summary-card');
+  if (answered > 0) {
+    summaryCard.classList.add('show');
+    document.getElementById('summary-answered').textContent = answered + ' / ' + totalQ;
+  } else {
+    summaryCard.classList.remove('show');
+  }
+}
+
+function saveDraft() {
+  const btn = event.target;
+  btn.textContent = '✓ Сохранено';
+  btn.style.color = 'var(--green)';
+  btn.style.borderColor = 'rgba(52,211,153,0.3)';
+  setTimeout(() => {
+    btn.textContent = '💾 Черновик';
+    btn.style.color = 'var(--amber)';
+    btn.style.borderColor = 'rgba(251,191,36,0.3)';
+  }, 2000);
+}
+
+function trySubmit() {
+  document.getElementById('submit-modal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('submit-modal').classList.remove('show');
+}
+function submitForm() {
+  closeModal();
+  document.getElementById('form-container').style.display = 'none';
+  document.getElementById('success-screen').classList.add('show');
+}
+
+renderQuestions();
+</script>
+</body>
+</html>

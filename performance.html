@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Оценка эффективности</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --bg2: #171b26;
+    --bg3: #1e2333;
+    --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --border3: rgba(255,255,255,0.18);
+    --text: #e8eaf0;
+    --muted: #7a7f94;
+    --accent: #6c7bff;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --teal: #2dd4bf;
+    --font-head: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--font-body); font-size: 13px;
+    line-height: 1.5; min-height: 100vh;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 24px; border-bottom: 1px solid var(--border);
+    background: var(--bg); position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .logo { font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .breadcrumb { font-size: 12px; color: var(--muted); }
+  .breadcrumb a { color: var(--accent2); text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  /* CONTAINER */
+  .container { max-width: 820px; margin: 0 auto; padding: 28px 24px 60px; }
+
+  /* EMPLOYEE HEADER */
+  .emp-header {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 24px;
+  }
+  .emp-avatar {
+    width: 48px; height: 48px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-size: 16px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .emp-info { flex: 1; }
+  .emp-name { font-family: var(--font-head); font-size: 17px; font-weight: 700; letter-spacing: -0.3px; }
+  .emp-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .emp-tags { display: flex; gap: 6px; margin-top: 6px; }
+  .tag {
+    font-size: 10px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px; letter-spacing: 0.3px;
+  }
+  .tag-grade { background: rgba(167,139,250,0.12); color: var(--accent2); border: 1px solid rgba(167,139,250,0.25); }
+  .tag-team { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.25); }
+  .tag-cycle { background: rgba(108,123,255,0.12); color: var(--accent); border: 1px solid rgba(108,123,255,0.25); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: var(--font-head); font-size: 16px; font-weight: 700;
+    letter-spacing: -0.3px; margin-bottom: 6px;
+  }
+  .section-desc { font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+
+  /* CRITERIA TABLE */
+  .criteria-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden; margin-bottom: 16px;
+  }
+  .criteria-row {
+    display: grid; grid-template-columns: 200px 1fr 220px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+  }
+  .criteria-row:last-child { border-bottom: none; }
+  .criteria-row:hover { background: rgba(255,255,255,0.015); }
+  .criteria-row.header {
+    background: var(--bg4);
+  }
+  .criteria-row.header .cr-cell {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--muted); font-weight: 600; padding: 10px 16px;
+  }
+  .cr-cell {
+    padding: 16px; display: flex; flex-direction: column; justify-content: center;
+    border-right: 1px solid var(--border);
+  }
+  .cr-cell:last-child { border-right: none; }
+  .cr-name {
+    font-family: var(--font-head); font-size: 13px; font-weight: 700;
+    letter-spacing: -0.1px; margin-bottom: 2px;
+  }
+  .cr-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* CRITERIA ITEMS */
+  .criteria-item {
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .criteria-item:last-child { padding-bottom: 0; border-bottom: none; }
+
+  /* COMMENT */
+  .comment-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 20px 24px; margin-bottom: 16px;
+  }
+  .comment-card label {
+    display: block; font-size: 12px; font-weight: 500;
+    color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 8px;
+  }
+  textarea {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 12px 14px; color: var(--text);
+    font-family: var(--font-body); font-size: 13px; line-height: 1.5;
+    outline: none; resize: vertical; transition: border-color 0.15s;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: rgba(122,127,148,0.5); }
+
+  /* DECISION */
+  .decision-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; margin-bottom: 16px;
+  }
+  .decision-title {
+    font-family: var(--font-head); font-size: 15px; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .decision-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+  .decision-options { display: flex; gap: 12px; }
+  .decision-opt {
+    flex: 1; padding: 20px; border-radius: 12px;
+    border: 2px solid var(--border2); background: var(--bg3);
+    cursor: pointer; transition: all 0.2s; text-align: center;
+  }
+  .decision-opt:hover { border-color: var(--border3); }
+  .decision-opt .d-icon { font-size: 28px; margin-bottom: 8px; }
+  .decision-opt .d-label {
+    font-family: var(--font-head); font-size: 14px; font-weight: 700;
+  }
+  .decision-opt .d-desc { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+  .decision-opt.admit.selected {
+    border-color: var(--green); background: rgba(52,211,153,0.06);
+    box-shadow: 0 0 20px rgba(52,211,153,0.1);
+  }
+  .decision-opt.admit.selected .d-label { color: var(--green); }
+
+  .decision-opt.block.selected {
+    border-color: var(--red); background: rgba(248,113,113,0.06);
+    box-shadow: 0 0 20px rgba(248,113,113,0.1);
+  }
+  .decision-opt.block.selected .d-label { color: var(--red); }
+
+  /* BLOCK REASON (shown when Недопуск selected) */
+  .block-reason {
+    display: none; margin-top: 16px;
+    animation: fadeIn 0.25s ease;
+  }
+  .block-reason.show { display: block; }
+  .block-reason label {
+    display: block; font-size: 12px; font-weight: 500;
+    color: var(--red); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 8px;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* FORM ACTIONS */
+  .form-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 28px; gap: 12px;
+  }
+  .btn {
+    font-family: var(--font-body); font-size: 13px; font-weight: 500;
+    padding: 10px 20px; border-radius: 10px; cursor: pointer;
+    transition: all 0.15s; border: 1px solid var(--border2);
+    background: var(--bg3); color: var(--text);
+  }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-draft { background: transparent; border: 1px solid rgba(251,191,36,0.3); color: var(--amber); }
+  .btn-draft:hover { background: rgba(251,191,36,0.08); }
+  .btn-submit { background: var(--green); border-color: var(--green); color: #0f1117; font-weight: 600; }
+  .btn-submit:hover { background: #4ae8af; }
+  .btn-group { display: flex; gap: 8px; }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 200;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 16px; padding: 28px; max-width: 440px; width: 90%;
+    text-align: center;
+  }
+  .modal-icon { font-size: 36px; margin-bottom: 12px; }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .modal-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .modal-actions { display: flex; gap: 10px; justify-content: center; }
+
+  /* WARNING BANNER */
+  .warning-banner {
+    display: none; align-items: center; gap: 10px;
+    background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2);
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 16px;
+    font-size: 12px; color: var(--red); line-height: 1.5;
+  }
+  .warning-banner.show { display: flex; }
+  .warning-banner .w-icon { font-size: 18px; flex-shrink: 0; }
+
+  /* SUCCESS */
+  .success-screen { display: none; text-align: center; padding: 60px 20px; }
+  .success-screen.show { display: block; }
+  .success-icon { font-size: 56px; margin-bottom: 16px; }
+  .success-title { font-family: var(--font-head); font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .success-title.green { color: var(--green); }
+  .success-title.red { color: var(--red); }
+  .success-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+  @media (max-width: 700px) {
+    .criteria-row { grid-template-columns: 1fr; }
+    .cr-cell { border-right: none; border-bottom: 1px solid var(--border); padding: 12px 16px; }
+    .cr-cell:last-child { border-bottom: none; }
+    .decision-options { flex-direction: column; }
+    .emp-header { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">Review<span>OS</span></span>
+    <span class="breadcrumb"><a href="index.html">Дашборд</a> → Оценка эффективности</span>
+  </div>
+</div>
+
+<div class="container" id="form-container">
+
+  <!-- EMPLOYEE HEADER -->
+  <div class="emp-header">
+    <div class="emp-avatar" style="background: rgba(52,211,153,0.15); color: #34d399; border: 1px solid rgba(52,211,153,0.25);">МИ</div>
+    <div class="emp-info">
+      <div class="emp-name">Мария Иванова</div>
+      <div class="emp-meta">Frontend разработчик · Команда Frontend</div>
+      <div class="emp-tags">
+        <span class="tag tag-grade">Sen1</span>
+        <span class="tag tag-team">Frontend</span>
+        <span class="tag tag-cycle">Q2 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION -->
+  <div class="section-title">Оценка эффективности</div>
+  <div class="section-desc">Опишите результативность сотрудника по каждому критерию в свободной форме.</div>
+
+  <!-- CRITERIA -->
+  <div class="criteria-card" style="padding: 20px 24px; display: flex; flex-direction: column; gap: 18px;">
+
+    <div class="criteria-item">
+      <div class="cr-name">Выполнение задач</div>
+      <div class="cr-desc" style="margin-bottom: 8px;">Степень выполнения поставленных задач в рамках периода</div>
+      <textarea rows="3" placeholder="Опишите, насколько сотрудник справился с поставленными задачами..."></textarea>
+    </div>
+
+    <div class="criteria-item">
+      <div class="cr-name">Достижение целей / KPI</div>
+      <div class="cr-desc" style="margin-bottom: 8px;">Достижение целевых показателей и ключевых результатов</div>
+      <textarea rows="3" placeholder="Какие цели и KPI были достигнуты, какие нет..."></textarea>
+    </div>
+
+    <div class="criteria-item">
+      <div class="cr-name">Качество результатов</div>
+      <div class="cr-desc" style="margin-bottom: 8px;">Соответствие результатов ожиданиям, стандартам и требованиям</div>
+      <textarea rows="3" placeholder="Оцените качество работы: код-ревью, баги, соответствие стандартам..."></textarea>
+    </div>
+
+    <div class="criteria-item">
+      <div class="cr-name">Соблюдение сроков</div>
+      <div class="cr-desc" style="margin-bottom: 8px;">Выполнение задач в установленные сроки, пунктуальность</div>
+      <textarea rows="3" placeholder="Насколько сотрудник соблюдал дедлайны, были ли задержки..."></textarea>
+    </div>
+
+    <div class="criteria-item">
+      <div class="cr-name">Общая результативность</div>
+      <div class="cr-desc" style="margin-bottom: 8px;">Итоговая оценка эффективности работы сотрудника за период</div>
+      <textarea rows="3" placeholder="Общее впечатление от результативности сотрудника за период..."></textarea>
+    </div>
+
+  </div>
+
+  <!-- COMMENT -->
+  <div class="comment-card">
+    <label>Комментарий / общее заключение</label>
+    <textarea rows="4" placeholder="Опишите общее впечатление от работы сотрудника: сильные стороны, зоны роста, рекомендации..." id="comment"></textarea>
+  </div>
+
+  <!-- DECISION -->
+  <div class="decision-card">
+    <div class="decision-title">Решение</div>
+    <div class="decision-desc">Допустить сотрудника к следующим этапам оценки или принять решение о недопуске?</div>
+
+    <div class="decision-options">
+      <div class="decision-opt admit" onclick="setDecision('admit')">
+        <div class="d-icon">✅</div>
+        <div class="d-label">Допуск</div>
+        <div class="d-desc">Сотрудник продолжает прохождение оценки по всем этапам</div>
+      </div>
+      <div class="decision-opt block" onclick="setDecision('block')">
+        <div class="d-icon">⛔</div>
+        <div class="d-label">Недопуск</div>
+        <div class="d-desc">Оценка останавливается. Сотрудник не переходит к следующим этапам</div>
+      </div>
+    </div>
+
+    <div class="block-reason" id="block-reason">
+      <label>Причина недопуска <span style="color:var(--red)">*</span></label>
+      <textarea rows="3" placeholder="Обязательно укажите причину недопуска сотрудника к дальнейшим этапам оценки..." id="block-reason-text"></textarea>
+    </div>
+  </div>
+
+  <!-- WARNING -->
+  <div class="warning-banner" id="warning-banner">
+    <span class="w-icon">⚠️</span>
+    <span>Внимание: при выборе «Недопуск» сотрудник не будет проходить дальнейшие этапы оценки (Hard skills, Soft skills 360°, СРВ, 1-on-1). Это действие потребует подтверждения.</span>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="form-actions">
+    <a href="index.html" class="btn" style="text-decoration:none">← На дашборд</a>
+    <div class="btn-group">
+      <button class="btn btn-draft" onclick="saveDraft()">💾 Черновик</button>
+      <button class="btn btn-submit" onclick="trySubmit()">Отправить оценку</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUBMIT MODAL -->
+<div class="modal-overlay" id="submit-modal">
+  <div class="modal">
+    <div class="modal-icon" id="modal-icon">📋</div>
+    <div class="modal-title" id="modal-title">Отправить оценку?</div>
+    <div class="modal-desc" id="modal-desc">После отправки форма станет недоступна для редактирования. Результаты будут видны HR и сотруднику.</div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-submit" id="modal-submit-btn" onclick="submitForm()">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="container success-screen" id="success-screen">
+  <div class="success-icon" id="success-icon">✅</div>
+  <div class="success-title green" id="success-title">Оценка отправлена!</div>
+  <div class="success-desc" id="success-desc">
+    Оценка эффективности для Марии Ивановой успешно сохранена.<br>
+    Следующий этап — оценка hard skills.<br><br>
+    <a href="index.html" style="color: var(--accent2)">← Вернуться на дашборд</a>
+  </div>
+</div>
+
+<script>
+let decision = null;
+
+function setDecision(type) {
+  decision = type;
+  document.querySelectorAll('.decision-opt').forEach(o => o.classList.remove('selected'));
+
+  if (type === 'admit') {
+    document.querySelector('.decision-opt.admit').classList.add('selected');
+    document.getElementById('block-reason').classList.remove('show');
+    document.getElementById('warning-banner').classList.remove('show');
+  } else {
+    document.querySelector('.decision-opt.block').classList.add('selected');
+    document.getElementById('block-reason').classList.add('show');
+    document.getElementById('warning-banner').classList.add('show');
+  }
+}
+
+function saveDraft() {
+  const btn = event.target;
+  btn.textContent = '✓ Сохранено';
+  btn.style.color = 'var(--green)';
+  btn.style.borderColor = 'rgba(52,211,153,0.3)';
+  setTimeout(() => {
+    btn.textContent = '💾 Черновик';
+    btn.style.color = 'var(--amber)';
+    btn.style.borderColor = 'rgba(251,191,36,0.3)';
+  }, 2000);
+}
+
+function trySubmit() {
+  const modalIcon = document.getElementById('modal-icon');
+  const modalTitle = document.getElementById('modal-title');
+  const modalDesc = document.getElementById('modal-desc');
+  const submitBtn = document.getElementById('modal-submit-btn');
+
+  if (decision === 'block') {
+    modalIcon.textContent = '⛔';
+    modalTitle.textContent = 'Подтвердить недопуск?';
+    modalDesc.textContent = 'Сотрудник Мария Иванова не будет проходить дальнейшие этапы оценки (Hard skills, Soft 360°, СРВ, 1-on-1). Это действие необратимо.';
+    submitBtn.textContent = 'Подтвердить недопуск';
+    submitBtn.style.background = 'var(--red)';
+    submitBtn.style.borderColor = 'var(--red)';
+  } else {
+    modalIcon.textContent = '📋';
+    modalTitle.textContent = 'Отправить оценку?';
+    modalDesc.textContent = 'После отправки форма станет недоступна для редактирования. Результаты будут видны HR и сотруднику.';
+    submitBtn.textContent = 'Подтвердить';
+    submitBtn.style.background = 'var(--green)';
+    submitBtn.style.borderColor = 'var(--green)';
+  }
+
+  document.getElementById('submit-modal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('submit-modal').classList.remove('show');
+}
+
+function submitForm() {
+  closeModal();
+  document.getElementById('form-container').style.display = 'none';
+
+  const successIcon = document.getElementById('success-icon');
+  const successTitle = document.getElementById('success-title');
+  const successDesc = document.getElementById('success-desc');
+
+  if (decision === 'block') {
+    successIcon.textContent = '⛔';
+    successTitle.textContent = 'Недопуск оформлен';
+    successTitle.className = 'success-title red';
+    successDesc.innerHTML = 'Мария Иванова не допущена к дальнейшим этапам оценки.<br>Причина зафиксирована и доступна HR.<br><br><a href="index.html" style="color: var(--accent2)">← Вернуться на дашборд</a>';
+  } else {
+    successIcon.textContent = '✅';
+    successTitle.textContent = 'Оценка отправлена!';
+    successTitle.className = 'success-title green';
+    successDesc.innerHTML = 'Оценка эффективности для Марии Ивановой успешно сохранена.<br>Следующий этап — оценка hard skills.<br><br><a href="index.html" style="color: var(--accent2)">← Вернуться на дашборд</a>';
+  }
+
+  document.getElementById('success-screen').classList.add('show');
+}
+</script>
+</body>
+</html>
