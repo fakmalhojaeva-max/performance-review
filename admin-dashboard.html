@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Дашборд админки</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --sidebar-w: 240px;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: flex; }
+
+  .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: var(--muted); font-size: 13px; border: none; background: none; width: 100%; font-family: var(--font-body); text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .sidebar-user-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(108,123,255,0.15); color: var(--accent2); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+
+  .main { margin-left: var(--sidebar-w); flex: 1; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+  .content { padding: 24px 28px; }
+
+  .btn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px; }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .badge-red { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+  .badge-gray { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+  /* PAGE TABS */
+  .page-tabs { display: flex; gap: 4px; margin-bottom: 24px; }
+  .page-tab { font-family: var(--font-body); font-size: 13px; font-weight: 500; padding: 9px 20px; border-radius: 10px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border); background: transparent; color: var(--muted); }
+  .page-tab:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .page-tab.active { background: rgba(108,123,255,0.12); color: var(--accent2); border-color: rgba(108,123,255,0.25); font-weight: 600; }
+  .page-panel { display: none; }
+  .page-panel.active { display: block; }
+
+  /* STAT CARDS */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; margin-bottom: 6px; }
+  .stat-value { font-family: var(--font-head); font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .stat-trend { font-size: 11px; font-weight: 600; margin-top: 4px; }
+  .trend-up { color: var(--green); }
+  .trend-down { color: var(--red); }
+
+  /* GRID LAYOUT */
+  .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .dash-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* CARD */
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; }
+  .card-body { padding: 18px 20px; }
+
+  /* PROGRESS BARS */
+  .progress-item { margin-bottom: 14px; }
+  .progress-item:last-child { margin-bottom: 0; }
+  .progress-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .progress-name { font-size: 12px; font-weight: 500; }
+  .progress-val { font-size: 12px; color: var(--muted); }
+  .progress-bar-bg { width: 100%; height: 6px; background: var(--border2); border-radius: 3px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+
+  /* CYCLE STAGES */
+  .stage-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .stage-item:last-child { border-bottom: none; }
+  .stage-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .stage-dot.done { background: var(--green); }
+  .stage-dot.active { background: var(--accent); box-shadow: 0 0 8px rgba(108,123,255,0.5); }
+  .stage-dot.pending { background: var(--border2); }
+  .stage-name { flex: 1; font-size: 12px; font-weight: 500; }
+  .stage-pct { font-family: var(--font-head); font-size: 12px; font-weight: 700; }
+
+  /* GRADE DISTRIBUTION */
+  .grade-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .grade-item { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; text-align: center; }
+  .grade-name { font-family: var(--font-head); font-size: 12px; font-weight: 700; color: var(--accent2); margin-bottom: 2px; }
+  .grade-count { font-family: var(--font-head); font-size: 18px; font-weight: 800; }
+  .grade-sub { font-size: 10px; color: var(--muted); }
+
+  /* ACTIVITY FEED */
+  .feed-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .feed-item:last-child { border-bottom: none; }
+  .feed-avatar { width: 28px; height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .feed-content { flex: 1; }
+  .feed-text { font-size: 12px; line-height: 1.4; }
+  .feed-text strong { color: var(--text); }
+  .feed-time { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* DEADLINE LIST */
+  .deadline-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .deadline-item:last-child { border-bottom: none; }
+  .deadline-emp { font-size: 12px; font-weight: 500; flex: 1; }
+  .deadline-stage { font-size: 11px; color: var(--muted); }
+  .deadline-date { font-size: 11px; font-weight: 600; }
+  .deadline-date.overdue { color: var(--red); }
+  .deadline-date.soon { color: var(--amber); }
+  .deadline-date.ok { color: var(--muted); }
+
+  /* AUDIT TABLE */
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 11px 16px; vertical-align: middle; font-size: 12px; }
+
+  .audit-action { font-weight: 500; }
+  .audit-user { display: flex; align-items: center; gap: 8px; }
+  .audit-avatar { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 9px; font-weight: 700; flex-shrink: 0; }
+
+  /* FILTERS */
+  .filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .filter-label { font-size: 12px; color: var(--muted); }
+  .filter-chip { font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.12s; font-family: var(--font-body); }
+  .filter-chip:hover, .filter-chip.active { border-color: var(--accent); color: var(--accent2); background: rgba(108,123,255,0.08); }
+  .search-input { margin-left: auto; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; color: var(--text); font-family: var(--font-body); font-size: 12px; outline: none; width: 220px; }
+  .search-input::placeholder { color: var(--muted); }
+  .search-input:focus { border-color: var(--accent); }
+
+  @media (max-width: 1100px) { .dash-grid-3 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar .nav-text, .sidebar-logo small { display: none; }
+    .main { margin-left: 60px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .dash-grid, .dash-grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">Review<span>OS</span><small>Админ-панель</small></div>
+  <div class="sidebar-nav">
+    <a class="nav-item active" href="admin-dashboard.html">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+      <span class="nav-text">Дашборд</span>
+    </a>
+    <a class="nav-item " href="admin.html">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg>
+      <span class="nav-text">Циклы оценки</span>
+    </a>
+    <a class="nav-item " href="admin-employees.html">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+      <span class="nav-text">Сотрудники</span>
+    </a>
+    <a class="nav-item " href="admin-references.html">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 01.707.293l3 3a1 1 0 01-1.414 1.414L10 5.414 7.707 7.707a1 1 0 01-1.414-1.414l3-3A1 1 0 0110 3zm-3.707 9.293a1 1 0 011.414 0L10 14.586l2.293-2.293a1 1 0 011.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/></svg>
+      <span class="nav-text">Справочники</span>
+    </a>
+    <a class="nav-item " href="admin-competencies.html">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg>
+      <span class="nav-text">Компетенции</span>
+    </a>
+    <a class="nav-item " href="admin-forms.html">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5z"/></svg>
+      <span class="nav-text">Конструктор форм</span>
+    </a>
+    <a class="nav-item " href="admin-users.html">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+      <span class="nav-text">Пользователи</span>
+    </a>
+    <a class="nav-item " href="admin-dashboard.html">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
+      <span class="nav-text">Аудит</span>
+    </a>
+    <a class="nav-item " href="admin-email-templates.html">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/></svg>
+      <span class="nav-text">Шаблоны писем</span>
+    </a>
+    <a class="nav-item" href="nav.html" style="border-top:1px solid var(--border);margin-top:8px;padding-top:12px">
+      <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+      <span class="nav-text">На главную</span>
+    </a>
+  </div>
+  <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
+</div>
+  <div class="sidebar-nav">
+    <button class="nav-item active" onclick="setPage(this,'dashboard')"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span class="nav-text">Дашборд</span></button>
+    <a class="nav-item" href="admin.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg><span class="nav-text">Циклы оценки</span></a>
+    <a class="nav-item" href="admin-employees.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg><span class="nav-text">Сотрудники</span></a>
+    <a class="nav-item" href="admin-references.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span class="nav-text">Справочники</span></a>
+    <a class="nav-item" href="admin-competencies.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg><span class="nav-text">Компетенции</span></a>
+    <a class="nav-item" href="admin-forms.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg><span class="nav-text">Конструктор форм</span></a>
+    <a class="nav-item" href="admin-users.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></a>
+    <button class="nav-item" onclick="setPage(this,'audit')"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg><span class="nav-text">Аудит</span></button>
+    <a class="nav-item" href="admin-email-templates.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg><span class="nav-text">Шаблоны писем</span></a>
+    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg><span class="nav-text">Журнал писем</span></a>
+  </div>
+  <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="page-title">Дашборд</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm" onclick="alert('Экспорт отчёта')">↓ Экспорт</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="page-panel active" id="panel-dashboard">
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Активный цикл</div>
+          <div class="stat-value" style="color:var(--green);font-size:16px;margin-top:4px">Q2 2026</div>
+          <div class="stat-sub">Дедлайн: 20 июня 2026</div>
+          <div class="stat-trend trend-up">● In progress</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Завершили оценку</div>
+          <div class="stat-value" style="color:var(--green)">7</div>
+          <div class="stat-sub">из 24 сотрудников</div>
+          <div class="stat-trend trend-up">↑ +3 за неделю</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">В процессе</div>
+          <div class="stat-value" style="color:var(--accent2)">12</div>
+          <div class="stat-sub">на разных этапах</div>
+          <div class="stat-trend" style="color:var(--muted)">→ без изменений</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Просрочено</div>
+          <div class="stat-value" style="color:var(--red)">2</div>
+          <div class="stat-sub">пропущен дедлайн</div>
+          <div class="stat-trend trend-down">↑ +1 вчера</div>
+        </div>
+      </div>
+
+      <!-- ROW 1 -->
+      <div class="dash-grid">
+
+        <!-- CYCLE PROGRESS -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Прогресс по этапам — Q2 2026</div>
+            <span class="badge badge-blue">42% общий</span>
+          </div>
+          <div class="card-body">
+            <div class="stage-item"><div class="stage-dot done"></div><div class="stage-name">Актуализация участников</div><span class="badge badge-green" style="font-size:9px">✓ Готово</span></div>
+            <div class="stage-item"><div class="stage-dot done"></div><div class="stage-name">Матрица компетенций</div><span class="badge badge-green" style="font-size:9px">✓ Готово</span></div>
+            <div class="stage-item"><div class="stage-dot done"></div><div class="stage-name">Самооценка</div><span class="badge badge-green" style="font-size:9px">22/24</span></div>
+            <div class="stage-item"><div class="stage-dot active"></div><div class="stage-name">Оценка Performance</div><span class="badge badge-blue" style="font-size:9px">● 14/24</span></div>
+            <div class="stage-item"><div class="stage-dot pending"></div><div class="stage-name">Hard Skills</div><span class="badge badge-gray" style="font-size:9px">Ожидает</span></div>
+            <div class="stage-item"><div class="stage-dot pending"></div><div class="stage-name">Soft Skills 360°</div><span class="badge badge-gray" style="font-size:9px">Ожидает</span></div>
+            <div class="stage-item"><div class="stage-dot pending"></div><div class="stage-name">СРВ</div><span class="badge badge-gray" style="font-size:9px">Ожидает</span></div>
+            <div class="stage-item"><div class="stage-dot pending"></div><div class="stage-name">1-on-1</div><span class="badge badge-gray" style="font-size:9px">Ожидает</span></div>
+          </div>
+        </div>
+
+        <!-- COMPLETION BY TEAM -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Прогресс по направлениям</div>
+          </div>
+          <div class="card-body">
+            <div class="progress-item">
+              <div class="progress-label"><span class="progress-name">.NET Backend</span><span class="progress-val">5/6</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:83%;background:var(--green)"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label"><span class="progress-name">Frontend</span><span class="progress-val">4/5</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:80%;background:var(--green)"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label"><span class="progress-name">QA</span><span class="progress-val">2/4</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:50%;background:var(--amber)"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label"><span class="progress-name">Data</span><span class="progress-val">3/4</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:75%;background:var(--teal)"></div></div>
+            </div>
+            <div class="progress-item">
+              <div class="progress-label"><span class="progress-name">Mobile</span><span class="progress-val">0/2</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0%;background:var(--red)"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ROW 2 -->
+      <div class="dash-grid-3">
+
+        <!-- GRADE DISTRIBUTION -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Распределение по грейдам</div></div>
+          <div class="card-body">
+            <div class="grade-grid">
+              <div class="grade-item"><div class="grade-name">Jun1-3</div><div class="grade-count">6</div><div class="grade-sub">Junior</div></div>
+              <div class="grade-item"><div class="grade-name">Mid1-3</div><div class="grade-count">11</div><div class="grade-sub">Middle</div></div>
+              <div class="grade-item"><div class="grade-name">Sen1-3</div><div class="grade-count">7</div><div class="grade-sub">Senior</div></div>
+            </div>
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+              <div style="font-size:11px;color:var(--muted);margin-bottom:8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Повышения за цикл</div>
+              <div style="display:flex;gap:8px">
+                <span class="badge badge-green">↑ Ожидается 3</span>
+                <span class="badge badge-gray">→ Остаётся 21</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DEADLINES -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Ближайшие дедлайны</div></div>
+          <div class="card-body">
+            <div class="deadline-item">
+              <div>
+                <div class="deadline-emp">Белова Татьяна</div>
+                <div class="deadline-stage">Самооценка</div>
+              </div>
+              <div class="deadline-date overdue">Просрочено</div>
+            </div>
+            <div class="deadline-item">
+              <div>
+                <div class="deadline-emp">Ли Дмитрий</div>
+                <div class="deadline-stage">Performance</div>
+              </div>
+              <div class="deadline-date soon">Завтра</div>
+            </div>
+            <div class="deadline-item">
+              <div>
+                <div class="deadline-emp">Петрова Анна</div>
+                <div class="deadline-stage">Самооценка</div>
+              </div>
+              <div class="deadline-date soon">3 июня</div>
+            </div>
+            <div class="deadline-item">
+              <div>
+                <div class="deadline-emp">Волков Сергей</div>
+                <div class="deadline-stage">Performance</div>
+              </div>
+              <div class="deadline-date ok">5 июня</div>
+            </div>
+            <div class="deadline-item">
+              <div>
+                <div class="deadline-emp">Зайцева Екатерина</div>
+                <div class="deadline-stage">Hard Skills</div>
+              </div>
+              <div class="deadline-date ok">5 июня</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RECENT ACTIVITY -->
+        <div class="card">
+          <div class="card-header"><div class="card-title">Последние события</div></div>
+          <div class="card-body">
+            <div class="feed-item">
+              <div class="feed-avatar" style="background:rgba(52,211,153,0.15);color:var(--green)">МИ</div>
+              <div class="feed-content">
+                <div class="feed-text"><strong>Мария Иванова</strong> отправила самооценку</div>
+                <div class="feed-time">2 мин назад</div>
+              </div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-avatar" style="background:rgba(108,123,255,0.15);color:var(--accent2)">АС</div>
+              <div class="feed-content">
+                <div class="feed-text"><strong>Анна Сидорова</strong> запустила цикл Q2 2026</div>
+                <div class="feed-time">1 час назад</div>
+              </div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-avatar" style="background:rgba(45,212,191,0.15);color:var(--teal)">АК</div>
+              <div class="feed-content">
+                <div class="feed-text"><strong>Алексей Козлов</strong> завершил оценку Hard Skills для 3 сотрудников</div>
+                <div class="feed-time">3 часа назад</div>
+              </div>
+            </div>
+            <div class="feed-item">
+              <div class="feed-avatar" style="background:rgba(251,191,36,0.15);color:var(--amber)">ДИ</div>
+              <div class="feed-content">
+                <div class="feed-text"><strong>Дмитрий Иванов</strong> оценил Performance для 5 сотрудников</div>
+                <div class="feed-time">5 часов назад</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ===== AUDIT ===== -->
+    <div class="page-panel" id="panel-audit">
+
+      <div class="filter-row">
+        <span class="filter-label">Тип:</span>
+        <button class="filter-chip active" onclick="setAuditFilter(this,'all')">Все</button>
+        <button class="filter-chip" onclick="setAuditFilter(this,'create')">Создание</button>
+        <button class="filter-chip" onclick="setAuditFilter(this,'update')">Изменение</button>
+        <button class="filter-chip" onclick="setAuditFilter(this,'delete')">Удаление</button>
+        <button class="filter-chip" onclick="setAuditFilter(this,'login')">Входы</button>
+        <input class="search-input" placeholder="🔍 Поиск по пользователю или объекту...">
+      </div>
+
+      <div class="card">
+        <table>
+          <thead><tr>
+            <th>Дата и время</th>
+            <th>Пользователь</th>
+            <th>Действие</th>
+            <th>Объект</th>
+            <th>Детали</th>
+            <th>IP</th>
+          </tr></thead>
+          <tbody id="audit-body"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+const auditLog = [
+  { id:1, dt:'30.04.2026 14:32', user:'Иванова М.С.', ucolor:'#34d399', uinit:'МИ', action:'create', actionLabel:'Отправка формы', object:'Самооценка', detail:'Цикл Q2 2026', ip:'192.168.1.45' },
+  { id:2, dt:'30.04.2026 13:15', user:'Сидорова А.Н.', ucolor:'#6c7bff', uinit:'АС', action:'update', actionLabel:'Запуск цикла', object:'Цикл Q2 2026', detail:'Статус: draft → active', ip:'192.168.1.10' },
+  { id:3, dt:'30.04.2026 11:40', user:'Козлов А.И.', ucolor:'#34d399', uinit:'АК', action:'create', actionLabel:'Оценка Hard Skills', object:'Иванова М.С.', detail:'Баллы: 19/21', ip:'192.168.1.23' },
+  { id:4, dt:'30.04.2026 11:38', user:'Козлов А.И.', ucolor:'#34d399', uinit:'АК', action:'create', actionLabel:'Оценка Hard Skills', object:'Смирнова О.В.', detail:'Баллы: 12/21', ip:'192.168.1.23' },
+  { id:5, dt:'30.04.2026 10:55', user:'Иванов Д.К.', ucolor:'#f472b6', uinit:'ДИ', action:'create', actionLabel:'Оценка Performance', object:'Козлов А.И.', detail:'Допуск подтверждён', ip:'192.168.1.31' },
+  { id:6, dt:'30.04.2026 10:22', user:'Иванова М.С.', ucolor:'#34d399', uinit:'МИ', action:'login', actionLabel:'Вход в систему', object:'—', detail:'Успешно', ip:'192.168.1.45' },
+  { id:7, dt:'30.04.2026 09:14', user:'Сидорова А.Н.', ucolor:'#6c7bff', uinit:'АС', action:'update', actionLabel:'Изменение матрицы', object:'Frontend / Hard Skills', detail:'Добавлена компетенция: Testing', ip:'192.168.1.10' },
+  { id:8, dt:'29.04.2026 18:30', user:'Иванов Д.К.', ucolor:'#f472b6', uinit:'ДИ', action:'login', actionLabel:'Вход в систему', object:'—', detail:'Успешно', ip:'192.168.1.31' },
+  { id:9, dt:'29.04.2026 17:10', user:'Сидорова А.Н.', ucolor:'#6c7bff', uinit:'АС', action:'create', actionLabel:'Добавлен пользователь', object:'Морозов П.Д.', detail:'Роль: Руководитель, Сотрудник', ip:'192.168.1.10' },
+  { id:10, dt:'29.04.2026 15:45', user:'Петров С.А.', ucolor:'#2dd4bf', uinit:'СП', action:'update', actionLabel:'Оценка 1-on-1', object:'Козлов А.И.', detail:'Решение: повышение до Mid3', ip:'192.168.1.28' },
+  { id:11, dt:'29.04.2026 14:20', user:'Сидорова А.Н.', ucolor:'#6c7bff', uinit:'АС', action:'delete', actionLabel:'Удаление шаблона', object:'Самооценка v1', detail:'Архивирован', ip:'192.168.1.10' },
+  { id:12, dt:'29.04.2026 12:00', user:'Белова Т.Н.', ucolor:'#fb923c', uinit:'ТБ', action:'login', actionLabel:'Вход в систему', object:'—', detail:'Неудачная попытка', ip:'192.168.1.55' },
+];
+
+const actionColors = {
+  create: { cls: 'badge-green', label: 'Создание' },
+  update: { cls: 'badge-blue', label: 'Изменение' },
+  delete: { cls: 'badge-red', label: 'Удаление' },
+  login: { cls: 'badge-gray', label: 'Вход' },
+};
+
+let auditFilter = 'all';
+
+function setAuditFilter(btn, f) {
+  auditFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAudit();
+}
+
+function renderAudit() {
+  const tbody = document.getElementById('audit-body');
+  const list = auditFilter === 'all' ? auditLog : auditLog.filter(a => a.action === auditFilter);
+  tbody.innerHTML = list.map(a => {
+    const ac = actionColors[a.action];
+    return `<tr>
+      <td style="color:var(--muted);font-size:11px;white-space:nowrap">${a.dt}</td>
+      <td>
+        <div class="audit-user">
+          <div class="audit-avatar" style="background:${a.ucolor}22;color:${a.ucolor}">${a.uinit}</div>
+          <span style="font-size:12px">${a.user}</span>
+        </div>
+      </td>
+      <td><span class="badge ${ac.cls}" style="font-size:9px">${a.actionLabel}</span></td>
+      <td style="font-weight:500">${a.object}</td>
+      <td style="color:var(--muted)">${a.detail}</td>
+      <td style="font-size:11px;color:var(--muted);font-family:monospace">${a.ip}</td>
+    </tr>`;
+  }).join('');
+}
+
+function setPage(btn, page) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + page).classList.add('active');
+  document.getElementById('page-title').textContent = page === 'dashboard' ? 'Дашборд' : 'Аудит действий';
+}
+
+renderAudit();
+</script>
+</body>
+</html>
