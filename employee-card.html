@@ -193,20 +193,99 @@
     .layout { grid-template-columns: 1fr; }
     .emp-sidebar { position: static; height: auto; }
   }
+
+  
+  .user-nav-admin:hover { background: rgba(108,123,255,0.15); }
+
+
+  /* USER SIDEBAR */
+  .user-sidebar {
+    width: 220px; min-height: 100vh; background: var(--bg2);
+    border-right: 1px solid var(--border); display: flex; flex-direction: column;
+    position: fixed; left: 0; top: 0; bottom: 0; z-index: 50;
+  }
+  .user-sidebar-logo {
+    padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px;
+    font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border);
+    text-decoration: none; color: var(--text); display: block;
+  }
+  .user-sidebar-logo span { color: var(--accent); }
+  .user-sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .user-sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .user-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px; cursor: pointer;
+    transition: all 0.15s; color: var(--muted); font-size: 13px;
+    text-decoration: none; border: none; background: none; width: 100%;
+    font-family: var(--font-body); font-weight: 400;
+  }
+  .user-nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .user-nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .user-nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .user-nav-item.active .user-nav-icon { opacity: 1; }
+  .user-sidebar-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+  .user-sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .user-sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .user-sidebar-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(52,211,153,0.15); color: var(--green); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+  .user-main { margin-left: 220px; flex: 1; min-height: 100vh; }
+
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-left">
-    <span class="logo">Review<span>OS</span></span>
-    <span class="breadcrumb"><a href="index.html">Дашборд</a> → Карточка сотрудника</span>
+<!-- USER SIDEBAR -->
+<div class="user-sidebar">
+  <a class="user-sidebar-logo" href="nav.html">ReviewOS<span style="color:var(--accent)"> </span><small>Система оценки</small></a>
+  <div class="user-sidebar-nav">
+    <a class="user-nav-item " href="index.html">
+      <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+      <span>Дашборд HR</span>
+    </a>
+    <a class="user-nav-item " href="self-assessment.html">
+      <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg>
+      <span>Самооценка</span>
+    </a>
+    <a class="user-nav-item " href="performance.html">
+      <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm4-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H7a1 1 0 01-1-1V7zm4-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+      <span>Performance</span>
+    </a>
+    <a class="user-nav-item " href="hard-skills.html">
+      <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838l-2.727 1.666 1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/></svg>
+      <span>Hard Skills</span>
+    </a>
+    <a class="user-nav-item " href="soft-skills.html">
+      <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zm5 2a2 2 0 11-4 0 2 2 0 014 0zm-4 7a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zm10 3h-2v.025A4.486 4.486 0 0116 13h2v-2zm-2 4h2v-1h-2v1zm-8-4H4v2H2v1h2v1h2v-1h2v-1H6v-2z"/></svg>
+      <span>Soft Skills 360°</span>
+    </a>
+    <a class="user-nav-item " href="srv-skills.html">
+      <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+      <span>СРВ</span>
+    </a>
+    <a class="user-nav-item active" href="employee-card.html">
+      <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"/></svg>
+      <span>Карточка + 1-on-1</span>
+    </a>
+    <div class="user-sidebar-divider"></div>
+    <a class="user-nav-item" href="admin-dashboard.html">
+      <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+      <span>Админ-панель</span>
+    </a>
+    <a class="user-nav-item" href="nav.html">
+      <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+      <span>Главная</span>
+    </a>
   </div>
-  <div class="topbar-right">
-    <button class="btn btn-sm" onclick="scheduleMeeting()">📅 Назначить 1-on-1</button>
-    <button class="btn btn-sm" onclick="alert('Экспорт PDF')">↓ PDF</button>
+  <div class="user-sidebar-footer">
+    <div class="user-sidebar-user">
+      <div class="user-sidebar-avatar">МИ</div>
+      <div>
+        <div style="font-weight:500;color:var(--text);font-size:12px">Мария Иванова</div>
+        <div style="font-size:10px;color:var(--muted)">Сотрудник · Frontend</div>
+      </div>
+    </div>
   </div>
 </div>
+
 
 <div class="layout">
 
