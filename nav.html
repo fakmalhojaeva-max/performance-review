@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Навигация прототипа</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* HEADER */
+  .header { padding: 28px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+  .logo { font-family: var(--font-head); font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .proto-badge { font-size: 10px; font-weight: 600; background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.25); border-radius: 20px; padding: 3px 10px; }
+
+  /* HERO */
+  .hero { text-align: center; padding: 48px 40px 32px; }
+  .hero-title { font-family: var(--font-head); font-size: 28px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 8px; }
+  .hero-title span { color: var(--accent2); }
+  .hero-sub { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 460px; margin: 0 auto; }
+
+  /* ENTRY POINTS */
+  .entry-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 780px; margin: 0 auto; padding: 0 40px 40px; }
+
+  .entry-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;
+    transition: all 0.15s;
+  }
+  .entry-card:hover { border-color: var(--border2); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+
+  .entry-card-top { padding: 28px 28px 20px; flex: 1; }
+  .entry-icon { font-size: 36px; margin-bottom: 14px; }
+  .entry-name { font-family: var(--font-head); font-size: 20px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 6px; }
+  .entry-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+  .entry-roles { display: flex; flex-wrap: wrap; gap: 5px; }
+  .role-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+
+  /* USER ENTRY */
+  .entry-card.user .entry-card-top { border-bottom: 1px solid var(--border); }
+  .entry-card.user .entry-name { color: var(--green); }
+  .entry-card.user .entry-footer { background: rgba(52,211,153,0.06); }
+  .entry-card.user .entry-btn { background: var(--green); color: #0f1117; border-color: var(--green); }
+  .entry-card.user .entry-btn:hover { background: #4ae8af; }
+
+  /* ADMIN ENTRY */
+  .entry-card.admin .entry-name { color: var(--accent2); }
+  .entry-card.admin .entry-footer { background: rgba(108,123,255,0.06); }
+  .entry-card.admin .entry-btn { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .entry-card.admin .entry-btn:hover { background: #7b8aff; }
+
+  .entry-footer { padding: 18px 28px; }
+  .entry-btn { display: block; text-align: center; text-decoration: none; padding: 12px; border-radius: 10px; font-family: var(--font-head); font-size: 14px; font-weight: 700; border: 2px solid transparent; transition: all 0.15s; width: 100%; }
+
+  /* PAGES LIST */
+  .pages-section { max-width: 780px; margin: 0 auto; padding: 0 40px 60px; }
+  .section-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .pages-group { margin-bottom: 28px; }
+  .pages-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+
+  .page-link {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 11px 14px;
+    text-decoration: none; color: var(--text);
+    transition: all 0.12s; font-size: 12px;
+  }
+  .page-link:hover { border-color: var(--border2); background: var(--bg3); }
+  .page-link-icon { font-size: 16px; flex-shrink: 0; }
+  .page-link-name { font-weight: 500; flex: 1; }
+  .page-link-tag { font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 8px; flex-shrink: 0; }
+  .tag-hr { background: rgba(108,123,255,0.12); color: var(--accent2); }
+  .tag-lead { background: rgba(45,212,191,0.12); color: var(--teal); }
+  .tag-emp { background: rgba(52,211,153,0.12); color: var(--green); }
+  .tag-po { background: rgba(244,114,182,0.12); color: #f472b6; }
+  .tag-all { background: rgba(255,255,255,0.05); color: var(--muted); }
+
+  @media (max-width: 680px) {
+    .header, .hero, .entry-grid, .pages-section { padding-left: 16px; padding-right: 16px; }
+    .entry-grid { grid-template-columns: 1fr; }
+    .hero-title { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">Review<span>OS</span></div>
+  <span class="proto-badge">⚡ Прототип</span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-title">Выберите <span>вход в систему</span></div>
+  <div class="hero-sub">Это прототип системы Performance Review. Данные демонстрационные, изменения не сохраняются между сессиями.</div>
+</div>
+
+<!-- TWO ENTRY POINTS -->
+<div class="entry-grid">
+
+  <!-- USER PORTAL -->
+  <div class="entry-card user">
+    <div class="entry-card-top">
+      <div class="entry-icon">👤</div>
+      <div class="entry-name">Пользовательский вход</div>
+      <div class="entry-desc">Для сотрудников, руководителей и продакт-оунеров. Заполнение форм оценки, просмотр результатов.</div>
+      <div class="entry-roles">
+        <span class="role-badge" style="background:rgba(52,211,153,0.12);color:var(--green);border:1px solid rgba(52,211,153,0.2)">Сотрудник</span>
+        <span class="role-badge" style="background:rgba(45,212,191,0.12);color:var(--teal);border:1px solid rgba(45,212,191,0.2)">Руководитель</span>
+        <span class="role-badge" style="background:rgba(244,114,182,0.12);color:#f472b6;border:1px solid rgba(244,114,182,0.2)">Продакт-оунер</span>
+      </div>
+    </div>
+    <div class="entry-footer">
+      <a href="index.html" class="entry-btn">Войти как пользователь →</a>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div class="entry-card admin">
+    <div class="entry-card-top">
+      <div class="entry-icon">⚙️</div>
+      <div class="entry-name">Админ-панель</div>
+      <div class="entry-desc">Для HR-администраторов. Управление циклами, сотрудниками, компетенциями и настройками.</div>
+      <div class="entry-roles">
+        <span class="role-badge" style="background:rgba(108,123,255,0.12);color:var(--accent2);border:1px solid rgba(108,123,255,0.2)">HR-администратор</span>
+      </div>
+    </div>
+    <div class="entry-footer">
+      <a href="admin.html" class="entry-btn">Войти как HR-админ →</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ALL PAGES LIST -->
+<div class="pages-section">
+
+  <div class="pages-group">
+    <div class="section-label">Пользовательские страницы</div>
+    <div class="pages-grid">
+      <a class="page-link" href="index.html"><span class="page-link-icon">📊</span><span class="page-link-name">Дашборд HR</span><span class="page-link-tag tag-hr">HR</span></a>
+      <a class="page-link" href="self-assessment.html"><span class="page-link-icon">✍️</span><span class="page-link-name">Самооценка</span><span class="page-link-tag tag-emp">Сотрудник</span></a>
+      <a class="page-link" href="performance.html"><span class="page-link-icon">📈</span><span class="page-link-name">Оценка Performance</span><span class="page-link-tag tag-po">Продакт</span></a>
+      <a class="page-link" href="hard-skills.html"><span class="page-link-icon">💻</span><span class="page-link-name">Hard Skills</span><span class="page-link-tag tag-lead">Лид</span></a>
+      <a class="page-link" href="soft-skills.html"><span class="page-link-icon">🤝</span><span class="page-link-name">Soft Skills 360°</span><span class="page-link-tag tag-all">Команда</span></a>
+      <a class="page-link" href="srv-skills.html"><span class="page-link-icon">🎯</span><span class="page-link-name">Оценка СРВ</span><span class="page-link-tag tag-lead">Лид</span></a>
+      <a class="page-link" href="employee-card.html"><span class="page-link-icon">📁</span><span class="page-link-name">Карточка + 1-on-1</span><span class="page-link-tag tag-lead">Лид + HR</span></a>
+    </div>
+  </div>
+
+  <div class="pages-group">
+    <div class="section-label">Админ-панель</div>
+    <div class="pages-grid">
+      <a class="page-link" href="admin.html"><span class="page-link-icon">🔄</span><span class="page-link-name">Циклы оценки</span><span class="page-link-tag tag-hr">HR</span></a>
+      <a class="page-link" href="admin-employees.html"><span class="page-link-icon">👥</span><span class="page-link-name">Сотрудники</span><span class="page-link-tag tag-hr">HR</span></a>
+      <a class="page-link" href="admin-competencies.html"><span class="page-link-icon">⊞</span><span class="page-link-name">Компетенции</span><span class="page-link-tag tag-hr">HR</span></a>
+      <a class="page-link" href="admin-forms.html"><span class="page-link-icon">📋</span><span class="page-link-name">Конструктор форм</span><span class="page-link-tag tag-hr">HR</span></a>
+      <a class="page-link" href="admin-references.html"><span class="page-link-icon">⚙️</span><span class="page-link-name">Справочники</span><span class="page-link-tag tag-hr">HR</span></a>
+      <a class="page-link" href="admin-users.html"><span class="page-link-icon">🔑</span><span class="page-link-name">Пользователи</span><span class="page-link-tag tag-hr">HR</span></a>
+      <a class="page-link" href="admin-email-templates.html"><span class="page-link-icon">✉️</span><span class="page-link-name">Шаблоны писем</span><span class="page-link-tag tag-hr">HR</span></a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
