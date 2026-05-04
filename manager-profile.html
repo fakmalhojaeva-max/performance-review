@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Дашборд руководителя</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; padding-left: 220px; }
+  @media (max-width: 900px) { body { padding-left: 60px; } }
+
+  /* USER SIDEBAR */
+  .user-sidebar { width: 220px; min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .user-sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--text); display: block; }
+  .user-sidebar-logo span { color: var(--accent); }
+  .user-sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .user-sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .user-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: var(--muted); font-size: 13px; text-decoration: none; border: none; background: none; width: 100%; font-family: var(--font-body); font-weight: 400; }
+  .user-nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .user-nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .user-nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .user-nav-item.active .user-nav-icon { opacity: 1; }
+  .user-sidebar-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+  .user-sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .user-sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .user-sidebar-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(45,212,191,0.15); color: var(--teal); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+  @media (max-width: 900px) { .user-sidebar { width: 60px; } .user-sidebar-logo small, .user-nav-item span:not(.user-nav-icon) { display: none; } .user-sidebar-footer { display: none; } }
+
+  /* TOPBAR */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+  .breadcrumb { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .breadcrumb a { color: var(--accent2); text-decoration: none; }
+  .content { padding: 24px 28px; max-width: 1200px; }
+
+  .btn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #7b8aff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-green { background: var(--green); border-color: var(--green); color: #0f1117; font-weight: 600; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .badge-red { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+  .badge-gray { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+  /* PROFILE */
+  .profile-card {
+    background: linear-gradient(135deg, var(--bg2) 0%, rgba(45,212,191,0.05) 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 22px 26px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .profile-avatar { width: 64px; height: 64px; border-radius: 14px; background: rgba(45,212,191,0.15); color: var(--teal); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 22px; font-weight: 800; border: 2px solid rgba(45,212,191,0.3); flex-shrink: 0; }
+  .profile-info { flex: 1; }
+  .profile-name { font-family: var(--font-head); font-size: 18px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 3px; }
+  .profile-position { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .profile-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .profile-meta-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .profile-meta-val { color: var(--text); font-weight: 500; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .stat-info { flex: 1; }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .stat-value { font-family: var(--font-head); font-size: 22px; font-weight: 800; line-height: 1.1; margin-top: 2px; }
+
+  @media (max-width: 900px) { .stats-row { grid-template-columns: repeat(2, 1fr) !important; } }
+
+  /* SECTION */
+  .section { margin-bottom: 28px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .section-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+
+  /* MY TASKS BLOCK (compact) */
+  .my-tasks {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .my-tasks-header {
+    background: rgba(108,123,255,0.06); padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .my-tasks-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--accent2); }
+  .my-tasks-list {  }
+  .my-task-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 18px; border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .my-task-item:last-child { border-bottom: none; }
+  .my-task-item:hover { background: rgba(255,255,255,0.02); }
+  .my-task-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .my-task-content { flex: 1; }
+  .my-task-title { font-size: 12px; font-weight: 500; }
+  .my-task-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .my-task-action { flex-shrink: 0; }
+
+  /* SUBORDINATES TABLE */
+  .sub-table-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .sub-filters {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .filter-chip { font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.12s; font-family: var(--font-body); }
+  .filter-chip:hover, .filter-chip.active { border-color: var(--accent); color: var(--accent2); background: rgba(108,123,255,0.08); }
+  .search-input { margin-left: auto; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; color: var(--text); font-family: var(--font-body); font-size: 12px; outline: none; width: 200px; }
+  .search-input:focus { border-color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 12px 16px; vertical-align: middle; font-size: 12px; }
+
+  .emp-cell { display: flex; align-items: center; gap: 10px; }
+  .emp-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .emp-name { font-weight: 500; font-size: 12px; }
+  .emp-pos { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* Stages indicator (mini) */
+  .stages-mini { display: flex; gap: 4px; }
+  .stage-dot {
+    width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; font-family: var(--font-head);
+    transition: all 0.15s; cursor: help;
+  }
+  .stage-dot.done { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.25); }
+  .stage-dot.active { background: rgba(108,123,255,0.15); color: var(--accent2); border: 1px solid rgba(108,123,255,0.25); animation: pulse 2s ease infinite; }
+  .stage-dot.todo { background: var(--bg4); color: var(--muted); border: 1px solid var(--border); }
+  .stage-dot.skip { background: rgba(248,113,113,0.08); color: var(--red); border: 1px solid rgba(248,113,113,0.2); text-decoration: line-through; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(108,123,255,0); } 50% { box-shadow: 0 0 0 4px rgba(108,123,255,0.15); } }
+
+  .progress-cell { min-width: 130px; }
+  .progress-text { font-size: 11px; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .progress-bar-bg { width: 100%; height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 2px; }
+
+  .actions-cell { display: flex; gap: 4px; flex-wrap: wrap; }
+  .act-btn {
+    padding: 4px 10px; border-radius: 6px;
+    border: 1px solid var(--border); background: transparent;
+    font-size: 11px; font-weight: 500; cursor: pointer;
+    transition: all 0.12s; font-family: var(--font-body);
+    text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .act-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .act-btn.primary:hover { background: #7b8aff; }
+  .act-btn:hover { color: var(--text); border-color: var(--border2); }
+  .act-btn.done { color: var(--green); border-color: rgba(52,211,153,0.3); cursor: default; }
+  .act-btn.done:hover { background: transparent; }
+
+  /* DEADLINE */
+  .deadline-cell { font-size: 11px; }
+  .deadline-cell.overdue { color: var(--red); font-weight: 600; }
+  .deadline-cell.soon { color: var(--amber); font-weight: 600; }
+  .deadline-cell.ok { color: var(--muted); }
+
+  /* HIERARCHY INDICATOR */
+  .hierarchy-info {
+    background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px; font-size: 11px;
+  }
+
+  /* LIGHT THEME */
+  body.light {
+    --bg: #f7f8fc;
+    --bg2: #ffffff;
+    --bg3: #f1f3f9;
+    --bg4: #e7eaf2;
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text: #1a1d2e;
+    --muted: #6b7184;
+  }
+  body.light .nav-item.active, body.light .user-nav-item.active {
+    background: rgba(108,123,255,0.1);
+    color: var(--accent);
+  }
+  body.light table thead th { background: rgba(0,0,0,0.02); }
+  body.light tbody tr:hover { background: rgba(0,0,0,0.02); }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .theme-toggle:hover { background: var(--bg4); border-color: var(--border2); }
+
+</style>
+</head>
+<body>
+
+<!-- USER SIDEBAR -->
+<div class="user-sidebar">
+  <a class="user-sidebar-logo" href="nav.html">ReviewOS<small>Система оценки</small></a>
+  <div class="user-sidebar-nav">
+    <a class="user-nav-item active" href="manager-profile.html"><svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span>Дашборд</span></a>
+    <div class="user-sidebar-divider"></div>
+    <a class="user-nav-item" href="nav.html"><svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg><span>Главная</span></a>
+  </div>
+  <div class="user-sidebar-footer">
+    <div class="user-sidebar-user">
+      <div class="user-sidebar-avatar">АК</div>
+      <div>
+        <div style="font-weight:500;color:var(--text);font-size:12px">Алексей Козлов</div>
+        <div style="font-size:10px;color:var(--muted)">Руководитель · Frontend</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Дашборд</div>
+    <div class="breadcrumb"><a href="nav.html">Главная</a> → Дашборд руководителя</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- PROFILE -->
+  <div class="profile-card">
+    <div class="profile-avatar">АК</div>
+    <div class="profile-info">
+      <div class="profile-name">Алексей Козлов</div>
+      <div class="profile-position">Frontend Lead · Команда Web App</div>
+      <div class="profile-meta">
+        <div class="profile-meta-item">Грейд: <span class="badge badge-green" style="margin-left:2px">Sen2</span></div>
+        <div class="profile-meta-item">Подчинённых: <span class="profile-meta-val">5</span></div>
+        <div class="profile-meta-item">Руководитель: <span class="profile-meta-val">Петров С.А.</span></div>
+        <div class="profile-meta-item">Цикл: <span class="badge badge-amber" style="margin-left:2px">Q2 2026</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS - what manager needs to do -->
+  <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(108,123,255,0.12);color:var(--accent2)">👥</div>
+      <div class="stat-info"><div class="stat-label">Подчинённых</div><div class="stat-value">5</div></div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(45,212,191,0.25);background:rgba(45,212,191,0.03)">
+      <div class="stat-icon" style="background:rgba(45,212,191,0.12);color:var(--teal)">💻</div>
+      <div class="stat-info">
+        <div class="stat-label">Hard Skills</div>
+        <div class="stat-value" style="color:var(--teal)">2</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">ждут оценки</div>
+      </div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(251,191,36,0.25);background:rgba(251,191,36,0.03)">
+      <div class="stat-icon" style="background:rgba(251,191,36,0.12);color:var(--amber)">🎯</div>
+      <div class="stat-info">
+        <div class="stat-label">СРВ</div>
+        <div class="stat-value" style="color:var(--amber)">1</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">ждёт оценки</div>
+      </div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.03)">
+      <div class="stat-icon" style="background:rgba(248,113,113,0.12);color:var(--red)">📁</div>
+      <div class="stat-info">
+        <div class="stat-label">1-on-1</div>
+        <div class="stat-value" style="color:var(--red)">1</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">ждёт встречи</div>
+      </div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(52,211,153,0.25);background:rgba(52,211,153,0.03)">
+      <div class="stat-icon" style="background:rgba(52,211,153,0.12);color:var(--green)">✓</div>
+      <div class="stat-info">
+        <div class="stat-label">Завершено</div>
+        <div class="stat-value" style="color:var(--green)">1</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">из 5</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY TASKS BLOCK -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">📋 Мои задачи</div>
+      <span style="font-size:11px;color:var(--muted)">Как сотрудник</span>
+    </div>
+
+    <div class="my-tasks">
+      <div class="my-tasks-header">
+        <div class="my-tasks-title">Вам также нужно пройти оценку как сотруднику</div>
+        <a href="employee-profile.html" class="btn btn-sm">Открыть мой профиль →</a>
+      </div>
+      <div class="my-tasks-list">
+        <div class="my-task-item">
+          <div class="my-task-icon" style="background:rgba(108,123,255,0.12);color:var(--accent2)">✍️</div>
+          <div class="my-task-content">
+            <div class="my-task-title">Заполнить самооценку</div>
+            <div class="my-task-meta">До 1 июня · осталось 2 дня</div>
+          </div>
+          <div class="my-task-action">
+            <a href="self-assessment.html" class="btn btn-primary btn-sm">Заполнить</a>
+          </div>
+        </div>
+        <div class="my-task-item">
+          <div class="my-task-icon" style="background:rgba(167,139,250,0.12);color:var(--accent2)">🤝</div>
+          <div class="my-task-content">
+            <div class="my-task-title">Оценить коллег (360°)</div>
+            <div class="my-task-meta">2 из 4 заполнено · до 10 июня</div>
+          </div>
+          <div class="my-task-action">
+            <a href="employee-profile.html" class="btn btn-sm">Продолжить</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBORDINATES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">👥 Мои сотрудники</div>
+      <span style="font-size:11px;color:var(--muted)">5 подчинённых</span>
+    </div>
+
+    <div class="hierarchy-info">
+      <span style="font-size:14px">ℹ️</span>
+      <div>Вы видите своих <strong>прямых подчинённых</strong>. Если у вас есть Лиды в подчинении — их подчинённые тоже отображаются (всё дерево вниз по иерархии).</div>
+    </div>
+
+    <div class="sub-table-card">
+      <div class="sub-filters">
+        <button class="filter-chip active" onclick="setFilter(this,'all')">Все</button>
+        <button class="filter-chip" onclick="setFilter(this,'awaiting')">Жду оценки</button>
+        <button class="filter-chip" onclick="setFilter(this,'progress')">В процессе</button>
+        <button class="filter-chip" onclick="setFilter(this,'done')">Завершено</button>
+        <input class="search-input" placeholder="🔍 Поиск...">
+      </div>
+
+      <table>
+        <thead><tr>
+          <th>Сотрудник</th>
+          <th>Грейд</th>
+          <th>Этапы оценки</th>
+          <th>Прогресс</th>
+          <th>Дедлайн</th>
+          <th>Действия</th>
+        </tr></thead>
+        <tbody>
+
+          <!-- Employee 1 - awaiting Hard Skills -->
+          <tr>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar" style="background:rgba(52,211,153,0.15);color:var(--green)">МИ</div>
+                <div>
+                  <div class="emp-name">Мария Иванова</div>
+                  <div class="emp-pos">Frontend · Web App</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Sen1</span></td>
+            <td>
+              <div class="stages-mini">
+                <div class="stage-dot done" title="Самооценка">С</div>
+                <div class="stage-dot done" title="Performance">P</div>
+                <div class="stage-dot active" title="Hard Skills — ваша задача">H</div>
+                <div class="stage-dot todo" title="Soft 360°">S</div>
+                <div class="stage-dot todo" title="СРВ — ваша задача">СРВ</div>
+                <div class="stage-dot todo" title="1-on-1 — ваша задача">1-1</div>
+              </div>
+            </td>
+            <td class="progress-cell">
+              <div class="progress-text"><span>3 из 6 этапов</span><span>50%</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:50%;background:var(--accent2)"></div></div>
+            </td>
+            <td><div class="deadline-cell soon">⏰ 5 июня · 6 дней</div></td>
+            <td>
+              <div class="actions-cell">
+                <a href="hard-skills.html" class="act-btn primary">Hard Skills</a>
+                <a href="employee-card.html" class="act-btn">📁 Карточка</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Employee 2 - waiting for self-assessment -->
+          <tr>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar" style="background:rgba(108,123,255,0.15);color:var(--accent2)">ДЛ</div>
+                <div>
+                  <div class="emp-name">Дмитрий Ли</div>
+                  <div class="emp-pos">QA · Web App</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Mid2</span></td>
+            <td>
+              <div class="stages-mini">
+                <div class="stage-dot active" title="Самооценка — ждём от сотрудника">С</div>
+                <div class="stage-dot todo" title="Performance">P</div>
+                <div class="stage-dot todo" title="Hard Skills — ваша задача">H</div>
+                <div class="stage-dot todo" title="Soft 360°">S</div>
+                <div class="stage-dot todo" title="СРВ — ваша задача">СРВ</div>
+                <div class="stage-dot todo" title="1-on-1 — ваша задача">1-1</div>
+              </div>
+            </td>
+            <td class="progress-cell">
+              <div class="progress-text"><span>0 из 6 этапов</span><span>0%</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0%"></div></div>
+            </td>
+            <td><div class="deadline-cell ok">10 июня · 11 дней</div></td>
+            <td>
+              <div class="actions-cell">
+                <button class="act-btn" onclick="alert('Отправить напоминание Дмитрию Ли')">📨 Напомнить</button>
+                <a href="employee-card.html" class="act-btn">📁 Карточка</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Employee 3 - awaiting СРВ -->
+          <tr>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar" style="background:rgba(167,139,250,0.15);color:var(--accent2)">ОС</div>
+                <div>
+                  <div class="emp-name">Ольга Смирнова</div>
+                  <div class="emp-pos">QA Lead · Testing</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Sen1</span></td>
+            <td>
+              <div class="stages-mini">
+                <div class="stage-dot done" title="Самооценка">С</div>
+                <div class="stage-dot done" title="Performance">P</div>
+                <div class="stage-dot done" title="Hard Skills">H</div>
+                <div class="stage-dot done" title="Soft 360°">S</div>
+                <div class="stage-dot active" title="СРВ — ваша задача">СРВ</div>
+                <div class="stage-dot todo" title="1-on-1 — ваша задача">1-1</div>
+              </div>
+            </td>
+            <td class="progress-cell">
+              <div class="progress-text"><span>4 из 6 этапов</span><span>67%</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:67%;background:var(--teal)"></div></div>
+            </td>
+            <td><div class="deadline-cell ok">8 июня · 9 дней</div></td>
+            <td>
+              <div class="actions-cell">
+                <a href="srv-skills.html" class="act-btn primary">Оценить СРВ</a>
+                <a href="employee-card.html" class="act-btn">📁 Карточка</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Employee 4 - 1-on-1 ready -->
+          <tr>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar" style="background:rgba(244,114,182,0.15);color:#f472b6">ИН</div>
+                <div>
+                  <div class="emp-name">Игорь Новиков</div>
+                  <div class="emp-pos">Frontend · Web App</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Mid3</span></td>
+            <td>
+              <div class="stages-mini">
+                <div class="stage-dot done" title="Самооценка">С</div>
+                <div class="stage-dot done" title="Performance">P</div>
+                <div class="stage-dot done" title="Hard Skills">H</div>
+                <div class="stage-dot done" title="Soft 360°">S</div>
+                <div class="stage-dot done" title="СРВ">СРВ</div>
+                <div class="stage-dot active" title="1-on-1 — ваша задача">1-1</div>
+              </div>
+            </td>
+            <td class="progress-cell">
+              <div class="progress-text"><span>5 из 6 этапов</span><span>83%</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:83%;background:var(--green)"></div></div>
+            </td>
+            <td><div class="deadline-cell overdue">⏰ Просрочено · вчера</div></td>
+            <td>
+              <div class="actions-cell">
+                <a href="employee-card.html" class="act-btn primary">📁 1-on-1</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Employee 5 - all done -->
+          <tr>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar" style="background:rgba(251,191,36,0.15);color:var(--amber)">ТБ</div>
+                <div>
+                  <div class="emp-name">Татьяна Белова</div>
+                  <div class="emp-pos">Frontend · Web App</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Mid1</span></td>
+            <td>
+              <div class="stages-mini">
+                <div class="stage-dot done" title="Самооценка">С</div>
+                <div class="stage-dot done" title="Performance">P</div>
+                <div class="stage-dot done" title="Hard Skills">H</div>
+                <div class="stage-dot done" title="Soft 360°">S</div>
+                <div class="stage-dot done" title="СРВ">СРВ</div>
+                <div class="stage-dot done" title="1-on-1">1-1</div>
+              </div>
+            </td>
+            <td class="progress-cell">
+              <div class="progress-text"><span>6 из 6 этапов</span><span style="color:var(--green)">100%</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:100%;background:var(--green)"></div></div>
+            </td>
+            <td><div class="deadline-cell ok"><span class="badge badge-green" style="font-size:9px">✓ Завершено</span></div></td>
+            <td>
+              <div class="actions-cell">
+                <a href="employee-card.html" class="act-btn">📁 Карточка</a>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- LEGEND -->
+    <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:5px;color:var(--muted)"><div class="stage-dot done" style="width:18px;height:18px;font-size:8px">✓</div>Этап завершён</div>
+      <div style="display:flex;align-items:center;gap:5px;color:var(--muted)"><div class="stage-dot active" style="width:18px;height:18px;font-size:8px">⌛</div>Ваша задача / в процессе</div>
+      <div style="display:flex;align-items:center;gap:5px;color:var(--muted)"><div class="stage-dot todo" style="width:18px;height:18px;font-size:8px">·</div>Этап ожидает</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function setFilter(btn, f) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('reviewos-theme', isLight ? 'light' : 'dark');
+  const btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = isLight ? '🌙' : '☀️';
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('reviewos-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.querySelector('.theme-toggle');
+    if (btn) btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
+})();
+
+</script>
+</body>
+</html>

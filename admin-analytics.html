@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Аналитика и отчёты</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf; --pink: #f472b6;
+    --sidebar-w: 240px;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: block; padding: 0; }
+  .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: var(--muted); font-size: 13px; border: none; background: none; width: 100%; font-family: var(--font-body); text-decoration: none; }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .sidebar-user-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(108,123,255,0.15); color: var(--accent2); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+
+  .main { margin-left: var(--sidebar-w); flex: none; min-height: 100vh; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+  .content { padding: 24px 28px; max-width: 1200px; }
+
+  .btn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .badge-red { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+
+  /* CYCLE FILTER */
+  .filter-bar {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 22px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px;
+  }
+  .filter-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+  .filter-select {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 7px 12px; color: var(--text); font-family: var(--font-body); font-size: 12px;
+    outline: none; appearance: none; min-width: 140px;
+  }
+  .filter-select:focus { border-color: var(--accent); }
+
+  /* KEY METRICS */
+  .metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .metric-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .metric-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; }
+  .metric-value { font-family: var(--font-head); font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+  .metric-trend { font-size: 11px; margin-top: 4px; }
+  .trend-up { color: var(--green); }
+  .trend-down { color: var(--red); }
+
+  /* SECTION */
+  .section { margin-bottom: 24px; }
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .card-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .card-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; }
+  .card-body { padding: 20px; }
+
+  /* GRADE DISTRIBUTION */
+  .grade-bars { display: flex; align-items: flex-end; gap: 14px; height: 220px; padding: 10px 0 30px; position: relative; }
+  .grade-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; position: relative; }
+  .grade-bar-wrap { flex: 1; width: 100%; max-width: 60px; position: relative; display: flex; flex-direction: column; justify-content: flex-end; }
+  .grade-bar { width: 100%; border-radius: 8px 8px 0 0; transition: height 0.4s; position: relative; }
+  .grade-bar-value { position: absolute; top: -22px; left: 0; right: 0; text-align: center; font-family: var(--font-head); font-size: 12px; font-weight: 700; }
+  .grade-bar-label { font-family: var(--font-head); font-size: 11px; font-weight: 700; color: var(--muted); position: absolute; bottom: -22px; }
+
+  /* DYNAMICS TABLE */
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  td { padding: 12px 16px; vertical-align: middle; font-size: 12px; }
+
+  /* DIRECTION ROW */
+  .dir-bar-cell { display: flex; align-items: center; gap: 10px; }
+  .dir-bar-bg { flex: 1; height: 6px; background: var(--border2); border-radius: 3px; overflow: hidden; }
+  .dir-bar-fill { height: 100%; border-radius: 3px; }
+  .dir-bar-val { font-family: var(--font-head); font-size: 12px; font-weight: 700; min-width: 40px; text-align: right; }
+
+  /* REPORTS */
+  .reports-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .report-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 18px 20px;
+    transition: all 0.15s; cursor: pointer; text-decoration: none; color: var(--text);
+    display: block;
+  }
+  .report-card:hover { border-color: var(--border2); background: var(--bg3); }
+  .report-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px; }
+  .report-name { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .report-desc { font-size: 11px; color: var(--muted); line-height: 1.4; margin-bottom: 12px; }
+  .report-action { font-size: 11px; color: var(--accent2); font-weight: 600; }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar .nav-text, .sidebar-logo small { display: none; }
+    .main { margin-left: 60px; }
+    .metrics-row { grid-template-columns: repeat(2, 1fr); }
+    .reports-grid { grid-template-columns: 1fr; }
+  }
+
+  /* LIGHT THEME */
+  body.light {
+    --bg: #f7f8fc;
+    --bg2: #ffffff;
+    --bg3: #f1f3f9;
+    --bg4: #e7eaf2;
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text: #1a1d2e;
+    --muted: #6b7184;
+  }
+  body.light .nav-item.active, body.light .user-nav-item.active {
+    background: rgba(108,123,255,0.1);
+    color: var(--accent);
+  }
+  body.light table thead th { background: rgba(0,0,0,0.02); }
+  body.light tbody tr:hover { background: rgba(0,0,0,0.02); }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .theme-toggle:hover { background: var(--bg4); border-color: var(--border2); }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">Review<span>OS</span><small>Админ-панель</small></div>
+  <div class="sidebar-nav">
+    <a class="nav-item" href="index.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span class="nav-text">Дашборд</span></a>
+    <a class="nav-item" href="admin.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg><span class="nav-text">Циклы оценки</span></a>
+    <a class="nav-item" href="admin-employees.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg><span class="nav-text">Сотрудники</span></a>
+    <a class="nav-item" href="admin-references.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span class="nav-text">Справочники</span></a>
+    <a class="nav-item" href="admin-competencies.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg><span class="nav-text">Компетенции</span></a>
+    <a class="nav-item" href="admin-forms.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg><span class="nav-text">Конструктор форм</span></a>
+    <a class="nav-item" href="admin-users.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></a>
+    <button class="nav-item active"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg><span class="nav-text">Аналитика</span></button>
+    <a class="nav-item" href="index.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg><span class="nav-text">Аудит</span></a>
+    <a class="nav-item" href="admin-email-templates.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg><span class="nav-text">Шаблоны писем</span></a>
+    <a class="nav-item" href="admin-email-log.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg><span class="nav-text">Журнал писем</span></a>
+    <a class="nav-item" href="nav.html" style="border-top:1px solid var(--border);margin-top:8px;padding-top:12px"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg><span class="nav-text">На главную</span></a>
+  </div>
+  <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Аналитика и отчёты</div>
+    <button class="btn btn-sm" onclick="alert('Скачать общий отчёт за выбранный цикл')">↓ Скачать сводный отчёт</button>
+  </div>
+
+  <div class="content">
+
+    <!-- FILTER -->
+    <div class="filter-bar">
+      <span class="filter-label">Цикл:</span>
+      <select class="filter-select">
+        <option>Q1 2026</option>
+        <option>Q3 2025</option>
+        <option>Q1 2025</option>
+        <option>Все циклы</option>
+      </select>
+      <span class="filter-label">Направление:</span>
+      <select class="filter-select">
+        <option>Все направления</option>
+        <option>.NET Backend</option>
+        <option>Frontend</option>
+        <option>QA</option>
+        <option>Data</option>
+        <option>Mobile</option>
+      </select>
+    </div>
+
+    <!-- GRADE DISTRIBUTION -->
+    <div class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📊 Распределение по грейдам</div>
+          <span style="font-size:11px;color:var(--muted)">Q1 2026 · 24 сотрудника</span>
+        </div>
+        <div class="card-body">
+          <div class="grade-bars">
+            <div class="grade-bar-col">
+              <div class="grade-bar-wrap">
+                <div class="grade-bar" style="height:25%;background:rgba(108,123,255,0.5)"><div class="grade-bar-value">2</div></div>
+              </div>
+              <div class="grade-bar-label">Jun1</div>
+            </div>
+            <div class="grade-bar-col">
+              <div class="grade-bar-wrap">
+                <div class="grade-bar" style="height:38%;background:rgba(108,123,255,0.6)"><div class="grade-bar-value">3</div></div>
+              </div>
+              <div class="grade-bar-label">Jun2</div>
+            </div>
+            <div class="grade-bar-col">
+              <div class="grade-bar-wrap">
+                <div class="grade-bar" style="height:13%;background:rgba(108,123,255,0.7)"><div class="grade-bar-value">1</div></div>
+              </div>
+              <div class="grade-bar-label">Jun3</div>
+            </div>
+            <div class="grade-bar-col">
+              <div class="grade-bar-wrap">
+                <div class="grade-bar" style="height:50%;background:rgba(45,212,191,0.6)"><div class="grade-bar-value">4</div></div>
+              </div>
+              <div class="grade-bar-label">Mid1</div>
+            </div>
+            <div class="grade-bar-col">
+              <div class="grade-bar-wrap">
+                <div class="grade-bar" style="height:63%;background:rgba(45,212,191,0.7)"><div class="grade-bar-value">5</div></div>
+              </div>
+              <div class="grade-bar-label">Mid2</div>
+            </div>
+            <div class="grade-bar-col">
+              <div class="grade-bar-wrap">
+                <div class="grade-bar" style="height:25%;background:rgba(45,212,191,0.8)"><div class="grade-bar-value">2</div></div>
+              </div>
+              <div class="grade-bar-label">Mid3</div>
+            </div>
+            <div class="grade-bar-col">
+              <div class="grade-bar-wrap">
+                <div class="grade-bar" style="height:50%;background:rgba(52,211,153,0.7)"><div class="grade-bar-value">4</div></div>
+              </div>
+              <div class="grade-bar-label">Sen1</div>
+            </div>
+            <div class="grade-bar-col">
+              <div class="grade-bar-wrap">
+                <div class="grade-bar" style="height:25%;background:rgba(52,211,153,0.8)"><div class="grade-bar-value">2</div></div>
+              </div>
+              <div class="grade-bar-label">Sen2</div>
+            </div>
+            <div class="grade-bar-col">
+              <div class="grade-bar-wrap">
+                <div class="grade-bar" style="height:13%;background:rgba(52,211,153,0.9)"><div class="grade-bar-value">1</div></div>
+              </div>
+              <div class="grade-bar-label">Sen3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BY DIRECTIONS -->
+    <div class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📈 Средний балл по направлениям</div>
+          <span style="font-size:11px;color:var(--muted)">Q1 2026</span>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:30%">Направление</th>
+                <th style="width:15%">Сотрудников</th>
+                <th style="width:35%">Средний балл</th>
+                <th style="width:20%">Повышены</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:500">Frontend</td>
+                <td>5</td>
+                <td>
+                  <div class="dir-bar-cell">
+                    <div class="dir-bar-bg"><div class="dir-bar-fill" style="width:62%;background:var(--green)"></div></div>
+                    <span class="dir-bar-val" style="color:var(--green)">6.2</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-green">2</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:500">.NET Backend</td>
+                <td>6</td>
+                <td>
+                  <div class="dir-bar-cell">
+                    <div class="dir-bar-bg"><div class="dir-bar-fill" style="width:58%;background:var(--teal)"></div></div>
+                    <span class="dir-bar-val" style="color:var(--teal)">5.8</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-green">1</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:500">QA</td>
+                <td>4</td>
+                <td>
+                  <div class="dir-bar-cell">
+                    <div class="dir-bar-bg"><div class="dir-bar-fill" style="width:51%;background:var(--accent2)"></div></div>
+                    <span class="dir-bar-val" style="color:var(--accent2)">5.1</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-green">1</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:500">Data</td>
+                <td>4</td>
+                <td>
+                  <div class="dir-bar-cell">
+                    <div class="dir-bar-bg"><div class="dir-bar-fill" style="width:45%;background:var(--amber)"></div></div>
+                    <span class="dir-bar-val" style="color:var(--amber)">4.5</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-green">1</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:500">Mobile</td>
+                <td>2</td>
+                <td>
+                  <div class="dir-bar-cell">
+                    <div class="dir-bar-bg"><div class="dir-bar-fill" style="width:40%;background:var(--amber)"></div></div>
+                    <span class="dir-bar-val" style="color:var(--amber)">4.0</span>
+                  </div>
+                </td>
+                <td><span class="badge" style="background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--border)">0</span></td>
+              </tr>
+              <tr>
+                <td style="font-weight:500">Mobile (новые)</td>
+                <td>3</td>
+                <td>
+                  <div class="dir-bar-cell">
+                    <div class="dir-bar-bg"><div class="dir-bar-fill" style="width:55%;background:var(--accent)"></div></div>
+                    <span class="dir-bar-val" style="color:var(--accent2)">5.5</span>
+                  </div>
+                </td>
+                <td><span class="badge badge-green">0</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DYNAMICS -->
+    <div class="section">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📉 Динамика по циклам</div>
+        </div>
+        <div class="card-body" style="padding:0">
+          <table>
+            <thead>
+              <tr>
+                <th>Цикл</th>
+                <th>Сотрудников</th>
+                <th>Средний балл</th>
+                <th>Повышены</th>
+                <th>Завершённость</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:500"><span class="badge badge-amber">Q1 2026 · текущий</span></td>
+                <td>24</td>
+                <td><span style="font-family:var(--font-head);font-weight:700;color:var(--green)">5.42</span></td>
+                <td><span class="badge badge-green">5 (21%)</span></td>
+                <td>96%</td>
+              </tr>
+              <tr>
+                <td>Q3 2025</td>
+                <td>22</td>
+                <td><span style="font-family:var(--font-head);font-weight:700">5.24</span></td>
+                <td>4 (18%)</td>
+                <td>100%</td>
+              </tr>
+              <tr>
+                <td>Q1 2025</td>
+                <td>20</td>
+                <td><span style="font-family:var(--font-head);font-weight:700">5.12</span></td>
+                <td>3 (15%)</td>
+                <td>100%</td>
+              </tr>
+              <tr>
+                <td>Q3 2024</td>
+                <td>18</td>
+                <td><span style="font-family:var(--font-head);font-weight:700">4.95</span></td>
+                <td>2 (11%)</td>
+                <td>94%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-family:var(--font-head);font-size:15px;font-weight:700">📁 Готовые отчёты</div>
+      </div>
+      <div class="reports-grid">
+
+        <a class="report-card" onclick="alert('Скачать отчёт по итогам цикла Q1 2026 (PDF)')">
+          <div class="report-icon" style="background:rgba(108,123,255,0.12);color:var(--accent2)">📄</div>
+          <div class="report-name">Итоги цикла</div>
+          <div class="report-desc">Сводный отчёт по результатам Q1 2026: распределение, повышения, средние баллы</div>
+          <div class="report-action">↓ Скачать PDF</div>
+        </a>
+
+        <a class="report-card" onclick="alert('Скачать отчёт по сотрудникам (Excel)')">
+          <div class="report-icon" style="background:rgba(52,211,153,0.12);color:var(--green)">📊</div>
+          <div class="report-name">Список сотрудников</div>
+          <div class="report-desc">Все сотрудники с грейдами, оценками и решениями за цикл</div>
+          <div class="report-action">↓ Скачать Excel</div>
+        </a>
+
+        <a class="report-card" onclick="alert('Скачать отчёт по компетенциям (Excel)')">
+          <div class="report-icon" style="background:rgba(45,212,191,0.12);color:var(--teal)">📋</div>
+          <div class="report-name">Матрица компетенций</div>
+          <div class="report-desc">Распределение баллов по компетенциям: где есть пробелы, кто экспертен</div>
+          <div class="report-action">↓ Скачать Excel</div>
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('reviewos-theme', isLight ? 'light' : 'dark');
+  const btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = isLight ? '🌙' : '☀️';
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('reviewos-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.querySelector('.theme-toggle');
+    if (btn) btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
+})();
+</script>
+</body>
+</html>

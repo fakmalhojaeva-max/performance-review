@@ -149,6 +149,94 @@
     .sidebar .nav-text, .sidebar-logo small { display: none; }
     .main { margin-left: 60px; }
   }
+
+  /* NOTIFICATIONS */
+  .notif-wrap { position: relative; display: inline-block; }
+  .notif-btn {
+    position: relative; width: 36px; height: 36px; border-radius: 9px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .notif-btn:hover { background: var(--bg4); border-color: var(--border2); }
+  .notif-badge {
+    position: absolute; top: -4px; right: -4px;
+    min-width: 18px; height: 18px; border-radius: 9px;
+    background: var(--red); color: #fff;
+    font-family: var(--font-head); font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 5px; border: 2px solid var(--bg);
+  }
+  .notif-dropdown {
+    display: none; position: absolute; top: calc(100% + 8px); right: 0;
+    width: 380px; max-height: 480px;
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    z-index: 1000; overflow: hidden; flex-direction: column;
+  }
+  .notif-dropdown.show { display: flex; }
+  .notif-header {
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  }
+  .notif-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; }
+  .notif-mark { font-size: 11px; color: var(--accent2); cursor: pointer; background: none; border: none; font-family: var(--font-body); }
+  .notif-mark:hover { text-decoration: underline; }
+  .notif-list { flex: 1; overflow-y: auto; }
+  .notif-item {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    display: flex; gap: 10px; cursor: pointer; transition: background 0.1s;
+    text-decoration: none; color: var(--text);
+  }
+  .notif-item:hover { background: rgba(255,255,255,0.02); }
+  .notif-item.unread { background: rgba(108,123,255,0.04); }
+  .notif-item.unread::before { content: ''; position: absolute; left: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 6px; }
+  .notif-item-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .notif-icon-task { background: rgba(251,191,36,0.12); color: var(--amber); }
+  .notif-icon-deadline { background: rgba(248,113,113,0.12); color: var(--red); }
+  .notif-icon-meeting { background: rgba(45,212,191,0.12); color: var(--teal); }
+  .notif-icon-result { background: rgba(52,211,153,0.12); color: var(--green); }
+  .notif-icon-system { background: rgba(108,123,255,0.12); color: var(--accent2); }
+  .notif-content { flex: 1; min-width: 0; }
+  .notif-text { font-size: 12px; line-height: 1.4; margin-bottom: 3px; }
+  .notif-text strong { color: var(--text); font-weight: 600; }
+  .notif-time { font-size: 10px; color: var(--muted); }
+  .notif-footer {
+    padding: 10px 16px; border-top: 1px solid var(--border);
+    text-align: center; flex-shrink: 0;
+  }
+  .notif-footer a { font-size: 11px; color: var(--accent2); text-decoration: none; }
+  .notif-footer a:hover { text-decoration: underline; }
+  .notif-empty { padding: 40px 20px; text-align: center; color: var(--muted); font-size: 12px; }
+
+
+  /* LIGHT THEME */
+  body.light {
+    --bg: #f7f8fc;
+    --bg2: #ffffff;
+    --bg3: #f1f3f9;
+    --bg4: #e7eaf2;
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text: #1a1d2e;
+    --muted: #6b7184;
+  }
+  body.light .nav-item.active, body.light .user-nav-item.active {
+    background: rgba(108,123,255,0.1);
+    color: var(--accent);
+  }
+  body.light table thead th { background: rgba(0,0,0,0.02); }
+  body.light tbody tr:hover { background: rgba(0,0,0,0.02); }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .theme-toggle:hover { background: var(--bg4); border-color: var(--border2); }
+
 </style>
 </head>
 <body>
@@ -157,7 +245,7 @@
 <div class="sidebar">
   <div class="sidebar-logo">Review<span>OS</span><small>Админ-панель</small></div>
   <div class="sidebar-nav">
-    <a class="nav-item " href="admin-dashboard.html">
+    <a class="nav-item " href="index.html">
       <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
       <span class="nav-text">Дашборд</span>
     </a>
@@ -185,7 +273,7 @@
       <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
       <span class="nav-text">Пользователи</span>
     </a>
-    <a class="nav-item " href="admin-dashboard.html">
+    <a class="nav-item " href="index.html">
       <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/></svg>
       <span class="nav-text">Аудит</span>
     </a>
@@ -193,6 +281,7 @@
       <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/></svg>
       <span class="nav-text">Шаблоны писем</span>
     </a>
+    <a class="nav-item" href="admin-analytics.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg><span class="nav-text">Аналитика</span></a>
     <a class="nav-item" href="nav.html" style="border-top:1px solid var(--border);margin-top:8px;padding-top:12px">
       <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
       <span class="nav-text">На главную</span>
@@ -207,7 +296,7 @@
     <button class="nav-item active"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span class="nav-text">Справочники</span></button>
     <a class="nav-item" href="admin-competencies.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg><span class="nav-text">Компетенции</span></a>
     <a class="nav-item" href="admin-forms.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg><span class="nav-text">Конструктор форм</span></a>
-    <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></a>
+    <a class="nav-item" href="admin-email-log.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></a>
     <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg><span class="nav-text">Аудит</span></a>
     <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg><span class="nav-text">Шаблоны писем</span></a>
     <a class="nav-item" href="#"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg><span class="nav-text">Журнал писем</span></a>
@@ -218,6 +307,59 @@
 <!-- MAIN -->
 <div class="main">
   <div class="topbar">
+  <div style="display:flex;gap:8px;align-items:center"><button class="theme-toggle" onclick="toggleTheme()" title="Переключить тему">☀️</button>
+      <div class="notif-wrap">
+  <button class="notif-btn" onclick="toggleNotif(event)">
+    🔔
+    <span class="notif-badge">3</span>
+  </button>
+  <div class="notif-dropdown" id="notif-dropdown">
+    <div class="notif-header">
+      <div class="notif-title">Уведомления</div>
+      <button class="notif-mark" onclick="markAllRead(event)">Отметить все прочитанными</button>
+    </div>
+    <div class="notif-list">
+      <a class="notif-item unread" href="#" style="position:relative;padding-left:20px">
+        <div class="notif-item-icon notif-icon-deadline">⏰</div>
+        <div class="notif-content">
+          <div class="notif-text">Дедлайн самооценки <strong>через 2 дня</strong> — заполните до 1 июня</div>
+          <div class="notif-time">2 часа назад</div>
+        </div>
+      </a>
+      <a class="notif-item unread" href="#" style="position:relative;padding-left:20px">
+        <div class="notif-item-icon notif-icon-task">📋</div>
+        <div class="notif-content">
+          <div class="notif-text">Вас пригласили оценить <strong>3 коллег</strong> в 360° опросе</div>
+          <div class="notif-time">5 часов назад</div>
+        </div>
+      </a>
+      <a class="notif-item unread" href="#" style="position:relative;padding-left:20px">
+        <div class="notif-item-icon notif-icon-meeting">📅</div>
+        <div class="notif-content">
+          <div class="notif-text">Назначена встреча 1-on-1 с <strong>Козлов А.И.</strong> на 15 июня, 15:00</div>
+          <div class="notif-time">Вчера</div>
+        </div>
+      </a>
+      <a class="notif-item" href="#">
+        <div class="notif-item-icon notif-icon-result">✓</div>
+        <div class="notif-content">
+          <div class="notif-text">Результаты цикла <strong>Q1 2026</strong> доступны для просмотра</div>
+          <div class="notif-time">2 дня назад</div>
+        </div>
+      </a>
+      <a class="notif-item" href="#">
+        <div class="notif-item-icon notif-icon-system">⚙</div>
+        <div class="notif-content">
+          <div class="notif-text">Запущен новый цикл оценки <strong>Q2 2026</strong></div>
+          <div class="notif-time">3 дня назад</div>
+        </div>
+      </a>
+    </div>
+    <div class="notif-footer">
+      <a href="#">Все уведомления →</a>
+    </div>
+  </div>
+</div></div>
     <div class="topbar-title">Справочники</div>
     <button class="btn btn-primary" onclick="openAddModal()">+ Добавить</button>
   </div>
@@ -475,6 +617,42 @@ renderDirections();
 renderPositions();
 renderTeams();
 renderGrades();
+
+function toggleNotif(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('notif-dropdown').classList.toggle('show');
+}
+function markAllRead(e) {
+  if (e) e.stopPropagation();
+  document.querySelectorAll('.notif-item').forEach(i => i.classList.remove('unread'));
+  document.querySelector('.notif-badge').style.display = 'none';
+}
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('notif-dropdown');
+  if (dd && !dd.contains(e.target) && !e.target.closest('.notif-btn')) {
+    dd.classList.remove('show');
+  }
+});
+
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('reviewos-theme', isLight ? 'light' : 'dark');
+  const btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = isLight ? '🌙' : '☀️';
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('reviewos-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.querySelector('.theme-toggle');
+    if (btn) btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
+})();
+
 </script>
 </body>
 </html>

@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Дашборд сотрудника</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; padding-left: 220px; }
+  @media (max-width: 900px) { body { padding-left: 60px; } }
+
+  /* USER SIDEBAR */
+  .user-sidebar { width: 220px; min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .user-sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--text); display: block; }
+  .user-sidebar-logo span { color: var(--accent); }
+  .user-sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .user-sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .user-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: var(--muted); font-size: 13px; text-decoration: none; border: none; background: none; width: 100%; font-family: var(--font-body); font-weight: 400; }
+  .user-nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .user-nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .user-nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .user-nav-item.active .user-nav-icon { opacity: 1; }
+  .user-sidebar-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+  .user-sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .user-sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .user-sidebar-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(52,211,153,0.15); color: var(--green); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+  @media (max-width: 900px) { .user-sidebar { width: 60px; } .user-sidebar-logo small, .user-nav-item span:not(.user-nav-icon) { display: none; } .user-sidebar-footer { display: none; } }
+
+  /* TOPBAR */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+  .breadcrumb { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .breadcrumb a { color: var(--accent2); text-decoration: none; }
+  .content { padding: 24px 28px; max-width: 1100px; }
+
+  .btn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #7b8aff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-green { background: var(--green); border-color: var(--green); color: #0f1117; font-weight: 600; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .badge-red { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+  .badge-gray { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+  /* PROFILE */
+  .profile-card {
+    background: linear-gradient(135deg, var(--bg2) 0%, rgba(108,123,255,0.05) 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 24px 28px; margin-bottom: 24px;
+    display: flex; align-items: center; gap: 22px;
+  }
+  .profile-avatar { width: 72px; height: 72px; border-radius: 16px; background: rgba(52,211,153,0.15); color: var(--green); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 26px; font-weight: 800; border: 2px solid rgba(52,211,153,0.3); flex-shrink: 0; }
+  .profile-info { flex: 1; }
+  .profile-name { font-family: var(--font-head); font-size: 20px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 3px; }
+  .profile-position { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  .profile-meta { display: flex; gap: 18px; flex-wrap: wrap; }
+  .profile-meta-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+  .profile-meta-val { color: var(--text); font-weight: 500; }
+
+  /* SECTION */
+  .section { margin-bottom: 28px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .section-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+
+  /* TASK CARDS */
+  .task-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; margin-bottom: 12px; overflow: hidden;
+    transition: all 0.15s;
+  }
+  .task-card.urgent { border-color: rgba(248,113,113,0.3); }
+  .task-card.soon { border-color: rgba(251,191,36,0.3); }
+
+  .task-header {
+    padding: 16px 20px; display: flex; align-items: center; gap: 16px;
+  }
+  .task-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .task-icon.self { background: rgba(108,123,255,0.12); color: var(--accent2); }
+  .task-icon.review { background: rgba(167,139,250,0.12); color: var(--accent2); }
+  .task-icon.meeting { background: rgba(45,212,191,0.12); color: var(--teal); }
+  .task-content { flex: 1; }
+  .task-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .task-desc { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .task-meta { display: flex; align-items: center; gap: 10px; font-size: 11px; flex-wrap: wrap; }
+  .task-deadline { color: var(--muted); }
+  .task-deadline.overdue { color: var(--red); font-weight: 600; }
+  .task-deadline.soon { color: var(--amber); font-weight: 600; }
+  .task-action { flex-shrink: 0; }
+
+  /* SELF-ASSESSMENT EXPAND */
+  .task-body {
+    display: none; padding: 0 20px 20px; border-top: 1px solid var(--border);
+    animation: fadeIn 0.2s ease;
+  }
+  .task-card.expanded .task-body { display: block; padding-top: 18px; }
+  .task-card.expanded .task-toggle { transform: rotate(180deg); }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .task-toggle {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--bg3); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--muted); cursor: pointer;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .task-toggle:hover { color: var(--text); border-color: var(--border2); }
+
+  /* COLLEAGUES LIST */
+  .colleague-list { display: flex; flex-direction: column; gap: 8px; }
+  .colleague-item {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden; transition: all 0.15s;
+  }
+  .colleague-item:hover { border-color: var(--border2); }
+  .colleague-item.expanded { border-color: rgba(108,123,255,0.3); }
+
+  .colleague-header {
+    padding: 12px 16px; display: flex; align-items: center; gap: 12px;
+    cursor: pointer;
+  }
+  .colleague-avatar { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .colleague-info { flex: 1; }
+  .colleague-name { font-weight: 500; font-size: 13px; margin-bottom: 1px; }
+  .colleague-role { font-size: 11px; color: var(--muted); }
+  .colleague-status { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+  /* COLLEAGUE FORM */
+  .colleague-form {
+    display: none; padding: 16px 20px 18px; border-top: 1px solid var(--border);
+    background: var(--bg2);
+  }
+  .colleague-item.expanded .colleague-form { display: block; }
+  .colleague-form-info {
+    background: rgba(52,211,153,0.06); border: 1px solid rgba(52,211,153,0.15);
+    border-radius: 8px; padding: 8px 12px; margin-bottom: 14px;
+    font-size: 11px; color: var(--text); display: flex; align-items: center; gap: 8px;
+  }
+
+  .question-block { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .question-block:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+  .question-text { font-size: 13px; font-weight: 500; margin-bottom: 10px; line-height: 1.5; }
+  .question-num { display: inline-block; width: 22px; height: 22px; border-radius: 6px; background: var(--bg4); color: var(--muted); font-family: var(--font-head); font-size: 10px; font-weight: 700; text-align: center; line-height: 22px; margin-right: 8px; }
+
+  .scale-row { display: flex; gap: 6px; justify-content: center; margin-bottom: 4px; }
+  .scale-btn {
+    width: 42px; height: 42px; border-radius: 9px;
+    border: 2px solid var(--border2); background: var(--bg3);
+    color: var(--muted); font-family: var(--font-head); font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .scale-btn:hover { border-color: var(--accent); color: var(--accent2); }
+  .scale-btn.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+
+  .comment-input {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 12px; outline: none;
+    margin-top: 8px; resize: vertical; min-height: 50px;
+  }
+  .comment-input:focus { border-color: var(--accent); }
+
+  .form-footer {
+    margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .form-progress { font-size: 11px; color: var(--muted); }
+
+  /* SELF-ASSESSMENT FORM SHORT */
+  .self-form-step {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+  }
+  .self-step-num { display: inline-block; width: 22px; height: 22px; border-radius: 6px; background: rgba(108,123,255,0.12); color: var(--accent2); font-family: var(--font-head); font-size: 10px; font-weight: 700; text-align: center; line-height: 22px; margin-right: 8px; }
+  .self-step-title { display: flex; align-items: center; margin-bottom: 4px; font-size: 12px; font-weight: 500; }
+  .self-step-status { font-size: 10px; color: var(--muted); margin-left: auto; }
+  .self-step-desc { font-size: 11px; color: var(--muted); }
+
+  /* CYCLE HISTORY */
+  .cycle-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 18px; cursor: pointer; transition: all 0.15s;
+  }
+  .cycle-card:hover { border-color: var(--border2); background: var(--bg3); }
+  .cycle-period { flex-shrink: 0; text-align: center; min-width: 70px; }
+  .cycle-period-name { font-family: var(--font-head); font-size: 13px; font-weight: 700; }
+  .cycle-period-year { font-size: 10px; color: var(--muted); }
+  .cycle-divider { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
+  .cycle-info { flex: 1; }
+  .cycle-grade-row { display: flex; align-items: center; gap: 8px; margin-bottom: 3px; }
+  .cycle-grade-arrow { color: var(--muted); font-size: 12px; }
+  .cycle-decision { font-size: 11px; color: var(--muted); }
+  .cycle-score { text-align: right; flex-shrink: 0; padding-right: 14px; }
+  .cycle-score-val { font-family: var(--font-head); font-size: 18px; font-weight: 800; }
+  .cycle-score-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+  /* LOCKED INFO */
+  .locked-info {
+    background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px; font-size: 12px;
+  }
+
+  textarea.field-textarea {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 9px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 13px; outline: none; resize: vertical;
+  }
+  textarea.field-textarea:focus { border-color: var(--accent); }
+  .field-label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+
+  /* NOTIFICATIONS */
+  .notif-wrap { position: relative; display: inline-block; }
+  .notif-btn {
+    position: relative; width: 36px; height: 36px; border-radius: 9px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .notif-btn:hover { background: var(--bg4); border-color: var(--border2); }
+  .notif-badge {
+    position: absolute; top: -4px; right: -4px;
+    min-width: 18px; height: 18px; border-radius: 9px;
+    background: var(--red); color: #fff;
+    font-family: var(--font-head); font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 5px; border: 2px solid var(--bg);
+  }
+  .notif-dropdown {
+    display: none; position: absolute; top: calc(100% + 8px); right: 0;
+    width: 380px; max-height: 480px;
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    z-index: 1000; overflow: hidden; flex-direction: column;
+  }
+  .notif-dropdown.show { display: flex; }
+  .notif-header {
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+  }
+  .notif-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; }
+  .notif-mark { font-size: 11px; color: var(--accent2); cursor: pointer; background: none; border: none; font-family: var(--font-body); }
+  .notif-mark:hover { text-decoration: underline; }
+  .notif-list { flex: 1; overflow-y: auto; }
+  .notif-item {
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    display: flex; gap: 10px; cursor: pointer; transition: background 0.1s;
+    text-decoration: none; color: var(--text);
+  }
+  .notif-item:hover { background: rgba(255,255,255,0.02); }
+  .notif-item.unread { background: rgba(108,123,255,0.04); }
+  .notif-item.unread::before { content: ''; position: absolute; left: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 6px; }
+  .notif-item-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .notif-icon-task { background: rgba(251,191,36,0.12); color: var(--amber); }
+  .notif-icon-deadline { background: rgba(248,113,113,0.12); color: var(--red); }
+  .notif-icon-meeting { background: rgba(45,212,191,0.12); color: var(--teal); }
+  .notif-icon-result { background: rgba(52,211,153,0.12); color: var(--green); }
+  .notif-icon-system { background: rgba(108,123,255,0.12); color: var(--accent2); }
+  .notif-content { flex: 1; min-width: 0; }
+  .notif-text { font-size: 12px; line-height: 1.4; margin-bottom: 3px; }
+  .notif-text strong { color: var(--text); font-weight: 600; }
+  .notif-time { font-size: 10px; color: var(--muted); }
+  .notif-footer {
+    padding: 10px 16px; border-top: 1px solid var(--border);
+    text-align: center; flex-shrink: 0;
+  }
+  .notif-footer a { font-size: 11px; color: var(--accent2); text-decoration: none; }
+  .notif-footer a:hover { text-decoration: underline; }
+  .notif-empty { padding: 40px 20px; text-align: center; color: var(--muted); font-size: 12px; }
+
+
+  /* LIGHT THEME */
+  body.light {
+    --bg: #f7f8fc;
+    --bg2: #ffffff;
+    --bg3: #f1f3f9;
+    --bg4: #e7eaf2;
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text: #1a1d2e;
+    --muted: #6b7184;
+  }
+  body.light .nav-item.active, body.light .user-nav-item.active {
+    background: rgba(108,123,255,0.1);
+    color: var(--accent);
+  }
+  body.light table thead th { background: rgba(0,0,0,0.02); }
+  body.light tbody tr:hover { background: rgba(0,0,0,0.02); }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .theme-toggle:hover { background: var(--bg4); border-color: var(--border2); }
+
+</style>
+</head>
+<body>
+
+<!-- USER SIDEBAR -->
+<div class="user-sidebar">
+  <a class="user-sidebar-logo" href="nav.html">ReviewOS<small>Система оценки</small></a>
+  <div class="user-sidebar-nav">
+    <a class="user-nav-item active" href="employee-profile.html"><svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span>Дашборд</span></a>
+    <div class="user-sidebar-divider"></div>
+    <a class="user-nav-item" href="nav.html"><svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg><span>Главная</span></a>
+  </div>
+  <div class="user-sidebar-footer">
+    <div class="user-sidebar-user">
+      <div class="user-sidebar-avatar">МИ</div>
+      <div>
+        <div style="font-weight:500;color:var(--text);font-size:12px">Мария Иванова</div>
+        <div style="font-size:10px;color:var(--muted)">Сотрудник · Frontend</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Дашборд</div>
+    <div class="breadcrumb"><a href="nav.html">Главная</a> → Мой дашборд</div>
+  <div style="display:flex;gap:8px;align-items:center"><button class="theme-toggle" onclick="toggleTheme()" title="Переключить тему">☀️</button>
+      <div class="notif-wrap">
+  <button class="notif-btn" onclick="toggleNotif(event)">
+    🔔
+    <span class="notif-badge">3</span>
+  </button>
+  <div class="notif-dropdown" id="notif-dropdown">
+    <div class="notif-header">
+      <div class="notif-title">Уведомления</div>
+      <button class="notif-mark" onclick="markAllRead(event)">Отметить все прочитанными</button>
+    </div>
+    <div class="notif-list">
+      <a class="notif-item unread" href="#" style="position:relative;padding-left:20px">
+        <div class="notif-item-icon notif-icon-deadline">⏰</div>
+        <div class="notif-content">
+          <div class="notif-text">Дедлайн самооценки <strong>через 2 дня</strong> — заполните до 1 июня</div>
+          <div class="notif-time">2 часа назад</div>
+        </div>
+      </a>
+      <a class="notif-item unread" href="#" style="position:relative;padding-left:20px">
+        <div class="notif-item-icon notif-icon-task">📋</div>
+        <div class="notif-content">
+          <div class="notif-text">Вас пригласили оценить <strong>3 коллег</strong> в 360° опросе</div>
+          <div class="notif-time">5 часов назад</div>
+        </div>
+      </a>
+      <a class="notif-item unread" href="#" style="position:relative;padding-left:20px">
+        <div class="notif-item-icon notif-icon-meeting">📅</div>
+        <div class="notif-content">
+          <div class="notif-text">Назначена встреча 1-on-1 с <strong>Козлов А.И.</strong> на 15 июня, 15:00</div>
+          <div class="notif-time">Вчера</div>
+        </div>
+      </a>
+      <a class="notif-item" href="#">
+        <div class="notif-item-icon notif-icon-result">✓</div>
+        <div class="notif-content">
+          <div class="notif-text">Результаты цикла <strong>Q1 2026</strong> доступны для просмотра</div>
+          <div class="notif-time">2 дня назад</div>
+        </div>
+      </a>
+      <a class="notif-item" href="#">
+        <div class="notif-item-icon notif-icon-system">⚙</div>
+        <div class="notif-content">
+          <div class="notif-text">Запущен новый цикл оценки <strong>Q2 2026</strong></div>
+          <div class="notif-time">3 дня назад</div>
+        </div>
+      </a>
+    </div>
+    <div class="notif-footer">
+      <a href="#">Все уведомления →</a>
+    </div>
+  </div>
+</div></div>
+  </div>
+  <button class="btn btn-sm" onclick="alert('Настройки профиля')">⚙ Настройки</button>
+</div>
+
+<div class="content">
+
+  <!-- PROFILE -->
+  <div class="profile-card">
+    <div class="profile-avatar">МИ</div>
+    <div class="profile-info">
+      <div class="profile-name">Мария Иванова</div>
+      <div class="profile-position">Frontend разработчик · Команда Web App</div>
+      <div class="profile-meta">
+        <div class="profile-meta-item">Грейд: <span class="badge badge-blue">Sen1</span></div>
+        <div class="profile-meta-item">Email: <span class="profile-meta-val">m.ivanova@company.com</span></div>
+        <div class="profile-meta-item">Руководитель: <span class="profile-meta-val">Козлов А.И.</span></div>
+        <div class="profile-meta-item">В компании: <span class="profile-meta-val">2 года 4 мес</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CURRENT TASKS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">📋 Текущие задачи</div>
+      <span class="badge badge-amber">Цикл Q2 2026</span>
+    </div>
+
+    <!-- TASK 1: SELF-ASSESSMENT (expandable) -->
+    <div class="task-card urgent" id="task-self">
+      <div class="task-header" onclick="toggleTask('task-self')">
+        <div class="task-icon self">✍️</div>
+        <div class="task-content">
+          <div class="task-title">Заполнить самооценку</div>
+          <div class="task-desc">3 шага: достижения, план развития, самооценка уровня</div>
+          <div class="task-meta">
+            <span class="task-deadline overdue">⏰ До 1 июня · осталось 2 дня</span>
+            <span class="badge badge-amber" style="font-size:9px">Не начата</span>
+          </div>
+        </div>
+        <button class="task-toggle" onclick="event.stopPropagation();toggleTask('task-self')">▼</button>
+      </div>
+      <div class="task-body">
+        <div class="self-form-step">
+          <div class="self-step-title">
+            <span class="self-step-num">1</span>Достижения за период
+            <span class="self-step-status">Не заполнено</span>
+          </div>
+          <div class="self-step-desc">Опишите ключевые проекты, нововведения и личные достижения</div>
+        </div>
+        <div class="self-form-step">
+          <div class="self-step-title">
+            <span class="self-step-num">2</span>Выполнение плана развития
+            <span class="self-step-status">Не заполнено</span>
+          </div>
+          <div class="self-step-desc">Расскажите как вы работали над пунктами плана из прошлого цикла</div>
+        </div>
+        <div class="self-form-step">
+          <div class="self-step-title">
+            <span class="self-step-num">3</span>Самооценка уровня
+            <span class="self-step-status">Не заполнено</span>
+          </div>
+          <div class="self-step-desc">Оцените на каком уровне вы сейчас находитесь и обоснуйте позицию</div>
+        </div>
+        <div style="margin-top:14px;display:flex;justify-content:flex-end">
+          <a href="self-assessment.html" class="btn btn-primary btn-sm">Открыть форму →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- TASK 2: 360 COLLEAGUES (expandable list) -->
+    <div class="task-card soon expanded" id="task-360">
+      <div class="task-header" onclick="toggleTask('task-360')">
+        <div class="task-icon review">🤝</div>
+        <div class="task-content">
+          <div class="task-title">Оценить коллег (360°)</div>
+          <div class="task-desc">Анонимная оценка soft-навыков 4 коллег по шкале 1–5</div>
+          <div class="task-meta">
+            <span class="task-deadline soon">⏰ До 10 июня · осталось 11 дней</span>
+            <span class="badge badge-blue" style="font-size:9px">1 из 4 заполнено</span>
+          </div>
+        </div>
+        <button class="task-toggle" onclick="event.stopPropagation();toggleTask('task-360')">▼</button>
+      </div>
+      <div class="task-body">
+        <div class="colleague-list">
+
+          <!-- Colleague 1 — DONE -->
+          <div class="colleague-item">
+            <div class="colleague-header">
+              <div class="colleague-avatar" style="background:rgba(45,212,191,0.15);color:var(--teal)">АК</div>
+              <div class="colleague-info">
+                <div class="colleague-name">Алексей Козлов</div>
+                <div class="colleague-role">Frontend Lead · Web App</div>
+              </div>
+              <div class="colleague-status">
+                <span class="badge badge-green">✓ Заполнено</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colleague 2 — EXPANDED FORM -->
+          <div class="colleague-item expanded" id="col-2">
+            <div class="colleague-header" onclick="toggleColleague('col-2')">
+              <div class="colleague-avatar" style="background:rgba(108,123,255,0.15);color:var(--accent2)">ДЛ</div>
+              <div class="colleague-info">
+                <div class="colleague-name">Дмитрий Ли</div>
+                <div class="colleague-role">QA Engineer · Web App</div>
+              </div>
+              <div class="colleague-status">
+                <span class="badge badge-amber">2 из 12</span>
+                <button class="task-toggle" style="transform:rotate(180deg)">▼</button>
+              </div>
+            </div>
+            <div class="colleague-form">
+              <div class="colleague-form-info">
+                🔒 Опрос анонимный — Дмитрий не увидит ваши ответы и комментарии. Видны только агрегированные результаты по всей команде.
+              </div>
+
+              <div class="question-block">
+                <div class="question-text"><span class="question-num">1</span>Насколько чётко коллега доносит свои мысли и идеи?</div>
+                <div class="scale-row">
+                  <button class="scale-btn" onclick="selectScale(this)">1</button>
+                  <button class="scale-btn" onclick="selectScale(this)">2</button>
+                  <button class="scale-btn" onclick="selectScale(this)">3</button>
+                  <button class="scale-btn selected" onclick="selectScale(this)">4</button>
+                  <button class="scale-btn" onclick="selectScale(this)">5</button>
+                </div>
+                <div class="scale-labels"><span>Никогда</span><span>Всегда</span></div>
+              </div>
+
+              <div class="question-block">
+                <div class="question-text"><span class="question-num">2</span>Готов ли помогать другим членам команды?</div>
+                <div class="scale-row">
+                  <button class="scale-btn" onclick="selectScale(this)">1</button>
+                  <button class="scale-btn" onclick="selectScale(this)">2</button>
+                  <button class="scale-btn" onclick="selectScale(this)">3</button>
+                  <button class="scale-btn" onclick="selectScale(this)">4</button>
+                  <button class="scale-btn selected" onclick="selectScale(this)">5</button>
+                </div>
+                <div class="scale-labels"><span>Никогда</span><span>Всегда</span></div>
+                <textarea class="comment-input" placeholder="Комментарий (опционально)..."></textarea>
+              </div>
+
+              <div class="question-block">
+                <div class="question-text"><span class="question-num">3</span>Как ведёт себя при разногласиях в команде?</div>
+                <div class="scale-row">
+                  <button class="scale-btn" onclick="selectScale(this)">1</button>
+                  <button class="scale-btn" onclick="selectScale(this)">2</button>
+                  <button class="scale-btn" onclick="selectScale(this)">3</button>
+                  <button class="scale-btn" onclick="selectScale(this)">4</button>
+                  <button class="scale-btn" onclick="selectScale(this)">5</button>
+                </div>
+                <div class="scale-labels"><span>Конфликтно</span><span>Конструктивно</span></div>
+              </div>
+
+              <div style="text-align:center;color:var(--muted);font-size:11px;padding:8px">+ ещё 9 вопросов</div>
+
+              <div class="form-footer">
+                <span class="form-progress">Прогресс: 2 из 12 вопросов</span>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-sm" onclick="alert('Сохранить как черновик')">💾 Черновик</button>
+                  <button class="btn btn-green btn-sm" onclick="alert('Отправить ответы по Дмитрию Ли')">Завершить</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colleague 3 -->
+          <div class="colleague-item" id="col-3">
+            <div class="colleague-header" onclick="toggleColleague('col-3')">
+              <div class="colleague-avatar" style="background:rgba(167,139,250,0.15);color:var(--accent2)">ОС</div>
+              <div class="colleague-info">
+                <div class="colleague-name">Ольга Смирнова</div>
+                <div class="colleague-role">QA Lead · Testing</div>
+              </div>
+              <div class="colleague-status">
+                <span class="badge badge-gray">Не начато</span>
+                <button class="task-toggle">▼</button>
+              </div>
+            </div>
+            <div class="colleague-form">
+              <div class="colleague-form-info">
+                🔒 Опрос анонимный — Ольга не увидит ваши ответы и комментарии.
+              </div>
+              <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Форма из 12 вопросов будет показана здесь</div>
+              <div style="text-align:center">
+                <button class="btn btn-primary btn-sm" onclick="alert('Начать оценку')">Начать оценку →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colleague 4 -->
+          <div class="colleague-item" id="col-4">
+            <div class="colleague-header" onclick="toggleColleague('col-4')">
+              <div class="colleague-avatar" style="background:rgba(244,114,182,0.15);color:#f472b6">СВ</div>
+              <div class="colleague-info">
+                <div class="colleague-name">Сергей Волков</div>
+                <div class="colleague-role">Data Engineer · Analytics</div>
+              </div>
+              <div class="colleague-status">
+                <span class="badge badge-gray">Не начато</span>
+                <button class="task-toggle">▼</button>
+              </div>
+            </div>
+            <div class="colleague-form">
+              <div class="colleague-form-info">
+                🔒 Опрос анонимный — Сергей не увидит ваши ответы и комментарии.
+              </div>
+              <div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Форма из 12 вопросов будет показана здесь</div>
+              <div style="text-align:center">
+                <button class="btn btn-primary btn-sm" onclick="alert('Начать оценку')">Начать оценку →</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- TASK 3: MEETING -->
+    <div class="task-card">
+      <div class="task-header">
+        <div class="task-icon meeting">📅</div>
+        <div class="task-content">
+          <div class="task-title">Встреча 1-on-1 с руководителем</div>
+          <div class="task-desc">Подведение итогов цикла, обсуждение результатов и плана развития</div>
+          <div class="task-meta">
+            <span class="task-deadline">📅 15 июня 2026, 15:00 · Microsoft Teams</span>
+            <span class="badge badge-gray" style="font-size:9px">Назначена</span>
+          </div>
+        </div>
+        <button class="btn btn-sm" onclick="alert('Открыть встречу в календаре')">Календарь</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LOCKED INFO -->
+  <div class="locked-info">
+    <span style="font-size:18px">🔒</span>
+    <div>Результаты текущего цикла (Q2 2026) станут доступны после его официального закрытия HR-администратором.</div>
+  </div>
+
+  <!-- CYCLE HISTORY -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">📚 История циклов</div>
+      <span style="font-size:11px;color:var(--muted)">Только закрытые циклы</span>
+    </div>
+
+    <div class="cycle-card" onclick="alert('Открыть детали цикла Q1 2026')">
+      <div class="cycle-period">
+        <div class="cycle-period-name">Q1 2026</div>
+        <div class="cycle-period-year">янв – мар</div>
+      </div>
+      <div class="cycle-divider"></div>
+      <div class="cycle-info">
+        <div class="cycle-grade-row">
+          <span class="badge badge-blue">Mid3</span>
+          <span class="cycle-grade-arrow">→</span>
+          <span class="badge badge-green">Sen1</span>
+          <span style="font-size:11px;color:var(--green);font-weight:600">↑ Повышение</span>
+        </div>
+        <div class="cycle-decision">Руководитель: Козлов А.И. · Решение принято 28.03.2026</div>
+      </div>
+      <div class="cycle-score">
+        <div class="cycle-score-val" style="color:var(--green)">5.62</div>
+        <div class="cycle-score-label">/ 10 баллов</div>
+      </div>
+      <span class="badge badge-green">✓ Закрыт</span>
+    </div>
+
+    <div class="cycle-card" onclick="alert('Открыть детали цикла Q3 2025')">
+      <div class="cycle-period">
+        <div class="cycle-period-name">Q3 2025</div>
+        <div class="cycle-period-year">июл – сен</div>
+      </div>
+      <div class="cycle-divider"></div>
+      <div class="cycle-info">
+        <div class="cycle-grade-row">
+          <span class="badge badge-blue">Mid2</span>
+          <span class="cycle-grade-arrow">→</span>
+          <span class="badge badge-blue">Mid3</span>
+          <span style="font-size:11px;color:var(--green);font-weight:600">↑ Повышение</span>
+        </div>
+        <div class="cycle-decision">Руководитель: Петров С.А. · Решение принято 30.09.2025</div>
+      </div>
+      <div class="cycle-score">
+        <div class="cycle-score-val" style="color:var(--teal)">4.85</div>
+        <div class="cycle-score-label">/ 10 баллов</div>
+      </div>
+      <span class="badge badge-green">✓ Закрыт</span>
+    </div>
+
+    <div class="cycle-card" onclick="alert('Открыть детали цикла Q1 2025')">
+      <div class="cycle-period">
+        <div class="cycle-period-name">Q1 2025</div>
+        <div class="cycle-period-year">янв – мар</div>
+      </div>
+      <div class="cycle-divider"></div>
+      <div class="cycle-info">
+        <div class="cycle-grade-row">
+          <span class="badge badge-blue">Mid2</span>
+          <span class="cycle-grade-arrow">→</span>
+          <span class="badge badge-blue">Mid2</span>
+          <span style="font-size:11px;color:var(--muted);font-weight:600">→ Без изменений</span>
+        </div>
+        <div class="cycle-decision">Руководитель: Петров С.А. · Решение принято 27.03.2025</div>
+      </div>
+      <div class="cycle-score">
+        <div class="cycle-score-val" style="color:var(--amber)">4.10</div>
+        <div class="cycle-score-label">/ 10 баллов</div>
+      </div>
+      <span class="badge badge-green">✓ Закрыт</span>
+    </div>
+
+    <div class="cycle-card" onclick="alert('Открыть детали цикла Q3 2024')">
+      <div class="cycle-period">
+        <div class="cycle-period-name">Q3 2024</div>
+        <div class="cycle-period-year">июл – сен</div>
+      </div>
+      <div class="cycle-divider"></div>
+      <div class="cycle-info">
+        <div class="cycle-grade-row">
+          <span class="badge badge-blue">Mid1</span>
+          <span class="cycle-grade-arrow">→</span>
+          <span class="badge badge-blue">Mid2</span>
+          <span style="font-size:11px;color:var(--green);font-weight:600">↑ Повышение</span>
+        </div>
+        <div class="cycle-decision">Руководитель: Петров С.А. · Решение принято 30.09.2024</div>
+      </div>
+      <div class="cycle-score">
+        <div class="cycle-score-val" style="color:var(--teal)">4.50</div>
+        <div class="cycle-score-label">/ 10 баллов</div>
+      </div>
+      <span class="badge badge-green">✓ Закрыт</span>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function toggleTask(id) {
+  document.getElementById(id).classList.toggle('expanded');
+}
+
+function toggleColleague(id) {
+  document.getElementById(id).classList.toggle('expanded');
+  const item = document.getElementById(id);
+  const toggle = item.querySelector('.task-toggle');
+  if (toggle) {
+    toggle.style.transform = item.classList.contains('expanded') ? 'rotate(180deg)' : '';
+  }
+}
+
+function selectScale(btn) {
+  const row = btn.parentElement;
+  row.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function toggleNotif(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('notif-dropdown').classList.toggle('show');
+}
+function markAllRead(e) {
+  if (e) e.stopPropagation();
+  document.querySelectorAll('.notif-item').forEach(i => i.classList.remove('unread'));
+  document.querySelector('.notif-badge').style.display = 'none';
+}
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('notif-dropdown');
+  if (dd && !dd.contains(e.target) && !e.target.closest('.notif-btn')) {
+    dd.classList.remove('show');
+  }
+});
+
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('reviewos-theme', isLight ? 'light' : 'dark');
+  const btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = isLight ? '🌙' : '☀️';
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('reviewos-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.querySelector('.theme-toggle');
+    if (btn) btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
+})();
+
+</script>
+</body>
+</html>
