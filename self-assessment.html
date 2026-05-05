@@ -500,6 +500,24 @@
 </head>
 <body>
 
+<!-- FLOATING TOOLBAR -->
+<div style="position:fixed;top:20px;right:20px;z-index:200;display:flex;gap:8px;align-items:center">
+  <button class="theme-toggle" onclick="toggleTheme()" title="Переключить тему">☀️</button>
+  <div class="notif-wrap">
+    <button class="notif-btn" onclick="toggleNotif(event)">🔔<span class="notif-badge">3</span></button>
+    <div class="notif-dropdown" id="notif-dropdown">
+      <div class="notif-header"><div class="notif-title">Уведомления</div><button class="notif-mark" onclick="markAllRead(event)">Отметить все</button></div>
+      <div class="notif-list">
+        <a class="notif-item unread" href="#"><div class="notif-item-icon">⏰</div><div class="notif-content"><div class="notif-text">Дедлайн самооценки <strong>через 2 дня</strong></div><div class="notif-time">2 часа назад</div></div></a>
+        <a class="notif-item unread" href="#"><div class="notif-item-icon">📋</div><div class="notif-content"><div class="notif-text">Назначена встреча 1-on-1 на <strong>15 июня</strong></div><div class="notif-time">Вчера</div></div></a>
+        <a class="notif-item" href="#"><div class="notif-item-icon">⚙</div><div class="notif-content"><div class="notif-text">Запущен новый цикл <strong>Q2 2026</strong></div><div class="notif-time">3 дня назад</div></div></a>
+      </div>
+      <div class="notif-footer"><a href="#">Все уведомления →</a></div>
+    </div>
+  </div>
+</div>
+
+
 <!-- USER SIDEBAR -->
 <div class="user-sidebar">
   <a class="user-sidebar-logo" href="nav.html">ReviewOS<span style="color:var(--accent)"> </span><small>Система оценки</small></a>
