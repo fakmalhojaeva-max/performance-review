@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Вход в систему</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body {
+    background: var(--bg); color: var(--text); font-family: var(--font-body);
+    font-size: 13px; min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(108,123,255,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(167,139,250,0.06) 0%, transparent 50%);
+  }
+
+  .login-box {
+    width: 100%; max-width: 440px;
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 16px; padding: 36px 32px;
+  }
+
+  .logo { font-family: var(--font-head); font-size: 24px; font-weight: 800; letter-spacing: -0.5px; text-align: center; margin-bottom: 30px; }
+  .logo span { color: var(--accent); }
+
+  .login-title { font-family: var(--font-head); font-size: 22px; font-weight: 700; letter-spacing: -0.4px; margin-bottom: 6px; text-align: center; }
+  .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 28px; text-align: center; }
+
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .field-input {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 12px 14px; color: var(--text);
+    font-family: var(--font-body); font-size: 14px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .field-input::placeholder { color: rgba(122,127,148,0.5); }
+
+  .password-wrap { position: relative; }
+  .password-toggle {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 14px; padding: 4px;
+  }
+  .password-toggle:hover { color: var(--text); }
+
+  .forgot-link {
+    font-size: 11px; color: var(--accent2); text-decoration: none;
+    cursor: pointer; transition: color 0.12s;
+  }
+  .forgot-link:hover { color: #8b97ff; text-decoration: underline; }
+
+  .login-btn {
+    width: 100%; padding: 13px; border-radius: 10px;
+    background: var(--accent); border: 1px solid var(--accent); color: #fff;
+    font-family: var(--font-head); font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: all 0.15s; margin-top: 8px;
+  }
+  .login-btn:hover { background: #7b8aff; }
+
+  /* LIGHT THEME */
+  body.light {
+    --bg: #f7f8fc;
+    --bg2: #ffffff;
+    --bg3: #f1f3f9;
+    --bg4: #e7eaf2;
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text: #1a1d2e;
+    --muted: #6b7184;
+  }
+  body.light .nav-item.active, body.light .user-nav-item.active {
+    background: rgba(108,123,255,0.1);
+    color: var(--accent);
+  }
+  body.light table thead th { background: rgba(0,0,0,0.02); }
+  body.light tbody tr:hover { background: rgba(0,0,0,0.02); }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .theme-toggle:hover { background: var(--bg4); border-color: var(--border2); }
+
+</style>
+</head>
+<body>
+<div style="position:fixed;top:20px;right:20px;z-index:100"><button class="theme-toggle" onclick="toggleTheme()" title="Переключить тему">☀️</button></div>
+
+
+<div class="login-box">
+  <div class="logo">Review<span>OS</span></div>
+
+  <div class="login-title">С возвращением!</div>
+  <div class="login-sub">Войдите в систему чтобы продолжить</div>
+
+  <form onsubmit="handleLogin(event)">
+    <div class="field-group">
+      <label class="field-label">Email</label>
+      <input class="field-input" type="email" placeholder="user@company.com" id="login-email" required>
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">
+        <span>Пароль</span>
+        <a class="forgot-link" onclick="forgotPassword()">Забыли пароль?</a>
+      </label>
+      <div class="password-wrap">
+        <input class="field-input" type="password" placeholder="••••••••" id="login-password" required>
+        <button type="button" class="password-toggle" onclick="togglePassword()">👁</button>
+      </div>
+    </div>
+
+    <button class="login-btn" type="submit">Войти</button>
+  </form>
+
+  <!-- DEMO HINT -->
+  <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--border)">
+    <div style="font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;text-align:center">⚡ Демо-доступы для прототипа</div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:11px">
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer" onclick="fillDemo('hr@reviewos.ru')">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent2);flex-shrink:0"></span>
+        <span style="flex:1;color:var(--muted)">HR-админ</span>
+        <code style="color:var(--text);font-family:monospace;font-size:10px">hr@reviewos.ru</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer" onclick="fillDemo('lead@reviewos.ru')">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0"></span>
+        <span style="flex:1;color:var(--muted)">Руководитель</span>
+        <code style="color:var(--text);font-family:monospace;font-size:10px">lead@reviewos.ru</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer" onclick="fillDemo('po@reviewos.ru')">
+        <span style="width:6px;height:6px;border-radius:50%;background:#f472b6;flex-shrink:0"></span>
+        <span style="flex:1;color:var(--muted)">Продакт-оунер</span>
+        <code style="color:var(--text);font-family:monospace;font-size:10px">po@reviewos.ru</code>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer" onclick="fillDemo('user@reviewos.ru')">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></span>
+        <span style="flex:1;color:var(--muted)">Сотрудник</span>
+        <code style="color:var(--text);font-family:monospace;font-size:10px">user@reviewos.ru</code>
+      </div>
+    </div>
+    <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:10px">Пароль для всех: <code style="color:var(--text);font-family:monospace">demo</code> · Кликните на доступ для автозаполнения</div>
+  </div>
+</div>
+
+<script>
+function fillDemo(email) {
+  document.getElementById('login-email').value = email;
+  document.getElementById('login-password').value = 'demo';
+  document.getElementById('login-password').focus();
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const password = document.getElementById('login-password').value;
+
+  if (!password) {
+    showError('Введите пароль');
+    return;
+  }
+
+  // Demo routing by login
+  const routes = {
+    'hr@reviewos.ru': 'admin-dashboard.html',
+    'lead@reviewos.ru': 'manager-profile.html',
+    'po@reviewos.ru': 'po-profile.html',
+    'user@reviewos.ru': 'employee-profile.html'
+  };
+
+  if (routes[email]) {
+    window.location.href = routes[email];
+  } else {
+    showError('Неверный email или пароль');
+  }
+}
+
+function showError(msg) {
+  let err = document.getElementById('login-error');
+  if (!err) {
+    err = document.createElement('div');
+    err.id = 'login-error';
+    err.style.cssText = 'background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:var(--red);border-radius:8px;padding:10px 14px;font-size:12px;margin-bottom:14px;text-align:center';
+    document.querySelector('form').insertBefore(err, document.querySelector('form').firstChild);
+  }
+  err.textContent = '⚠ ' + msg;
+}
+
+function togglePassword() {
+  const input = document.getElementById('login-password');
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+function forgotPassword() {
+  const email = document.getElementById('login-email').value;
+  if (!email) {
+    alert('Введите email для восстановления пароля');
+    return;
+  }
+  alert('Инструкции по восстановлению пароля отправлены на:\n' + email);
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('reviewos-theme', isLight ? 'light' : 'dark');
+  const btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = isLight ? '🌙' : '☀️';
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('reviewos-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.querySelector('.theme-toggle');
+    if (btn) btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
+})();
+
+</script>
+</body>
+</html>
