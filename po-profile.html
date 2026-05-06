@@ -229,6 +229,90 @@
   .notif-footer { padding: 10px 16px; border-top: 1px solid var(--border); text-align: center; }
   .notif-footer a { font-size: 11px; color: var(--accent2); text-decoration: none; }
 
+
+  /* EVALUATION MODALS */
+  .eval-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    z-index: 1000; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .eval-modal-overlay.show { display: flex; }
+  .eval-modal {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 14px; width: 100%; max-width: 720px;
+    max-height: 90vh; display: flex; flex-direction: column;
+    overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  }
+  .eval-modal-header {
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(135deg, var(--bg2) 0%, rgba(244,114,182,0.04) 100%);
+  }
+  .eval-modal-avatar {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-size: 14px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .eval-modal-info { flex: 1; }
+  .eval-modal-name { font-family: var(--font-head); font-size: 15px; font-weight: 700; }
+  .eval-modal-pos { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .eval-modal-type {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+    background: rgba(244,114,182,0.12); color: #f472b6;
+    border: 1px solid rgba(244,114,182,0.25);
+  }
+  .eval-modal-close {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); width: 30px; height: 30px;
+    border-radius: 8px; cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .eval-modal-close:hover { color: var(--text); border-color: var(--border2); }
+  .eval-modal-body {
+    flex: 1; overflow-y: auto; padding: 22px 24px;
+  }
+  .eval-modal-footer {
+    padding: 14px 24px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; background: var(--bg);
+  }
+
+  .perf-block { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+  .perf-block:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+  .perf-block-title { font-family: var(--font-head); font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+  .perf-block-desc { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .perf-toggle {
+    display: flex; gap: 8px; margin-bottom: 8px;
+  }
+  .perf-toggle-btn {
+    flex: 1; padding: 10px;
+    border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    font-family: var(--font-body); font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all 0.12s;
+  }
+  .perf-toggle-btn:hover { color: var(--text); }
+  .perf-toggle-btn.yes.selected { background: rgba(52,211,153,0.12); color: var(--green); border-color: rgba(52,211,153,0.4); font-weight: 600; }
+  .perf-toggle-btn.no.selected { background: rgba(248,113,113,0.12); color: var(--red); border-color: rgba(248,113,113,0.4); font-weight: 600; }
+  .perf-comment {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 12px; outline: none;
+    resize: vertical; min-height: 50px;
+  }
+  .perf-comment:focus { border-color: var(--accent); }
+  .perf-comment::placeholder { color: var(--muted); }
+
+  .final-decision {
+    background: rgba(108,123,255,0.06); border: 1px solid rgba(108,123,255,0.2);
+    border-radius: 10px; padding: 14px 16px; margin-top: 14px;
+  }
+  .final-decision-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 8px; }
+  .progress-info { font-size: 11px; color: var(--muted); }
+
 </style>
 </head>
 <body>
@@ -392,7 +476,7 @@
             <td><div class="deadline-cell overdue">⏰ Просрочено · вчера</div></td>
             <td>
               <div class="actions-cell">
-                <a href="performance.html" class="act-btn primary">Оценить</a>
+                <button class="act-btn primary" onclick="openPerfModal('Игорь Новиков', 'Frontend разработчик', 'ИН', {bg:'rgba(244,114,182,0.15)', fg:'#f472b6'})">Оценить</button>
               </div>
             </td>
           </tr>
@@ -414,7 +498,7 @@
             <td><div class="deadline-cell soon">⏰ 5 июня · 6 дней</div></td>
             <td>
               <div class="actions-cell">
-                <a href="performance.html" class="act-btn primary">Оценить</a>
+                <button class="act-btn primary" onclick="openPerfModal('Мария Иванова', 'Frontend разработчик', 'МИ', {bg:'rgba(52,211,153,0.15)', fg:'var(--green)'})">Оценить</button>
               </div>
             </td>
           </tr>
@@ -436,7 +520,7 @@
             <td><div class="deadline-cell ok"><span class="badge badge-green" style="font-size:9px">Готово</span></div></td>
             <td>
               <div class="actions-cell">
-                <a href="performance.html" class="act-btn">✎ Изменить</a>
+                <button class="act-btn" onclick="openPerfModal('Ольга Смирнова', 'QA Lead', 'ОС', {bg:'rgba(167,139,250,0.15)', fg:'var(--accent2)'})">✎ Изменить</button>
               </div>
             </td>
           </tr>
@@ -458,7 +542,7 @@
             <td><div class="deadline-cell ok"><span class="badge badge-green" style="font-size:9px">Готово</span></div></td>
             <td>
               <div class="actions-cell">
-                <a href="performance.html" class="act-btn">✎ Изменить</a>
+                <button class="act-btn" onclick="openPerfModal('Татьяна Белова', 'Frontend разработчик', 'ТБ', {bg:'rgba(251,191,36,0.15)', fg:'var(--amber)'})">✎ Изменить</button>
               </div>
             </td>
           </tr>
@@ -480,7 +564,7 @@
             <td><div class="deadline-cell ok">5 июня · 6 дней</div></td>
             <td>
               <div class="actions-cell">
-                <a href="performance.html" class="act-btn primary">Оценить</a>
+                <button class="act-btn primary" onclick="openPerfModal('Дмитрий Ли', 'QA Engineer', 'ДЛ', {bg:'rgba(108,123,255,0.15)', fg:'var(--accent2)'})">Оценить</button>
               </div>
             </td>
           </tr>
@@ -556,5 +640,127 @@ function markAllRead(e) { if (e) e.stopPropagation(); document.querySelectorAll(
 document.addEventListener('click', function(e) { const dd = document.getElementById('notif-dropdown'); if (dd && !dd.contains(e.target) && !e.target.closest('.notif-btn')) dd.classList.remove('show'); });
 
 </script>
+
+<!-- PERFORMANCE MODAL -->
+<div class="eval-modal-overlay" id="perf-modal">
+  <div class="eval-modal">
+    <div class="eval-modal-header">
+      <div class="eval-modal-avatar" id="perf-avatar">МИ</div>
+      <div class="eval-modal-info">
+        <div class="eval-modal-name" id="perf-name">Мария Иванова</div>
+        <div class="eval-modal-pos" id="perf-pos">Frontend разработчик</div>
+      </div>
+      <span class="eval-modal-type">Performance</span>
+      <button class="eval-modal-close" onclick="closeModal('perf-modal')">✕</button>
+    </div>
+    <div class="eval-modal-body">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Оцените 5 критериев работы по принципу «Допуск/Недопуск» с обязательным комментарием</div>
+      
+      <div class="perf-block">
+        <div class="perf-block-title">1. Закрытие задач в срок</div>
+        <div class="perf-block-desc">Своевременное выполнение поставленных задач без существенных просрочек</div>
+        <div class="perf-toggle">
+          <button class="perf-toggle-btn yes selected" onclick="selectPerf(this)">✓ Допуск</button>
+          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск</button>
+        </div>
+        <textarea class="perf-comment" placeholder="Комментарий (обязательно)...">Все спринты Q1 закрывала на 95-100%, дедлайны не срывала.</textarea>
+      </div>
+
+      <div class="perf-block">
+        <div class="perf-block-title">2. Качество выполнения</div>
+        <div class="perf-block-desc">Минимальное количество багов, code review без существенных замечаний</div>
+        <div class="perf-toggle">
+          <button class="perf-toggle-btn yes selected" onclick="selectPerf(this)">✓ Допуск</button>
+          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск</button>
+        </div>
+        <textarea class="perf-comment" placeholder="Комментарий (обязательно)...">Высокое качество кода, мало замечаний на ревью.</textarea>
+      </div>
+
+      <div class="perf-block">
+        <div class="perf-block-title">3. Инициативность</div>
+        <div class="perf-block-desc">Самостоятельные предложения по улучшениям, проактивность</div>
+        <div class="perf-toggle">
+          <button class="perf-toggle-btn yes" onclick="selectPerf(this)">✓ Допуск</button>
+          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск</button>
+        </div>
+        <textarea class="perf-comment" placeholder="Комментарий (обязательно)..."></textarea>
+      </div>
+
+      <div class="perf-block">
+        <div class="perf-block-title">4. Командное взаимодействие</div>
+        <div class="perf-block-desc">Работа в команде, помощь коллегам, конструктивный диалог</div>
+        <div class="perf-toggle">
+          <button class="perf-toggle-btn yes" onclick="selectPerf(this)">✓ Допуск</button>
+          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск</button>
+        </div>
+        <textarea class="perf-comment" placeholder="Комментарий (обязательно)..."></textarea>
+      </div>
+
+      <div class="perf-block">
+        <div class="perf-block-title">5. Соблюдение процессов</div>
+        <div class="perf-block-desc">Следование принятым в команде процессам и стандартам</div>
+        <div class="perf-toggle">
+          <button class="perf-toggle-btn yes" onclick="selectPerf(this)">✓ Допуск</button>
+          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск</button>
+        </div>
+        <textarea class="perf-comment" placeholder="Комментарий (обязательно)..."></textarea>
+      </div>
+
+      <div class="final-decision">
+        <div class="final-decision-label">Итоговое решение по Performance</div>
+        <div class="perf-toggle">
+          <button class="perf-toggle-btn yes" onclick="selectPerf(this)">✓ Допуск к дальнейшей оценке</button>
+          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск к дальнейшей оценке</button>
+        </div>
+      </div>
+    </div>
+    <div class="eval-modal-footer">
+      <span class="progress-info">Заполнено: 2 из 5 критериев</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="closeModal('perf-modal')">Отмена</button>
+        <button class="btn btn-sm" onclick="saveDraft('perf-modal')">💾 Черновик</button>
+        <button class="btn btn-primary btn-sm" onclick="saveAndClose('perf-modal')">Сохранить и закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openPerfModal(name, pos, initials, color) {
+  document.getElementById('perf-name').textContent = name;
+  document.getElementById('perf-pos').textContent = pos;
+  const avatar = document.getElementById('perf-avatar');
+  avatar.textContent = initials;
+  if (color) avatar.style.background = color.bg, avatar.style.color = color.fg;
+  document.getElementById('perf-modal').classList.add('show');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function saveDraft(id) {
+  alert('Черновик сохранён');
+  closeModal(id);
+}
+
+function saveAndClose(id) {
+  alert('Оценка сохранена');
+  closeModal(id);
+}
+
+function selectPerf(btn) {
+  btn.parentElement.querySelectorAll('.perf-toggle-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+// Close on overlay click
+document.querySelectorAll('.eval-modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) overlay.classList.remove('show');
+  });
+});
+</script>
+
 </body>
 </html>

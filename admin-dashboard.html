@@ -330,9 +330,7 @@
       </div>
     </div>
     
-    <button class="btn" onclick="alert('Экспорт в Excel')">↓ Экспорт</button>
     <button class="btn" onclick="alert('Напомнить опоздавшим')">📨 Напомнить</button>
-    <button class="btn btn-primary" onclick="alert('Настройки цикла')">⚙ Настройки цикла</button>
   </div>
 </div>
 
@@ -373,14 +371,12 @@
       <div class="stat-sub" style="margin-top:2px">Дедлайн: 20 июня 2026</div>
     </div>
     <div class="cycle-stages">
-      <div class="stage-step done"><div class="stage-dot">✓</div><div class="stage-name">Участники</div></div>
-      <div class="stage-step done"><div class="stage-dot">✓</div><div class="stage-name">Матрица</div></div>
-      <div class="stage-step done"><div class="stage-dot">✓</div><div class="stage-name">Самооценка</div></div>
-      <div class="stage-step active"><div class="stage-dot">4</div><div class="stage-name">Performance</div></div>
-      <div class="stage-step"><div class="stage-dot">5</div><div class="stage-name">Hard skills</div></div>
-      <div class="stage-step"><div class="stage-dot">6</div><div class="stage-name">Soft 360°</div></div>
-      <div class="stage-step"><div class="stage-dot">7</div><div class="stage-name">СРВ</div></div>
-      <div class="stage-step"><div class="stage-dot">8</div><div class="stage-name">1-on-1</div></div>
+      <div class="stage-step done"><div class="stage-dot">✓</div><div class="stage-name">Performance</div></div>
+      <div class="stage-step active"><div class="stage-dot">2</div><div class="stage-name">Самооценка</div></div>
+      <div class="stage-step"><div class="stage-dot">3</div><div class="stage-name">Hard skills</div></div>
+      <div class="stage-step"><div class="stage-dot">4</div><div class="stage-name">Soft 360°</div></div>
+      <div class="stage-step"><div class="stage-dot">5</div><div class="stage-name">СРВ</div></div>
+      <div class="stage-step"><div class="stage-dot">6</div><div class="stage-name">1-on-1</div></div>
     </div>
   </div>
 
@@ -421,20 +417,20 @@
 
 <script>
 const employees = [
-  { name:'Алексей Козлов', initials:'АК', color:'#6c7bff', role:'.NET разработчик', grade:'Mid2', team:'backend', stages:['done','done','done','done','done','done','done','done'], score:87, deadline:'15 мая', deadlineStatus:'ok', status:'completed' },
-  { name:'Мария Иванова', initials:'МИ', color:'#34d399', role:'Frontend разработчик', grade:'Sen1', team:'frontend', stages:['done','done','done','active','pending','pending','pending','pending'], score:null, deadline:'1 июня', deadlineStatus:'ok', status:'in_progress' },
-  { name:'Дмитрий Ли', initials:'ДЛ', color:'#f472b6', role:'QA инженер', grade:'Jun3', team:'qa', stages:['done','done','done','done','active','pending','pending','pending'], score:null, deadline:'28 мая', deadlineStatus:'warn', status:'in_progress' },
-  { name:'Анна Петрова', initials:'АП', color:'#fbbf24', role:'Data Engineer', grade:'Mid1', team:'data', stages:['done','done','active','pending','pending','pending','pending','pending'], score:null, deadline:'3 июня', deadlineStatus:'ok', status:'in_progress' },
-  { name:'Сергей Волков', initials:'СВ', color:'#2dd4bf', role:'Mobile разработчик', grade:'Mid3', team:'mobile', stages:['done','done','done','blocked','pending','pending','pending','pending'], score:42, deadline:'5 июня', deadlineStatus:'ok', status:'blocked' },
-  { name:'Ольга Смирнова', initials:'ОС', color:'#a78bfa', role:'Frontend разработчик', grade:'Jun2', team:'frontend', stages:['done','done','done','done','done','done','done','active'], score:73, deadline:'10 июня', deadlineStatus:'ok', status:'in_progress' },
-  { name:'Игорь Новиков', initials:'ИН', color:'#f87171', role:'.NET разработчик', grade:'Sen2', team:'backend', stages:['done','done','done','done','done','done','done','done'], score:91, deadline:'15 мая', deadlineStatus:'ok', status:'completed' },
-  { name:'Татьяна Белова', initials:'ТБ', color:'#fb923c', role:'QA инженер', grade:'Mid2', team:'qa', stages:['pending','pending','pending','pending','pending','pending','pending','pending'], score:null, deadline:'1 июня', deadlineStatus:'over', status:'not_started' },
-  { name:'Павел Морозов', initials:'ПМ', color:'#4ade80', role:'DevOps инженер', grade:'Mid1', team:'backend', stages:['done','done','done','active','pending','pending','pending','pending'], score:null, deadline:'8 июня', deadlineStatus:'ok', status:'in_progress' },
-  { name:'Екатерина Зайцева', initials:'ЕЗ', color:'#60a5fa', role:'Data Analyst', grade:'Jun1', team:'data', stages:['done','done','done','done','done','active','pending','pending'], score:null, deadline:'5 июня', deadlineStatus:'ok', status:'in_progress' },
+  { name:'Алексей Козлов', initials:'АК', color:'#6c7bff', role:'.NET разработчик', grade:'Mid2', team:'backend', stages:['done','done','done','done','done','done'], score:87, deadline:'15 мая', deadlineStatus:'ok', status:'completed' },
+  { name:'Мария Иванова', initials:'МИ', color:'#34d399', role:'Frontend разработчик', grade:'Sen1', team:'frontend', stages:['active','done','pending','pending','pending','pending'], score:null, deadline:'1 июня', deadlineStatus:'ok', status:'in_progress' },
+  { name:'Дмитрий Ли', initials:'ДЛ', color:'#f472b6', role:'QA инженер', grade:'Jun3', team:'qa', stages:['done','done','active','pending','pending','pending'], score:null, deadline:'28 мая', deadlineStatus:'warn', status:'in_progress' },
+  { name:'Анна Петрова', initials:'АП', color:'#fbbf24', role:'Data Engineer', grade:'Mid1', team:'data', stages:['pending','active','pending','pending','pending','pending'], score:null, deadline:'3 июня', deadlineStatus:'ok', status:'in_progress' },
+  { name:'Сергей Волков', initials:'СВ', color:'#2dd4bf', role:'Mobile разработчик', grade:'Mid3', team:'mobile', stages:['blocked','done','pending','pending','pending','pending'], score:42, deadline:'5 июня', deadlineStatus:'ok', status:'blocked' },
+  { name:'Ольга Смирнова', initials:'ОС', color:'#a78bfa', role:'Frontend разработчик', grade:'Jun2', team:'frontend', stages:['done','done','done','done','done','active'], score:73, deadline:'10 июня', deadlineStatus:'ok', status:'in_progress' },
+  { name:'Игорь Новиков', initials:'ИН', color:'#f87171', role:'.NET разработчик', grade:'Sen2', team:'backend', stages:['done','done','done','done','done','done'], score:91, deadline:'15 мая', deadlineStatus:'ok', status:'completed' },
+  { name:'Татьяна Белова', initials:'ТБ', color:'#fb923c', role:'QA инженер', grade:'Mid2', team:'qa', stages:['pending','pending','pending','pending','pending','pending'], score:null, deadline:'1 июня', deadlineStatus:'over', status:'not_started' },
+  { name:'Павел Морозов', initials:'ПМ', color:'#4ade80', role:'DevOps инженер', grade:'Mid1', team:'backend', stages:['active','done','pending','pending','pending','pending'], score:null, deadline:'8 июня', deadlineStatus:'ok', status:'in_progress' },
+  { name:'Екатерина Зайцева', initials:'ЕЗ', color:'#60a5fa', role:'Data Analyst', grade:'Jun1', team:'data', stages:['done','done','done','active','pending','pending'], score:null, deadline:'5 июня', deadlineStatus:'ok', status:'in_progress' },
 ];
 
-const stageLabels = ['1','2','3','4','5','6','7','8'];
-const stageTitles = ['Участники','Матрица','Самооценка','Performance','Hard','Soft 360°','СРВ','1-on-1'];
+const stageLabels = ['1','2','3','4','5','6'];
+const stageTitles = ['Performance','Самооценка','Hard','Soft 360°','СРВ','1-on-1'];
 
 function scoreColor(s) {
   if (!s) return 'var(--muted)';
