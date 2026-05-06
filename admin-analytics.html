@@ -16,8 +16,8 @@
     --sidebar-w: 240px;
     --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
   }
-  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: block; padding: 0; }
-  .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: flex; }
+  .sidebar { width: 240px; min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
   .sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); }
   .sidebar-logo span { color: var(--accent); }
   .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
@@ -31,7 +31,7 @@
   .sidebar-user { display: flex; align-items: center; gap: 8px; }
   .sidebar-user-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(108,123,255,0.15); color: var(--accent2); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
 
-  .main { margin-left: var(--sidebar-w); flex: none; min-height: 100vh; }
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
   .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
   .content { padding: 24px 28px; max-width: 1200px; }
@@ -191,6 +191,8 @@
     <a class="nav-item" href="index.html" style="border-top:1px solid var(--border);margin-top:8px;padding-top:12px"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg><span class="nav-text">Выход</span></a>
   </div>
   <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
+
+</div>
 
 <!-- MAIN -->
 <div class="main">

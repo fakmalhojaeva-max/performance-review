@@ -28,15 +28,7 @@
     --font-body: 'DM Sans', sans-serif;
   }
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 13px;
-    line-height: 1.5;
-    padding: 0;
-    min-height: 100vh;
-  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: flex; }
 
   .topbar {
     display: flex;
@@ -69,7 +61,7 @@
   .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
   .btn-primary:hover { background: #7b8aff; }
 
-  .main { padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
 
   .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
   .stat-card {
