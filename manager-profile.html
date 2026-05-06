@@ -288,23 +288,71 @@
   /* COMPETENCY ROW */
   .comp-row {
     background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 10px; padding: 14px 16px; margin-bottom: 10px;
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;
   }
   .comp-name { font-weight: 500; font-size: 13px; margin-bottom: 4px; }
-  .comp-desc { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
-  .comp-scale {
+  .comp-desc { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+
+  /* Score cards layout - shows all 4 descriptions */
+  .score-grid {
     display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+    align-items: stretch;
   }
-  .comp-btn {
-    padding: 10px 8px; border-radius: 8px;
-    border: 1px solid var(--border); background: transparent;
-    color: var(--muted); font-family: var(--font-head); font-weight: 700;
-    cursor: pointer; transition: all 0.12s; font-size: 12px;
-    text-align: center;
+  .score-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px; cursor: pointer;
+    transition: all 0.15s; text-align: left;
+    display: flex; flex-direction: column; gap: 6px;
+    font-family: var(--font-body);
+    height: 110px;
+    overflow: hidden;
   }
-  .comp-btn:hover { color: var(--text); border-color: var(--border2); }
-  .comp-btn.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .comp-btn-label { display: block; font-size: 9px; font-weight: 500; margin-top: 2px; opacity: 0.8; }
+  .score-card:hover { border-color: var(--border2); }
+  .score-card-header {
+    display: flex; align-items: center; gap: 6px;
+    flex-shrink: 0;
+  }
+  .score-card-num {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-weight: 700; font-size: 12px;
+    background: var(--bg4); color: var(--muted);
+    flex-shrink: 0;
+  }
+  .score-card-label {
+    font-size: 11px; font-weight: 600; color: var(--text);
+  }
+  .score-card-desc {
+    font-size: 10px; color: var(--muted); line-height: 1.4;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  /* Custom scrollbar for descriptions */
+  .score-card-desc::-webkit-scrollbar { width: 4px; }
+  .score-card-desc::-webkit-scrollbar-track { background: transparent; }
+  .score-card-desc::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+  .score-card-desc::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+  .score-card.selected {
+    background: rgba(108,123,255,0.08);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .score-card.selected .score-card-num {
+    background: var(--accent); color: #fff;
+  }
+  .score-card.n0.selected { background: rgba(248,113,113,0.08); border-color: var(--red); box-shadow: 0 0 0 1px var(--red); }
+  .score-card.n0.selected .score-card-num { background: var(--red); }
+  .score-card.n1.selected { background: rgba(251,191,36,0.08); border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber); }
+  .score-card.n1.selected .score-card-num { background: var(--amber); color: #1a1d2e; }
+  .score-card.n2.selected { background: rgba(45,212,191,0.08); border-color: var(--teal); box-shadow: 0 0 0 1px var(--teal); }
+  .score-card.n2.selected .score-card-num { background: var(--teal); color: #1a1d2e; }
+  .score-card.n3.selected { background: rgba(52,211,153,0.08); border-color: var(--green); box-shadow: 0 0 0 1px var(--green); }
+  .score-card.n3.selected .score-card-num { background: var(--green); color: #1a1d2e; }
+
+  @media (max-width: 700px) {
+    .score-grid { grid-template-columns: 1fr 1fr; }
+  }
 
   /* PERFORMANCE CRITERIA */
   .perf-block { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
@@ -438,6 +486,32 @@
         <div class="stat-label">Завершено</div>
         <div class="stat-value" style="color:var(--green)">1</div>
         <div style="font-size:10px;color:var(--muted);margin-top:2px">из 5</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPROVAL REQUEST BLOCK (от ПО) -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">⚠️ Запрос на согласование от ПО</div>
+      <span style="font-size:11px;color:var(--amber)">Требует решения</span>
+    </div>
+
+    <div class="my-tasks" style="border-color:rgba(251,191,36,0.3)">
+      <div class="my-tasks-header" style="border-color:rgba(251,191,36,0.2)">
+        <div class="my-tasks-title" style="color:var(--amber)">Продакт-оунер выставил «Недопуск» сотруднику — требуется ваше решение</div>
+      </div>
+      <div class="my-tasks-list">
+        <div class="my-task-item">
+          <div class="my-task-icon" style="background:rgba(251,191,36,0.15);color:var(--amber);font-size:16px">📋</div>
+          <div class="my-task-content">
+            <div class="my-task-title">Татьяна Белова — Performance: «Недопуск»</div>
+            <div class="my-task-meta">От Иванова Д. (ПО · Web App) · 1 час назад</div>
+          </div>
+          <div class="my-task-action">
+            <button class="btn btn-primary btn-sm" onclick="openApprovalModal()">Рассмотреть</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -744,47 +818,144 @@ document.addEventListener('click', function(e) { const dd = document.getElementB
     <div class="eval-modal-body">
       <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Оцените уровень владения каждой компетенцией от 0 до 3</div>
       
+      
       <div class="comp-row">
         <div class="comp-name">HTML / CSS</div>
         <div class="comp-desc">Семантичная, адаптивная и доступная вёрстка</div>
-        <div class="comp-scale">
-          <button class="comp-btn" onclick="selectComp(this)">0<span class="comp-btn-label">Не владеет</span></button>
-          <button class="comp-btn" onclick="selectComp(this)">1<span class="comp-btn-label">Базово</span></button>
-          <button class="comp-btn selected" onclick="selectComp(this)">2<span class="comp-btn-label">Уверенно</span></button>
-          <button class="comp-btn" onclick="selectComp(this)">3<span class="comp-btn-label">Эксперт</span></button>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Не владеет</span>
+            </div>
+            <div class="score-card-desc">Не понимает базовых тегов и принципов CSS</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Базово</span>
+            </div>
+            <div class="score-card-desc">Делает простую вёрстку, путается с Flexbox/Grid</div>
+          </div>
+          <div class="score-card n2 selected" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Уверенно использует Flexbox/Grid, делает адаптивную вёрстку</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Эксперт</span>
+            </div>
+            <div class="score-card-desc">Архитектура CSS, дизайн-системы, доступность (a11y)</div>
+          </div>
         </div>
       </div>
       
       <div class="comp-row">
         <div class="comp-name">JavaScript / TypeScript</div>
         <div class="comp-desc">Владение языком, паттернами, асинхронностью</div>
-        <div class="comp-scale">
-          <button class="comp-btn" onclick="selectComp(this)">0<span class="comp-btn-label">Не владеет</span></button>
-          <button class="comp-btn" onclick="selectComp(this)">1<span class="comp-btn-label">Базово</span></button>
-          <button class="comp-btn selected" onclick="selectComp(this)">2<span class="comp-btn-label">Уверенно</span></button>
-          <button class="comp-btn" onclick="selectComp(this)">3<span class="comp-btn-label">Эксперт</span></button>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Не владеет</span>
+            </div>
+            <div class="score-card-desc">Не пишет код самостоятельно</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Базово</span>
+            </div>
+            <div class="score-card-desc">Простые скрипты, базовый синтаксис</div>
+          </div>
+          <div class="score-card n2 selected" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Async/await, паттерны, типизация в TypeScript</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Эксперт</span>
+            </div>
+            <div class="score-card-desc">Глубокое понимание engine, оптимизация, продвинутые типы</div>
+          </div>
         </div>
       </div>
       
       <div class="comp-row">
         <div class="comp-name">React / Фреймворк</div>
         <div class="comp-desc">Проектирование компонентных приложений на React</div>
-        <div class="comp-scale">
-          <button class="comp-btn" onclick="selectComp(this)">0</button>
-          <button class="comp-btn" onclick="selectComp(this)">1</button>
-          <button class="comp-btn" onclick="selectComp(this)">2</button>
-          <button class="comp-btn" onclick="selectComp(this)">3</button>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Не владеет</span>
+            </div>
+            <div class="score-card-desc">Не работал с React</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Базово</span>
+            </div>
+            <div class="score-card-desc">Понимает hooks, компоненты, простой state</div>
+          </div>
+          <div class="score-card n2" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Архитектура приложений, оптимизация ре-рендеров, контекст</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Эксперт</span>
+            </div>
+            <div class="score-card-desc">Сложные паттерны, custom hooks, проектирование с нуля</div>
+          </div>
         </div>
       </div>
       
       <div class="comp-row">
         <div class="comp-name">Web Performance</div>
         <div class="comp-desc">Оптимизация производительности, Core Web Vitals</div>
-        <div class="comp-scale">
-          <button class="comp-btn" onclick="selectComp(this)">0</button>
-          <button class="comp-btn" onclick="selectComp(this)">1</button>
-          <button class="comp-btn" onclick="selectComp(this)">2</button>
-          <button class="comp-btn" onclick="selectComp(this)">3</button>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Не владеет</span>
+            </div>
+            <div class="score-card-desc">Не знает о метриках производительности</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Базово</span>
+            </div>
+            <div class="score-card-desc">Понимает что такое LCP, FID, CLS</div>
+          </div>
+          <div class="score-card n2" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Оптимизирует bundle, lazy loading, кэширование</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Эксперт</span>
+            </div>
+            <div class="score-card-desc">Глубокая оптимизация, профилирование, RUM</div>
+          </div>
         </div>
       </div>
       
@@ -816,47 +987,144 @@ document.addEventListener('click', function(e) { const dd = document.getElementB
     <div class="eval-modal-body">
       <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Система Развития: оцените 6 компетенций развития от 0 до 3</div>
       
+      
       <div class="comp-row">
         <div class="comp-name">Самостоятельность</div>
         <div class="comp-desc">Способность принимать решения и доводить дела до конца без напоминаний</div>
-        <div class="comp-scale">
-          <button class="comp-btn" onclick="selectComp(this)">0</button>
-          <button class="comp-btn" onclick="selectComp(this)">1</button>
-          <button class="comp-btn selected" onclick="selectComp(this)">2</button>
-          <button class="comp-btn" onclick="selectComp(this)">3</button>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Низкая</span>
+            </div>
+            <div class="score-card-desc">Постоянно ждёт указаний, не принимает решений сам</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Развивается</span>
+            </div>
+            <div class="score-card-desc">Иногда требует напоминаний и помощи</div>
+          </div>
+          <div class="score-card n2 selected" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Сам ведёт задачи, эскалирует только сложные ситуации</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Высокая</span>
+            </div>
+            <div class="score-card-desc">Полностью автономен, инициирует решения для команды</div>
+          </div>
         </div>
       </div>
       
       <div class="comp-row">
         <div class="comp-name">Ответственность</div>
         <div class="comp-desc">Признание ошибок, готовность нести последствия за свои решения</div>
-        <div class="comp-scale">
-          <button class="comp-btn" onclick="selectComp(this)">0</button>
-          <button class="comp-btn" onclick="selectComp(this)">1</button>
-          <button class="comp-btn" onclick="selectComp(this)">2</button>
-          <button class="comp-btn selected" onclick="selectComp(this)">3</button>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Низкая</span>
+            </div>
+            <div class="score-card-desc">Перекладывает ответственность на других</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Развивается</span>
+            </div>
+            <div class="score-card-desc">Признаёт ошибки только при прямых вопросах</div>
+          </div>
+          <div class="score-card n2" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Открыто признаёт ошибки, исправляет их</div>
+          </div>
+          <div class="score-card n3 selected" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Высокая</span>
+            </div>
+            <div class="score-card-desc">Берёт ответственность за команду, учится на ошибках</div>
+          </div>
         </div>
       </div>
       
       <div class="comp-row">
         <div class="comp-name">Коммуникация</div>
         <div class="comp-desc">Чёткое донесение мыслей, активное слушание, конструктивный диалог</div>
-        <div class="comp-scale">
-          <button class="comp-btn" onclick="selectComp(this)">0</button>
-          <button class="comp-btn" onclick="selectComp(this)">1</button>
-          <button class="comp-btn" onclick="selectComp(this)">2</button>
-          <button class="comp-btn" onclick="selectComp(this)">3</button>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Слабая</span>
+            </div>
+            <div class="score-card-desc">Не может донести мысль, плохо слушает</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Развивается</span>
+            </div>
+            <div class="score-card-desc">Иногда путано объясняет, но старается</div>
+          </div>
+          <div class="score-card n2" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Чётко и структурировано общается, слушает</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Высокая</span>
+            </div>
+            <div class="score-card-desc">Адаптирует стиль под аудиторию, медиатор конфликтов</div>
+          </div>
         </div>
       </div>
       
       <div class="comp-row">
         <div class="comp-name">Командная работа</div>
         <div class="comp-desc">Помощь коллегам, готовность к компромиссам, поддержка</div>
-        <div class="comp-scale">
-          <button class="comp-btn" onclick="selectComp(this)">0</button>
-          <button class="comp-btn" onclick="selectComp(this)">1</button>
-          <button class="comp-btn" onclick="selectComp(this)">2</button>
-          <button class="comp-btn" onclick="selectComp(this)">3</button>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Низкая</span>
+            </div>
+            <div class="score-card-desc">Работает изолированно, не помогает коллегам</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Развивается</span>
+            </div>
+            <div class="score-card-desc">Помогает только когда просят</div>
+          </div>
+          <div class="score-card n2" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Активно помогает коллегам, делится знаниями</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Высокая</span>
+            </div>
+            <div class="score-card-desc">Драйвер командного духа, ментор для младших</div>
+          </div>
         </div>
       </div>
       
@@ -911,12 +1179,155 @@ function selectComp(btn) {
   btn.classList.add('selected');
 }
 
+function selectCard(card) {
+  card.parentElement.querySelectorAll('.score-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
 // Close on overlay click
 document.querySelectorAll('.eval-modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', function(e) {
     if (e.target === overlay) overlay.classList.remove('show');
   });
 });
+</script>
+
+<!-- APPROVAL MODAL (from PO Недопуск request) -->
+<div class="eval-modal-overlay" id="approval-modal">
+  <div class="eval-modal" style="max-width: 760px">
+    <div class="eval-modal-header">
+      <div class="eval-modal-avatar" style="background:rgba(251,191,36,0.15);color:var(--amber)">ТБ</div>
+      <div class="eval-modal-info">
+        <div class="eval-modal-name">Татьяна Белова</div>
+        <div class="eval-modal-pos">Frontend разработчик · Web App</div>
+      </div>
+      <span class="eval-modal-type" style="background:rgba(251,191,36,0.12);color:var(--amber);border-color:rgba(251,191,36,0.3)">📋 Согласование</span>
+      <button class="eval-modal-close" onclick="closeModal('approval-modal')">✕</button>
+    </div>
+    <div class="eval-modal-body">
+      <!-- Approval header -->
+      <div style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.3);border-radius:10px;padding:14px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <div style="font-size:18px">⚠️</div>
+          <div style="font-family:var(--font-head);font-weight:700;font-size:13px;color:var(--amber)">Запрос на согласование «Недопуска»</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">
+          Иванов Дмитрий (Продакт-оунер) выставил решение «Недопуск к дальнейшей оценке». Ваше решение требуется для финализации статуса.
+        </div>
+      </div>
+
+      <!-- PO's evaluation by criterion -->
+      <div style="margin-bottom:18px">
+        <div style="font-family:var(--font-head);font-weight:700;font-size:13px;margin-bottom:10px">Оценка ПО по критериям</div>
+        
+        <div class="comp-row" style="margin-bottom:8px">
+          <div class="comp-name" style="font-size:12px">1. Закрытие задач в срок</div>
+          <div class="comp-desc" style="font-size:11px">«Срывает дедлайны последние 2 спринта, не успевает по 30-40% задач»</div>
+        </div>
+        <div class="comp-row" style="margin-bottom:8px">
+          <div class="comp-name" style="font-size:12px">2. Качество выполнения</div>
+          <div class="comp-desc" style="font-size:11px">«Много замечаний на ревью, регрессы в продакшене на её фичах»</div>
+        </div>
+        <div class="comp-row" style="margin-bottom:8px">
+          <div class="comp-name" style="font-size:12px">3. Инициативность</div>
+          <div class="comp-desc" style="font-size:11px">«Не предлагает улучшений, делает только что назначено»</div>
+        </div>
+        <div class="comp-row" style="margin-bottom:8px">
+          <div class="comp-name" style="font-size:12px">4. Командное взаимодействие</div>
+          <div class="comp-desc" style="font-size:11px">«Есть жалобы от коллег на сложности в коммуникации»</div>
+        </div>
+        <div class="comp-row" style="margin-bottom:0">
+          <div class="comp-name" style="font-size:12px">5. Соблюдение процессов</div>
+          <div class="comp-desc" style="font-size:11px">«Часто пропускает стендапы, забывает обновлять статус задач»</div>
+        </div>
+      </div>
+
+      <!-- PO's reasoning -->
+      <div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.25);border-radius:10px;padding:14px;margin-bottom:18px">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px">Обоснование ПО</div>
+        <div style="font-size:12px;line-height:1.6;color:var(--text)">
+          Сотрудник систематически не справляется с базовыми обязанностями последние 2 квартала. Несмотря на наставничество и адаптацию задач, прогресса нет. Считаю, что необходимо принять кадровое решение, прежде чем продолжать оценку Hard Skills и СРВ.
+        </div>
+      </div>
+
+      <!-- Approval route status -->
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:18px">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:10px">Маршрут согласования</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:11px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px">✓</div>
+            <span style="color:var(--text);font-weight:500">ПО (отправил)</span>
+          </div>
+          <span style="color:var(--muted)">→</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="width:24px;height:24px;border-radius:50%;background:var(--amber);color:#1a1d2e;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:10px">!</div>
+            <span style="color:var(--text);font-weight:600">Вы (ожидает)</span>
+          </div>
+          <span style="color:var(--muted)">→</span>
+          <div style="display:flex;align-items:center;gap:6px;opacity:0.6">
+            <div style="width:24px;height:24px;border-radius:50%;background:rgba(167,139,250,0.15);color:var(--accent2);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:10px">HR</div>
+            <span style="color:var(--muted)">HR</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision section -->
+      <div style="border-top:1px solid var(--border);padding-top:18px">
+        <div style="font-family:var(--font-head);font-weight:700;font-size:13px;margin-bottom:10px">Ваше решение</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="perf-toggle-btn yes" onclick="selectApproval(this, 'approve')" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer">✓ Поддерживаю «Недопуск»</button>
+          <button class="perf-toggle-btn no" onclick="selectApproval(this, 'reject')" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer">✕ Не согласен (вернуть к допуску)</button>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;display:block;margin-bottom:6px">Комментарий к решению</label>
+          <textarea id="approval-comment" placeholder="Поясните своё решение для ПО и HR..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--font-body);font-size:12px;outline:none;resize:vertical;min-height:60px"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="eval-modal-footer">
+      <span class="progress-info" style="font-size:11px;color:var(--muted)">После вашего решения заявка переходит к HR</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="closeModal('approval-modal')">Закрыть</button>
+        <button class="btn btn-primary btn-sm" onclick="submitApproval()">Отправить решение</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.perf-toggle-btn:hover { color: var(--text) !important; }
+.perf-toggle-btn.yes.selected { background: rgba(52,211,153,0.12) !important; color: var(--green) !important; border-color: rgba(52,211,153,0.4) !important; font-weight: 600 !important; }
+.perf-toggle-btn.no.selected { background: rgba(248,113,113,0.12) !important; color: var(--red) !important; border-color: rgba(248,113,113,0.4) !important; font-weight: 600 !important; }
+</style>
+
+<script>
+let approvalDecision = null;
+function openApprovalModal() {
+  document.getElementById('approval-modal').classList.add('show');
+}
+function selectApproval(btn, decision) {
+  btn.parentElement.querySelectorAll('.perf-toggle-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  approvalDecision = decision;
+}
+function submitApproval() {
+  if (!approvalDecision) {
+    alert('Выберите решение: поддержать или не согласиться');
+    return;
+  }
+  const comment = document.getElementById('approval-comment').value.trim();
+  if (!comment) {
+    alert('Укажите комментарий к решению');
+    return;
+  }
+  if (approvalDecision === 'approve') {
+    alert('Ваше решение «Поддерживаю Недопуск» отправлено в HR.\n\nСтатус: Передано на финальное согласование HR');
+  } else {
+    alert('Ваше решение «Не согласен» отправлено в HR.\n\nСтатус: Передано на финальное согласование HR');
+  }
+  closeModal('approval-modal');
+  approvalDecision = null;
+}
 </script>
 
 </body>

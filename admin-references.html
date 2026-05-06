@@ -242,11 +242,7 @@
   </div>
   <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
 
-      <button class="btn" onclick="alert('Экспорт текущего списка в Excel')">↓ Экспорт</button>
-      <button class="btn btn-primary" onclick="openAddModal()">+ Добавить вручную</button>
-    </div>
-  </div>
-
+</div>
 
 <!-- MAIN -->
 <div class="main">
@@ -286,7 +282,7 @@
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">
           <div style="font-family:var(--font-head);font-size:14px;font-weight:700">Направления</div>
-          <input style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-size:12px;outline:none;width:200px" placeholder="🔍 Поиск...">
+          <div style="display:flex;gap:8px;align-items:center"><input style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-size:12px;outline:none;width:200px" placeholder="🔍 Поиск..."><button class="btn btn-primary btn-sm" onclick="openAddModal('direction')">+ Добавить</button></div>
         </div>
         <table style="width:100%;border-collapse:collapse">
           <thead><tr><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)">Название</th><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)">Описание</th><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)">Сотрудников</th><th style="padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)"></th></tr></thead>
@@ -306,6 +302,7 @@
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">
           <div style="font-family:var(--font-head);font-size:14px;font-weight:700">Должности</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal('position')">+ Добавить</button>
         </div>
         <table style="width:100%;border-collapse:collapse">
           <thead><tr><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)">Название</th><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)">Направление</th><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)">Сотрудников</th><th style="padding:10px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)"></th></tr></thead>
@@ -325,6 +322,7 @@
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden">
         <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">
           <div style="font-family:var(--font-head);font-size:14px;font-weight:700">Команды</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddModal('team')">+ Добавить</button>
         </div>
         <table style="width:100%;border-collapse:collapse">
           <thead><tr><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)">Название</th><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)">Описание</th><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)">Сотрудников</th><th style="padding:10px 16px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)">Тимлид</th></tr></thead>
@@ -344,7 +342,7 @@
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
           <div><span style="display:inline-block;width:8px;height:24px;border-radius:4px;background:rgba(108,123,255,0.7);margin-right:10px;vertical-align:middle"></span><span style="font-family:var(--font-head);font-size:16px;font-weight:800">Junior</span> <span style="font-size:11px;color:var(--muted);margin-left:8px">3 подуровня</span></div>
-          <button class="btn btn-sm">✎ Уровень</button>
+          <button class="btn btn-sm" onclick="alert('Редактировать уровень')">✎ Уровень</button>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:8px">
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--font-head);font-weight:700;font-size:12px">Jun1</div>
@@ -355,7 +353,7 @@
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
           <div><span style="display:inline-block;width:8px;height:24px;border-radius:4px;background:rgba(45,212,191,0.7);margin-right:10px;vertical-align:middle"></span><span style="font-family:var(--font-head);font-size:16px;font-weight:800">Middle</span> <span style="font-size:11px;color:var(--muted);margin-left:8px">3 подуровня</span></div>
-          <button class="btn btn-sm">✎ Уровень</button>
+          <button class="btn btn-sm" onclick="alert('Редактировать уровень')">✎ Уровень</button>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:8px">
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--font-head);font-weight:700;font-size:12px">Mid1</div>
@@ -366,7 +364,7 @@
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:14px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
           <div><span style="display:inline-block;width:8px;height:24px;border-radius:4px;background:rgba(52,211,153,0.7);margin-right:10px;vertical-align:middle"></span><span style="font-family:var(--font-head);font-size:16px;font-weight:800">Senior</span> <span style="font-size:11px;color:var(--muted);margin-left:8px">3 подуровня</span></div>
-          <button class="btn btn-sm">✎ Уровень</button>
+          <button class="btn btn-sm" onclick="alert('Редактировать уровень')">✎ Уровень</button>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:8px">
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--font-head);font-weight:700;font-size:12px">Sen1</div>
@@ -374,7 +372,7 @@
           <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-family:var(--font-head);font-weight:700;font-size:12px">Sen3</div>
         </div>
       </div>
-      <button class="btn btn-primary" style="margin-top:8px">+ Добавить уровень</button>
+      <button class="btn btn-primary" style="margin-top:8px" onclick="openAddModal('level')">+ Добавить уровень</button>
     </div>
 
     <script>
@@ -390,68 +388,143 @@
       document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
       document.getElementById('panel-' + tab).style.display = 'block';
     }
+
+    // MODAL TEMPLATES
+    const modalTemplates = {
+      direction: {
+        title: 'Добавить направление',
+        body: `
+          <div class="field-group">
+            <label class="field-label">Название</label>
+            <input class="field-input" type="text" placeholder="Например: Frontend">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Описание</label>
+            <textarea class="field-input" rows="2" placeholder="Краткое описание направления"></textarea>
+          </div>
+        `
+      },
+      position: {
+        title: 'Добавить должность',
+        body: `
+          <div class="field-group">
+            <label class="field-label">Название должности</label>
+            <input class="field-input" type="text" placeholder="Например: Frontend разработчик">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Направление</label>
+            <select class="field-input">
+              <option>Frontend</option>
+              <option>.NET Backend</option>
+              <option>QA</option>
+              <option>Data</option>
+              <option>Mobile</option>
+            </select>
+          </div>
+        `
+      },
+      team: {
+        title: 'Добавить команду',
+        body: `
+          <div class="field-group">
+            <label class="field-label">Название команды</label>
+            <input class="field-input" type="text" placeholder="Например: Web App">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Описание</label>
+            <textarea class="field-input" rows="2" placeholder="Чем занимается команда"></textarea>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Тимлид</label>
+            <input class="field-input" type="text" placeholder="ФИО руководителя команды">
+          </div>
+        `
+      },
+      level: {
+        title: 'Добавить уровень',
+        body: `
+          <div class="field-group">
+            <label class="field-label">Название уровня</label>
+            <input class="field-input" type="text" placeholder="Например: Lead">
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">Используется как название группы (Junior / Middle / Senior / Lead)</div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Цвет уровня</label>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(108,123,255,0.1);border:1px solid rgba(108,123,255,0.3);border-radius:8px;cursor:pointer">
+                <input type="radio" name="level-color" value="blue" checked style="accent-color:var(--accent)">
+                <span style="display:inline-block;width:14px;height:14px;background:rgba(108,123,255,0.7);border-radius:3px"></span> Синий
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(45,212,191,0.1);border:1px solid rgba(45,212,191,0.3);border-radius:8px;cursor:pointer">
+                <input type="radio" name="level-color" value="teal" style="accent-color:var(--teal)">
+                <span style="display:inline-block;width:14px;height:14px;background:rgba(45,212,191,0.7);border-radius:3px"></span> Бирюзовый
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.3);border-radius:8px;cursor:pointer">
+                <input type="radio" name="level-color" value="green" style="accent-color:var(--green)">
+                <span style="display:inline-block;width:14px;height:14px;background:rgba(52,211,153,0.7);border-radius:3px"></span> Зелёный
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(244,114,182,0.1);border:1px solid rgba(244,114,182,0.3);border-radius:8px;cursor:pointer">
+                <input type="radio" name="level-color" value="pink" style="accent-color:#f472b6">
+                <span style="display:inline-block;width:14px;height:14px;background:rgba(244,114,182,0.7);border-radius:3px"></span> Розовый
+              </label>
+              <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:8px;cursor:pointer">
+                <input type="radio" name="level-color" value="amber" style="accent-color:var(--amber)">
+                <span style="display:inline-block;width:14px;height:14px;background:rgba(251,191,36,0.7);border-radius:3px"></span> Жёлтый
+              </label>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Подуровни (через запятую)</label>
+            <input class="field-input" type="text" placeholder="Lead1, Lead2, Lead3">
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">Например: Lead1, Lead2, Lead3</div>
+          </div>
+        `
+      }
+    };
+
+    function openAddModal(type) {
+      const tpl = modalTemplates[type];
+      if (!tpl) { alert('Тип не найден: ' + type); return; }
+      document.getElementById('modal-title').textContent = tpl.title;
+      document.getElementById('modal-body').innerHTML = tpl.body;
+      document.getElementById('add-modal').classList.add('show');
+    }
+
+    function closeAddModal() {
+      document.getElementById('add-modal').classList.remove('show');
+    }
+
+    function saveItem() {
+      alert('Запись успешно добавлена!');
+      closeAddModal();
+    }
+
+    // Close on overlay click
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('add-modal');
+      if (modal) {
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) closeAddModal();
+        });
+      }
+    });
     </script>
 </div>
 </div>
 
-<!-- ADD EMPLOYEE MODAL -->
+<!-- ADD/EDIT MODAL -->
 <div class="modal-overlay" id="add-modal">
   <div class="modal">
-    <div class="modal-title">Добавить сотрудника</div>
-    <div class="field-group">
-      <label class="field-label">ФИО</label>
-      <input class="field-input" type="text" placeholder="Фамилия Имя Отчество">
+    <div class="modal-title" id="modal-title">Добавить запись</div>
+    <div id="modal-body">
+      <!-- Content inserted by JS based on type -->
     </div>
-    <div class="field-group">
-      <label class="field-label">Email</label>
-      <input class="field-input" type="email" placeholder="employee@company.com">
-    </div>
-    <div class="field-group">
-      <label class="field-label">Должность</label>
-      <input class="field-input" type="text" placeholder="Например: Frontend разработчик">
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="field-group">
-        <label class="field-label">Направление</label>
-        <select class="field-select">
-          <option>.NET Backend</option><option>Frontend</option><option>QA</option><option>Data</option><option>Mobile</option>
-        </select>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Команда</label>
-        <input class="field-input" type="text" placeholder="Например: Platform">
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="field-group">
-        <label class="field-label">Руководитель</label>
-        <input class="field-input" type="text" placeholder="ФИО руководителя">
-      </div>
-      <div class="field-group">
-        <label class="field-label">Продакт-оунер</label>
-        <input class="field-input" type="text" placeholder="ФИО продакт-оунера">
-      </div>
-    </div>
-    <div class="field-group">
-      <label class="field-label">Текущий уровень</label>
-      <select class="field-select">
-        <option>Jun1</option><option>Jun2</option><option>Jun3</option>
-        <option>Mid1</option><option selected>Mid2</option><option>Mid3</option>
-        <option>Sen1</option><option>Sen2</option><option>Sen3</option>
-      </select>
-    </div>
-    <label style="display:flex;align-items:center;gap:10px;margin-top:4px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer">
-      <input type="checkbox" checked style="width:16px;height:16px;accent-color:var(--accent)">
-      <div>
-        <div style="font-size:12px;font-weight:500;color:var(--text)">Создать учётную запись</div>
-        <div style="font-size:11px;color:var(--muted)">Пароль будет отправлен на указанный email</div>
-      </div>
-    </label>
     <div class="modal-actions">
       <button class="btn" onclick="closeAddModal()">Отмена</button>
-      <button class="btn btn-primary" onclick="closeAddModal();alert('Сотрудник добавлен')">Добавить</button>
+      <button class="btn btn-primary" onclick="saveItem()">Сохранить</button>
     </div>
   </div>
+</div>
 
 
 <script>

@@ -242,10 +242,7 @@
   </div>
   <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
 
-      <button class="btn" onclick="alert('Экспорт текущего списка в Excel')">↓ Экспорт</button>
-      <button class="btn btn-primary" onclick="openAddModal()">+ Добавить вручную</button>
-    </div>
-  </div>
+</div>
 
 
 <!-- MAIN -->
@@ -255,6 +252,8 @@
       <div class="topbar-title">Пользователи и роли</div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn" onclick="alert('Экспорт текущего списка в Excel')">↓ Экспорт</button>
+      <button class="btn btn-primary" onclick="openAddModal()">+ Добавить вручную</button>
       <button class="theme-toggle" onclick="toggleTheme()" title="Переключить тему">☀️</button>
       <div class="notif-wrap">
         <button class="notif-btn" onclick="toggleNotif(event)">🔔<span class="notif-badge">3</span></button>
@@ -308,8 +307,8 @@
 
 <!-- ADD EMPLOYEE MODAL -->
 <div class="modal-overlay" id="add-modal">
-  <div class="modal">
-    <div class="modal-title">Добавить сотрудника</div>
+  <div class="modal" style="max-width: 560px; max-height: 90vh; overflow-y: auto">
+    <div class="modal-title">Добавить пользователя</div>
     <div class="field-group">
       <label class="field-label">ФИО</label>
       <input class="field-input" type="text" placeholder="Фамилия Имя Отчество">
@@ -334,7 +333,37 @@
         <input class="field-input" type="text" placeholder="Например: Platform">
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+    <!-- ROLES SECTION -->
+    <div style="background:rgba(108,123,255,0.04);border:1px solid rgba(108,123,255,0.2);border-radius:10px;padding:14px 16px;margin-top:14px;margin-bottom:14px">
+      <div style="font-family:var(--font-head);font-weight:700;font-size:13px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
+        🛡 Роли пользователя
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;line-height:1.5">
+        Каждый пользователь имеет основную роль. При необходимости можно назначить дополнительные (например, тимлид может быть и Сотрудником, и Руководителем).
+      </div>
+
+      <div class="field-group" style="margin-bottom:10px">
+        <label class="field-label">Основная роль</label>
+        <select class="field-select" id="primary-role">
+          <option value="employee" selected>Сотрудник</option>
+          <option value="manager">Руководитель</option>
+          <option value="po">Продакт-оунер</option>
+          <option value="hr">HR-админ</option>
+        </select>
+      </div>
+
+      <div id="extra-roles-container">
+        <!-- Extra roles will be added here -->
+      </div>
+
+      <button type="button" class="btn btn-sm" onclick="addExtraRole()" style="margin-top:6px;width:100%;border-style:dashed">
+        + Добавить дополнительную роль
+      </button>
+    </div>
+
+    <!-- Manager / PO links - shown for employees -->
+    <div id="links-section" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div class="field-group">
         <label class="field-label">Руководитель</label>
         <input class="field-input" type="text" placeholder="ФИО руководителя">
@@ -361,7 +390,7 @@
     </label>
     <div class="modal-actions">
       <button class="btn" onclick="closeAddModal()">Отмена</button>
-      <button class="btn btn-primary" onclick="closeAddModal();alert('Сотрудник добавлен')">Добавить</button>
+      <button class="btn btn-primary" onclick="closeAddModal();alert('Пользователь добавлен с ролями')">Добавить</button>
     </div>
   </div>
 </div>
@@ -402,6 +431,58 @@ function toggleTheme() {
   });
 })();
 
+// === ADD USER MODAL ===
+function openAddModal() {
+  document.getElementById('add-modal').classList.add('show');
+}
+
+function closeAddModal() {
+  document.getElementById('add-modal').classList.remove('show');
+  // Reset extra roles
+  document.getElementById('extra-roles-container').innerHTML = '';
+}
+
+const allRoles = {
+  employee: 'Сотрудник',
+  manager: 'Руководитель',
+  po: 'Продакт-оунер',
+  hr: 'HR-админ'
+};
+
+function getUsedRoles() {
+  // Get currently selected roles (primary + extras)
+  const used = [document.getElementById('primary-role').value];
+  document.querySelectorAll('.extra-role-select').forEach(s => used.push(s.value));
+  return used;
+}
+
+function addExtraRole() {
+  const used = getUsedRoles();
+  const available = Object.keys(allRoles).filter(r => !used.includes(r));
+
+  if (available.length === 0) {
+    alert('Все роли уже назначены');
+    return;
+  }
+
+  const container = document.getElementById('extra-roles-container');
+  const idx = Date.now();
+
+  const optionsHtml = available.map(r => `<option value="${r}">${allRoles[r]}</option>`).join('');
+
+  const div = document.createElement('div');
+  div.className = 'extra-role-row';
+  div.style.cssText = 'display:flex;gap:8px;align-items:flex-end;margin-bottom:8px';
+  div.innerHTML = `
+    <div class="field-group" style="flex:1;margin-bottom:0">
+      <label class="field-label">Дополнительная роль</label>
+      <select class="field-select extra-role-select">${optionsHtml}</select>
+    </div>
+    <button type="button" onclick="this.parentElement.remove()" style="padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--red);cursor:pointer;font-size:14px;height:35px">🗑</button>
+  `;
+  container.appendChild(div);
+}
 </script>
+</div>
 </body>
 </html>
