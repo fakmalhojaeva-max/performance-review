@@ -390,8 +390,8 @@
       <div class="stat-info"><div class="stat-label">Ожидают</div><div class="stat-value" style="color:var(--amber)">2</div></div>
     </div>
     <div class="stat-card">
-      <div class="stat-icon" style="background:rgba(248,113,113,0.12);color:var(--red)">⏰</div>
-      <div class="stat-info"><div class="stat-label">Просрочено</div><div class="stat-value" style="color:var(--red)">1</div></div>
+      <div class="stat-icon" style="background:rgba(167,139,250,0.12);color:var(--accent2)">📋</div>
+      <div class="stat-info"><div class="stat-label">На согласовании</div><div class="stat-value" style="color:var(--accent2)">1</div></div>
     </div>
   </div>
 
@@ -559,12 +559,12 @@
               </div>
             </td>
             <td><span class="badge badge-blue">Mid1</span></td>
-            <td><span class="perf-status todo"><span class="status-dot"></span>Не оценено</span></td>
-            <td><span class="badge badge-gray">—</span></td>
-            <td><div class="deadline-cell ok">5 июня · 6 дней</div></td>
+            <td><span class="perf-status done"><span class="status-dot"></span>Оценено · 2.1 / 5</span></td>
+            <td><span class="badge" style="background:rgba(251,191,36,0.12);color:var(--amber);border:1px solid rgba(251,191,36,0.3)">⏳ На рассмотрении</span></td>
+            <td><div class="deadline-cell ok"><span style="font-size:11px;color:var(--muted)">У РУК и HR</span></div></td>
             <td>
               <div class="actions-cell">
-                <button class="act-btn primary" onclick="openPerfModal('Дмитрий Ли', 'QA Engineer', 'ДЛ', {bg:'rgba(108,123,255,0.15)', fg:'var(--accent2)'})">Оценить</button>
+                <button class="act-btn" onclick="alert('Отправлено на согласование Руководителю и HR.\\n\\nОбоснование: Не закрывает задачи в срок последние 2 спринта, есть жалобы от команды.\\n\\nСтатус: Ожидает решения')">Просмотр</button>
               </div>
             </td>
           </tr>
@@ -654,72 +654,90 @@ document.addEventListener('click', function(e) { const dd = document.getElementB
       <button class="eval-modal-close" onclick="closeModal('perf-modal')">✕</button>
     </div>
     <div class="eval-modal-body">
-      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Оцените 5 критериев работы по принципу «Допуск/Недопуск» с обязательным комментарием</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Заполните комментарии по каждому критерию. Итоговое решение «Допуск/Недопуск» — в конце формы.</div>
       
       <div class="perf-block">
         <div class="perf-block-title">1. Закрытие задач в срок</div>
         <div class="perf-block-desc">Своевременное выполнение поставленных задач без существенных просрочек</div>
-        <div class="perf-toggle">
-          <button class="perf-toggle-btn yes selected" onclick="selectPerf(this)">✓ Допуск</button>
-          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск</button>
-        </div>
         <textarea class="perf-comment" placeholder="Комментарий (обязательно)...">Все спринты Q1 закрывала на 95-100%, дедлайны не срывала.</textarea>
       </div>
 
       <div class="perf-block">
         <div class="perf-block-title">2. Качество выполнения</div>
         <div class="perf-block-desc">Минимальное количество багов, code review без существенных замечаний</div>
-        <div class="perf-toggle">
-          <button class="perf-toggle-btn yes selected" onclick="selectPerf(this)">✓ Допуск</button>
-          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск</button>
-        </div>
         <textarea class="perf-comment" placeholder="Комментарий (обязательно)...">Высокое качество кода, мало замечаний на ревью.</textarea>
       </div>
 
       <div class="perf-block">
         <div class="perf-block-title">3. Инициативность</div>
         <div class="perf-block-desc">Самостоятельные предложения по улучшениям, проактивность</div>
-        <div class="perf-toggle">
-          <button class="perf-toggle-btn yes" onclick="selectPerf(this)">✓ Допуск</button>
-          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск</button>
-        </div>
         <textarea class="perf-comment" placeholder="Комментарий (обязательно)..."></textarea>
       </div>
 
       <div class="perf-block">
         <div class="perf-block-title">4. Командное взаимодействие</div>
         <div class="perf-block-desc">Работа в команде, помощь коллегам, конструктивный диалог</div>
-        <div class="perf-toggle">
-          <button class="perf-toggle-btn yes" onclick="selectPerf(this)">✓ Допуск</button>
-          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск</button>
-        </div>
         <textarea class="perf-comment" placeholder="Комментарий (обязательно)..."></textarea>
       </div>
 
       <div class="perf-block">
         <div class="perf-block-title">5. Соблюдение процессов</div>
         <div class="perf-block-desc">Следование принятым в команде процессам и стандартам</div>
-        <div class="perf-toggle">
-          <button class="perf-toggle-btn yes" onclick="selectPerf(this)">✓ Допуск</button>
-          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск</button>
-        </div>
         <textarea class="perf-comment" placeholder="Комментарий (обязательно)..."></textarea>
       </div>
 
       <div class="final-decision">
         <div class="final-decision-label">Итоговое решение по Performance</div>
         <div class="perf-toggle">
-          <button class="perf-toggle-btn yes" onclick="selectPerf(this)">✓ Допуск к дальнейшей оценке</button>
-          <button class="perf-toggle-btn no" onclick="selectPerf(this)">✕ Недопуск к дальнейшей оценке</button>
+          <button class="perf-toggle-btn yes" onclick="selectFinalDecision(this, 'pass')">✓ Допуск к дальнейшей оценке</button>
+          <button class="perf-toggle-btn no" onclick="selectFinalDecision(this, 'fail')">✕ Недопуск к дальнейшей оценке</button>
+        </div>
+
+        <!-- Escalation block - only shown when "Недопуск" is selected -->
+        <div id="escalation-block" style="display:none;margin-top:14px;padding:14px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.3);border-radius:10px">
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+            <div style="font-size:18px;flex-shrink:0">⚠️</div>
+            <div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:13px;color:var(--amber);margin-bottom:4px">Решение требует согласования</div>
+              <div style="font-size:11px;color:var(--muted);line-height:1.5">
+                При выставлении «Недопуска» решение автоматически отправляется на рассмотрение <strong style="color:var(--text)">Руководителю</strong> и <strong style="color:var(--text)">HR-администратору</strong>. Финальный статус будет назначен после их одобрения.
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group" style="margin-bottom:10px">
+            <label class="field-label" style="font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);font-weight:600;margin-bottom:6px;display:block">Обоснование недопуска (обязательно)</label>
+            <textarea class="perf-comment" id="fail-reason" placeholder="Опишите причины почему вы считаете, что сотрудник не должен быть допущен к дальнейшей оценке..." style="min-height:70px"></textarea>
+          </div>
+
+          <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:8px">Маршрут согласования</div>
+            <div style="display:flex;align-items:center;gap:10px;font-size:11px">
+              <div style="display:flex;align-items:center;gap:6px">
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(244,114,182,0.15);color:#f472b6;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:10px">ПО</div>
+                <span style="color:var(--text);font-weight:500">Вы</span>
+              </div>
+              <span style="color:var(--muted)">→</span>
+              <div style="display:flex;align-items:center;gap:6px;opacity:0.7">
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(45,212,191,0.15);color:var(--teal);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:10px">РУК</div>
+                <span style="color:var(--muted)">Руководитель</span>
+              </div>
+              <span style="color:var(--muted)">→</span>
+              <div style="display:flex;align-items:center;gap:6px;opacity:0.7">
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(167,139,250,0.15);color:var(--accent2);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:10px">HR</div>
+                <span style="color:var(--muted)">HR</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
     <div class="eval-modal-footer">
-      <span class="progress-info">Заполнено: 2 из 5 критериев</span>
+      <span class="progress-info" id="progress-info">Заполнено: 2 из 5 критериев</span>
       <div style="display:flex;gap:8px">
         <button class="btn btn-sm" onclick="closeModal('perf-modal')">Отмена</button>
         <button class="btn btn-sm" onclick="saveDraft('perf-modal')">💾 Черновик</button>
-        <button class="btn btn-primary btn-sm" onclick="saveAndClose('perf-modal')">Сохранить и закрыть</button>
+        <button class="btn btn-primary btn-sm" id="save-btn" onclick="saveAndClose('perf-modal')">Сохранить и закрыть</button>
       </div>
     </div>
   </div>
@@ -744,14 +762,41 @@ function saveDraft(id) {
   closeModal(id);
 }
 
+let currentFinalDecision = null; // 'pass' or 'fail'
+
 function saveAndClose(id) {
-  alert('Оценка сохранена');
+  if (currentFinalDecision === 'fail') {
+    const reason = document.getElementById('fail-reason').value.trim();
+    if (!reason) {
+      alert('Укажите обоснование недопуска — это обязательное поле для эскалации');
+      return;
+    }
+    alert('Решение «Недопуск» отправлено на согласование Руководителю и HR.\n\nСтатус: На рассмотрении\n\nВы получите уведомление после принятия финального решения.');
+  } else {
+    alert('Оценка сохранена');
+  }
   closeModal(id);
+  // Reset state for next opening
+  currentFinalDecision = null;
+  document.getElementById('escalation-block').style.display = 'none';
 }
 
-function selectPerf(btn) {
+function selectFinalDecision(btn, decision) {
+  // Highlight chosen button (within final-decision block only)
   btn.parentElement.querySelectorAll('.perf-toggle-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
+  currentFinalDecision = decision;
+
+  const escalation = document.getElementById('escalation-block');
+  const saveBtn = document.getElementById('save-btn');
+
+  if (decision === 'fail') {
+    escalation.style.display = 'block';
+    saveBtn.textContent = 'Отправить на согласование';
+  } else {
+    escalation.style.display = 'none';
+    saveBtn.textContent = 'Сохранить и закрыть';
+  }
 }
 
 // Close on overlay click

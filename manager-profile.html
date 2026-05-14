@@ -285,6 +285,74 @@
     gap: 12px; background: var(--bg);
   }
 
+  /* LEVEL REQUIREMENTS BAR (узкая таблица сверху каждой компетенции) */
+  .level-req-bar {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; margin-bottom: 10px;
+  }
+  .level-req-header { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .level-req-grid {
+    display: grid; grid-template-columns: repeat(9, 1fr); gap: 3px;
+  }
+  .level-req-cell {
+    text-align: center; padding: 4px 0;
+    font-family: var(--font-head); font-weight: 700; font-size: 12px;
+    border-radius: 5px; position: relative;
+  }
+  .level-req-cell .lv-name {
+    font-family: var(--font-body); font-size: 8px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;
+  }
+  .level-req-cell.req-0 { background: rgba(248,113,113,0.08); color: var(--red); }
+  .level-req-cell.req-1 { background: rgba(251,191,36,0.08); color: var(--amber); }
+  .level-req-cell.req-2 { background: rgba(45,212,191,0.08); color: var(--teal); }
+  .level-req-cell.req-3 { background: rgba(52,211,153,0.1); color: var(--green); }
+  .level-req-cell.current {
+    box-shadow: 0 0 0 2px var(--accent2);
+    transform: scale(1.05);
+  }
+  .level-req-cell.current::before {
+    content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    color: var(--accent2); font-size: 10px;
+  }
+
+  /* MATRIX SUMMARY TABLE (внизу модалок оценки) */
+  .matrix-summary-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
+  .matrix-summary-table th { padding: 8px 6px; text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); white-space: nowrap; }
+  .matrix-summary-table th.lv-current { background: rgba(108,123,255,0.12); color: var(--accent2); }
+  .matrix-summary-table td { padding: 7px 6px; text-align: center; font-family: var(--font-head); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--border); }
+  .matrix-summary-table td:first-child { text-align: left; padding-left: 10px; font-family: var(--font-body); font-weight: 500; color: var(--text); white-space: nowrap; }
+  .matrix-summary-table td.lv-0 { color: var(--red); }
+  .matrix-summary-table td.lv-1 { color: var(--amber); }
+  .matrix-summary-table td.lv-2 { color: var(--teal); }
+  .matrix-summary-table td.lv-3 { color: var(--green); }
+  .matrix-summary-table td.lv-current { background: rgba(108,123,255,0.08); box-shadow: inset 2px 0 0 var(--accent2), inset -2px 0 0 var(--accent2); }
+  .matrix-summary-table td.lv-actual { background: rgba(108,123,255,0.1); color: var(--accent2); font-size: 14px; font-weight: 800; }
+  .matrix-summary-table tr.row-total td { border-top: 2px solid var(--border2); background: rgba(255,255,255,0.02); font-family: var(--font-head); font-weight: 800; font-size: 14px; color: var(--text); padding-top: 10px; padding-bottom: 10px; }
+  .matrix-summary-table tr.row-total td:first-child { color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px; }
+
+  /* TOTAL SCORES BLOCK (внизу модалки) */
+  .totals-block {
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 12px; padding: 14px 16px; margin-top: 14px;
+  }
+  .totals-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .totals-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+  }
+  .totals-cell {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .totals-cell-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 4px; }
+  .totals-cell-value { font-family: var(--font-head); font-size: 18px; font-weight: 700; }
+  .totals-cell-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .totals-cell.actual .totals-cell-value { color: var(--accent2); }
+  .totals-cell.required .totals-cell-value { color: var(--text); }
+  .totals-cell.gap .totals-cell-value.gap-ok { color: var(--green); }
+  .totals-cell.gap .totals-cell-value.gap-warn { color: var(--amber); }
+  .totals-cell.gap .totals-cell-value.gap-bad { color: var(--red); }
+
   /* COMPETENCY ROW */
   .comp-row {
     background: var(--bg3); border: 1px solid var(--border);
@@ -602,7 +670,6 @@
                 <div class="stage-dot done" title="Самооценка">С</div>
                 <div class="stage-dot done" title="Performance">P</div>
                 <div class="stage-dot active" title="Hard Skills — ваша задача">H</div>
-                <div class="stage-dot todo" title="Soft 360°">S</div>
                 <div class="stage-dot todo" title="СРВ — ваша задача">СРВ</div>
                 <div class="stage-dot todo" title="1-on-1 — ваша задача">1-1</div>
               </div>
@@ -637,7 +704,6 @@
                 <div class="stage-dot active" title="Самооценка — ждём от сотрудника">С</div>
                 <div class="stage-dot todo" title="Performance">P</div>
                 <div class="stage-dot todo" title="Hard Skills — ваша задача">H</div>
-                <div class="stage-dot todo" title="Soft 360°">S</div>
                 <div class="stage-dot todo" title="СРВ — ваша задача">СРВ</div>
                 <div class="stage-dot todo" title="1-on-1 — ваша задача">1-1</div>
               </div>
@@ -672,7 +738,6 @@
                 <div class="stage-dot done" title="Самооценка">С</div>
                 <div class="stage-dot done" title="Performance">P</div>
                 <div class="stage-dot done" title="Hard Skills">H</div>
-                <div class="stage-dot done" title="Soft 360°">S</div>
                 <div class="stage-dot active" title="СРВ — ваша задача">СРВ</div>
                 <div class="stage-dot todo" title="1-on-1 — ваша задача">1-1</div>
               </div>
@@ -707,7 +772,6 @@
                 <div class="stage-dot done" title="Самооценка">С</div>
                 <div class="stage-dot done" title="Performance">P</div>
                 <div class="stage-dot done" title="Hard Skills">H</div>
-                <div class="stage-dot done" title="Soft 360°">S</div>
                 <div class="stage-dot done" title="СРВ">СРВ</div>
                 <div class="stage-dot active" title="1-on-1 — ваша задача">1-1</div>
               </div>
@@ -741,7 +805,6 @@
                 <div class="stage-dot done" title="Самооценка">С</div>
                 <div class="stage-dot done" title="Performance">P</div>
                 <div class="stage-dot done" title="Hard Skills">H</div>
-                <div class="stage-dot done" title="Soft 360°">S</div>
                 <div class="stage-dot done" title="СРВ">СРВ</div>
                 <div class="stage-dot done" title="1-on-1">1-1</div>
               </div>
@@ -960,6 +1023,59 @@ document.addEventListener('click', function(e) { const dd = document.getElementB
       </div>
       
       <div style="text-align:center;color:var(--muted);font-size:11px;padding:6px">+ ещё 4 компетенции</div>
+
+      <!-- TOTALS MATRIX BLOCK -->
+      <div class="totals-block">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="totals-title" style="margin-bottom:2px">📊 Итоговая матрица Hard Skills</div>
+            <div style="font-size:11px;color:var(--muted)">Текущий уровень сотрудника: <strong style="color:var(--accent2)">Mid2</strong></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div style="background:rgba(108,123,255,0.1);border:1px solid rgba(108,123,255,0.3);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Факт</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--accent2)">14</div>
+            </div>
+            <div style="background:var(--bg2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Mid2</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px">16</div>
+            </div>
+            <div style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Разрыв</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--amber)">−2</div>
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="matrix-summary-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">Компетенция</th>
+              <th>Jun1</th><th>Jun2</th><th>Jun3</th><th>Mid1</th><th class="lv-current">Mid2</th><th>Mid3</th><th>Sen1</th><th>Sen2</th><th>Sen3</th>
+              <th style="background:rgba(108,123,255,0.1);color:var(--accent2)">Факт</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>HTML / CSS</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>JavaScript / TypeScript</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2 lv-current">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>React / Фреймворк</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">1</td></tr>
+            <tr><td>Web Performance</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1 lv-current">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>Node.js / Backend для FE</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>Тестирование (Jest, Cypress)</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>CI/CD и инфраструктура</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">1</td></tr>
+            <tr><td>Архитектура и паттерны</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr class="row-total">
+              <td>ИТОГО</td>
+              <td>0</td><td>3</td><td>7</td><td>11</td><td class="lv-current"><strong>16</strong></td><td>17</td><td>22</td><td>24</td><td>24</td>
+              <td style="color:var(--accent2)"><strong>14</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <div style="margin-top:10px;padding:10px 12px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.5">
+          ⚠️ Фактический балл сотрудника (14) ниже требования для уровня Mid2 (16). Рекомендуется обсудить на 1-on-1. Прокрутите вверх чтобы изменить оценки.
+        </div>
+      </div>
     </div>
     <div class="eval-modal-footer">
       <span class="progress-info">Заполнено: 2 из 8 компетенций</span>
@@ -1129,6 +1245,57 @@ document.addEventListener('click', function(e) { const dd = document.getElementB
       </div>
       
       <div style="text-align:center;color:var(--muted);font-size:11px;padding:6px">+ ещё 2 компетенции</div>
+
+      <!-- TOTALS MATRIX BLOCK -->
+      <div class="totals-block">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="totals-title" style="margin-bottom:2px">📊 Итоговая матрица СРВ</div>
+            <div style="font-size:11px;color:var(--muted)">Текущий уровень сотрудника: <strong style="color:var(--accent2)">Sen2</strong></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div style="background:rgba(108,123,255,0.1);border:1px solid rgba(108,123,255,0.3);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Факт</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--accent2)">17</div>
+            </div>
+            <div style="background:var(--bg2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Sen2</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px">18</div>
+            </div>
+            <div style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Разрыв</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--amber)">−1</div>
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="matrix-summary-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">Компетенция</th>
+              <th>Jun1</th><th>Jun2</th><th>Jun3</th><th>Mid1</th><th>Mid2</th><th>Mid3</th><th>Sen1</th><th class="lv-current">Sen2</th><th>Sen3</th>
+              <th style="background:rgba(108,123,255,0.1);color:var(--accent2)">Факт</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Самостоятельность</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">3</td></tr>
+            <tr><td>Ответственность</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">3</td></tr>
+            <tr><td>Коммуникация</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>Командная работа</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">3</td></tr>
+            <tr><td>Развитие и обучение</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">3</td></tr>
+            <tr><td>Лидерство и менторинг</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">3</td></tr>
+            <tr class="row-total">
+              <td>ИТОГО</td>
+              <td>0</td><td>2</td><td>5</td><td>8</td><td>12</td><td>13</td><td>17</td><td class="lv-current"><strong>18</strong></td><td>18</td>
+              <td style="color:var(--accent2)"><strong>17</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <div style="margin-top:10px;padding:10px 12px;background:rgba(45,212,191,0.06);border:1px solid rgba(45,212,191,0.25);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.5">
+          💡 Фактический балл (17) почти соответствует требованию Sen2 (18). Незначительный разрыв допустим — сотрудник на уровне.
+        </div>
+      </div>
     </div>
     <div class="eval-modal-footer">
       <span class="progress-info">Заполнено: 2 из 6 компетенций</span>

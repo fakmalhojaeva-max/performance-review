@@ -367,10 +367,6 @@
       <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838l-2.727 1.666 1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"/></svg>
       <span>Hard Skills</span>
     </a>
-    <a class="user-nav-item " href="soft-skills.html">
-      <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zm5 2a2 2 0 11-4 0 2 2 0 014 0zm-4 7a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zm10 3h-2v.025A4.486 4.486 0 0116 13h2v-2zm-2 4h2v-1h-2v1zm-8-4H4v2H2v1h2v1h2v-1h2v-1H6v-2z"/></svg>
-      <span>Soft Skills 360°</span>
-    </a>
     <a class="user-nav-item " href="srv-skills.html">
       <svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
       <span>СРВ</span>
@@ -445,42 +441,47 @@
       </div>
       <div class="section-body">
         <table class="scores-table">
-          <thead><tr><th>Блок оценки</th><th>Оценщик</th><th>Балл</th><th>Вес</th><th>Взвешенный</th></tr></thead>
+          <thead><tr><th>Блок оценки</th><th>Оценщик</th><th>Этап</th><th style="text-align:right">Итоговый балл</th></tr></thead>
           <tbody>
             <tr>
-              <td>Performance</td>
+              <td style="font-weight:500">Performance</td>
               <td style="color:var(--muted)">Продакт-оунер</td>
-              <td><span class="score-num" style="color:var(--teal)">4.2</span></td>
-              <td>25% <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:25%"></div></div></td>
-              <td style="color:var(--teal);font-weight:600">1.05</td>
+              <td><span class="badge badge-green" style="font-size:9px">✓ Допуск</span></td>
+              <td style="text-align:right"><span class="score-num" style="color:var(--green);font-size:16px">Допущен</span></td>
             </tr>
             <tr>
-              <td>Hard Skills</td>
-              <td style="color:var(--muted)">Лид</td>
-              <td><span class="score-num" style="color:var(--green)">19 / 21</span></td>
-              <td>30% <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:30%"></div></div></td>
-              <td style="color:var(--green);font-weight:600">2.71</td>
-            </tr>
-            <tr>
-              <td>Soft Skills 360°</td>
-              <td style="color:var(--muted)">Команда (5 чел.)</td>
-              <td><span class="score-num" style="color:var(--green)">2</span></td>
-              <td>25% <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:25%"></div></div></td>
-              <td style="color:var(--green);font-weight:600">0.50</td>
-            </tr>
-            <tr>
-              <td>СРВ</td>
+              <td style="font-weight:500">Hard Skills</td>
               <td style="color:var(--muted)">Руководитель</td>
-              <td><span class="score-num" style="color:var(--teal)">13 / 18</span></td>
-              <td>20% <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:20%"></div></div></td>
-              <td style="color:var(--teal);font-weight:600">1.44</td>
+              <td><span class="badge badge-teal" style="font-size:9px">Mid2</span></td>
+              <td style="text-align:right"><span class="score-num" style="color:var(--teal);font-size:16px">14 / 24</span><div style="font-size:10px;color:var(--muted);margin-top:2px">требование Mid2: 16</div></td>
             </tr>
-            <tr class="total-row">
-              <td colspan="4" style="font-weight:700;font-family:var(--font-head)">Итоговый балл</td>
-              <td><span class="total-score">5.70</span> <span style="font-size:11px;color:var(--muted)">/ 10</span></td>
+            <tr>
+              <td style="font-weight:500">СРВ</td>
+              <td style="color:var(--muted)">Руководитель</td>
+              <td><span class="badge badge-teal" style="font-size:9px">Mid2</span></td>
+              <td style="text-align:right"><span class="score-num" style="color:var(--green);font-size:16px">7 / 9</span><div style="font-size:10px;color:var(--muted);margin-top:2px">требование Mid2: 6</div></td>
             </tr>
           </tbody>
         </table>
+
+        <!-- SUMMARY CARDS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px">
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;font-weight:600;margin-bottom:6px">Hard Skills</div>
+            <div style="font-family:var(--font-head);font-size:22px;font-weight:700;color:var(--teal)">14</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">из 24 (требование Mid2: 16)</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;font-weight:600;margin-bottom:6px">СРВ</div>
+            <div style="font-family:var(--font-head);font-size:22px;font-weight:700;color:var(--green)">7</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">из 9 (требование Mid2: 6)</div>
+          </div>
+          <div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.3);border-radius:10px;padding:12px 14px">
+            <div style="font-size:10px;color:var(--green);text-transform:uppercase;letter-spacing:0.4px;font-weight:600;margin-bottom:6px">Performance</div>
+            <div style="font-family:var(--font-head);font-size:18px;font-weight:700;color:var(--green)">✓ Допуск</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">прошёл первичный этап</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -536,9 +537,6 @@
             <tr><td>Web Performance</td><td><span class="badge badge-teal" style="font-size:9px">Hard</span></td><td>3</td><td>2</td><td><span class="gap-warn">-1</span></td></tr>
             <tr><td>Git / Code Review</td><td><span class="badge badge-teal" style="font-size:9px">Hard</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
             <tr><td>REST API / GraphQL</td><td><span class="badge badge-teal" style="font-size:9px">Hard</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
-            <tr><td>Коммуникация</td><td><span class="badge badge-blue" style="font-size:9px">Soft</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
-            <tr><td>Командная работа</td><td><span class="badge badge-blue" style="font-size:9px">Soft</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
-            <tr><td>Инициативность</td><td><span class="badge badge-blue" style="font-size:9px">Soft</span></td><td>3</td><td>2</td><td><span class="gap-warn">-1</span></td></tr>
             <tr><td>Автономность решений</td><td><span class="badge badge-amber" style="font-size:9px">СРВ</span></td><td>3</td><td>3</td><td><span class="gap-ok">0</span></td></tr>
             <tr><td>Масштаб влияния</td><td><span class="badge badge-amber" style="font-size:9px">СРВ</span></td><td>3</td><td>2</td><td><span class="gap-warn">-1</span></td></tr>
           </tbody>

@@ -77,16 +77,40 @@
   }
   .dir-chip:hover, .dir-chip.active { border-color: var(--accent); color: var(--accent2); background: rgba(108,123,255,0.08); }
 
-  /* ACTUALIZE BANNER */
-  .actualize-bar {
-    display: flex; align-items: center; justify-content: space-between;
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 12px 18px; margin-bottom: 16px;
-  }
-  .actualize-status { display: flex; align-items: center; gap: 8px; font-size: 12px; }
-  .actualize-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .actualize-dot.ok { background: var(--green); }
-  .actualize-dot.warn { background: var(--amber); }
+  /* DIRECTION SUMMARY */
+  .dir-summary { margin-top: 20px; padding: 20px 22px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 14px; }
+  .dir-summary-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; }
+  .dir-summary-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .dir-summary-subtitle { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .dir-summary-meta { font-size: 11px; color: var(--muted); }
+  .dir-summary-meta strong { color: var(--text); }
+  .summary-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--bg3); border-radius: 10px; overflow: hidden; }
+  .summary-table th { padding: 10px 6px; text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); }
+  .summary-table th:first-child { text-align: left; padding-left: 14px; }
+  .summary-table td { padding: 10px 6px; text-align: center; font-family: var(--font-head); font-weight: 700; font-size: 14px; color: var(--text); }
+  .summary-table td:first-child { text-align: left; padding-left: 14px; font-family: var(--font-body); font-weight: 500; font-size: 12px; color: var(--muted); }
+  .summary-table .sum-row td { color: var(--accent2); background: rgba(108,123,255,0.08); font-size: 16px; }
+  .summary-table .sum-row td:first-child { font-family: var(--font-head); font-weight: 700; color: var(--text); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .summary-cell-lv-0 { color: var(--red); }
+  .summary-cell-lv-1 { color: var(--amber); }
+  .summary-cell-lv-2 { color: var(--teal); }
+  .summary-cell-lv-3 { color: var(--green); }
+  .levels-section { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .levels-title { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .levels-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+  .levels-table th { padding: 6px 4px; text-align: center; font-size: 9px; text-transform: uppercase; letter-spacing: 0.3px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  .levels-table td { padding: 8px 4px; text-align: center; font-family: var(--font-head); font-weight: 700; font-size: 14px; }
+  .levels-table td.lv-0 { color: var(--red); background: rgba(248,113,113,0.06); }
+  .levels-table td.lv-1 { color: var(--amber); background: rgba(251,191,36,0.06); }
+  .levels-table td.lv-2 { color: var(--teal); background: rgba(45,212,191,0.06); }
+  .levels-table td.lv-3 { color: var(--green); background: rgba(52,211,153,0.08); }
+
+  /* LEVELS INPUT GRID (в форме добавления) */
+  .levels-input-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 6px; }
+  .level-input-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .level-input-cell label { font-size: 9px; color: var(--muted); font-weight: 600; }
+  .level-input-cell select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 6px 4px; border-radius: 6px; font-family: var(--font-head); font-weight: 700; text-align: center; font-size: 13px; cursor: pointer; }
+  .level-input-cell select:focus { border-color: var(--accent); outline: none; }
 
   .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.2px; }
   .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
@@ -209,16 +233,13 @@
 <div class="sidebar">
   <div class="sidebar-logo">Review<span>OS</span><small>Админ-панель</small></div>
   <div class="sidebar-nav">
-    <a class="nav-item" href="admin-dashboard.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span class="nav-text">Дашборд</span></a>
+    <a class="nav-item" href="admin-dashboard.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span class="nav-text">Обзор</span></a>
     <a class="nav-item" href="admin.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg><span class="nav-text">Циклы оценки</span></a>
     <a class="nav-item" href="admin-employees.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg><span class="nav-text">Сотрудники</span></a>
     <a class="nav-item" href="admin-references.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span class="nav-text">Справочники</span></a>
     <a class="nav-item active" href="admin-competencies.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg><span class="nav-text">Компетенции</span></a>
-    <a class="nav-item" href="admin-forms.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9zM4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"/></svg><span class="nav-text">Конструктор форм</span></a>
     <a class="nav-item" href="admin-users.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></a>
     <a class="nav-item" href="admin-analytics.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg><span class="nav-text">Аналитика</span></a>
-    <a class="nav-item" href="admin-email-templates.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg><span class="nav-text">Шаблоны писем</span></a>
-    <a class="nav-item" href="admin-email-log.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg><span class="nav-text">Журнал писем</span></a>
     <a class="nav-item" href="index.html" style="border-top:1px solid var(--border);margin-top:8px;padding-top:12px"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg><span class="nav-text">Выход</span></a>
   </div>
   <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
@@ -252,42 +273,34 @@
     <div class="stats-row">
       <div class="stat-card"><div class="stat-label">Всего компетенций</div><div class="stat-value">26</div></div>
       <div class="stat-card"><div class="stat-label">Hard Skills</div><div class="stat-value" style="color:var(--teal)">12</div></div>
-      <div class="stat-card"><div class="stat-label">Soft Skills</div><div class="stat-value" style="color:var(--accent2)">8</div></div>
       <div class="stat-card"><div class="stat-label">СРВ</div><div class="stat-value" style="color:var(--amber)">6</div></div>
     </div>
 
     <!-- TABS -->
     <div class="tabs-row">
       <button class="tab-btn active" onclick="setTab(this,'hard')">Hard Skills<span class="tab-count">12</span></button>
-      <button class="tab-btn" onclick="setTab(this,'soft')">Soft Skills<span class="tab-count">8</span></button>
       <button class="tab-btn" onclick="setTab(this,'srv')">СРВ<span class="tab-count">6</span></button>
     </div>
 
     <!-- DIRECTION FILTER -->
     <div class="dir-filter">
       <span class="dir-filter-label">Направление:</span>
-      <button class="dir-chip active" onclick="setDir(this,'all')">Все</button>
-      <button class="dir-chip" onclick="setDir(this,'backend')">.NET Backend</button>
-      <button class="dir-chip" onclick="setDir(this,'frontend')">Frontend</button>
-      <button class="dir-chip" onclick="setDir(this,'qa')">QA</button>
-      <button class="dir-chip" onclick="setDir(this,'data')">Data</button>
-      <button class="dir-chip" onclick="setDir(this,'mobile')">Mobile</button>
-    </div>
-
-    <!-- ACTUALIZE BAR -->
-    <div class="actualize-bar" id="actualize-bar">
-      <div class="actualize-status">
-        <div class="actualize-dot ok" id="act-dot"></div>
-        <span id="act-text">Матрица актуализирована для выбранного направления</span>
-      </div>
-      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px">
-        <input type="checkbox" id="act-check" checked style="width:14px;height:14px;accent-color:var(--green)" onchange="toggleActualize()">
-        <span>Актуализирована</span>
-      </label>
+      <select id="dir-select" onchange="setDirFromSelect(this.value)" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;color:var(--text);font-family:var(--font-body);font-size:12px;outline:none;cursor:pointer;min-width:180px">
+        <option value="backend">.NET Backend</option>
+        <option value="frontend">Frontend</option>
+        <option value="qa">QA</option>
+        <option value="data">Data</option>
+        <option value="mobile">Mobile</option>
+      </select>
+      <button class="btn btn-sm" onclick="openImportModal()" style="margin-left:auto">📋 Импорт из другого направления</button>
+      <button class="btn btn-sm" onclick="openExcelImportModal()">📤 Импорт матрицы из Excel</button>
     </div>
 
     <!-- COMPETENCY LIST -->
     <div class="comp-list" id="comp-list"></div>
+
+    <!-- DIRECTION SUMMARY (Итого по направлению) -->
+    <div class="dir-summary" id="dir-summary"></div>
   </div>
 </div>
 
@@ -299,9 +312,8 @@
     <div class="field-row">
       <div class="field-group">
         <label class="field-label">Тип</label>
-        <select class="field-select" id="m-type">
+        <select class="field-select" id="m-type" onchange="toggleLevelsSection()">
           <option value="hard">Hard Skill</option>
-          <option value="soft">Soft Skill</option>
           <option value="srv">СРВ</option>
         </select>
       </div>
@@ -350,6 +362,25 @@
       </div>
     </div>
 
+    <!-- LEVEL REQUIREMENTS SECTION (only for Hard Skills) -->
+    <div class="field-group" id="m-levels-section">
+      <label class="field-label">📊 Требуемый балл по уровням <span style="color:var(--muted);font-weight:400;text-transform:none">(Hard Skills и СРВ)</span></label>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px">
+        <div class="levels-input-grid">
+          <div class="level-input-cell"><label>Jun1</label><select id="m-lv-Jun1"><option>0</option><option>1</option><option>2</option><option>3</option></select></div>
+          <div class="level-input-cell"><label>Jun2</label><select id="m-lv-Jun2"><option>0</option><option selected>1</option><option>2</option><option>3</option></select></div>
+          <div class="level-input-cell"><label>Jun3</label><select id="m-lv-Jun3"><option>0</option><option selected>1</option><option>2</option><option>3</option></select></div>
+          <div class="level-input-cell"><label>Mid1</label><select id="m-lv-Mid1"><option>0</option><option>1</option><option selected>2</option><option>3</option></select></div>
+          <div class="level-input-cell"><label>Mid2</label><select id="m-lv-Mid2"><option>0</option><option>1</option><option selected>2</option><option>3</option></select></div>
+          <div class="level-input-cell"><label>Mid3</label><select id="m-lv-Mid3"><option>0</option><option>1</option><option selected>2</option><option>3</option></select></div>
+          <div class="level-input-cell"><label>Sen1</label><select id="m-lv-Sen1"><option>0</option><option>1</option><option>2</option><option selected>3</option></select></div>
+          <div class="level-input-cell"><label>Sen2</label><select id="m-lv-Sen2"><option>0</option><option>1</option><option>2</option><option selected>3</option></select></div>
+          <div class="level-input-cell"><label>Sen3</label><select id="m-lv-Sen3"><option>0</option><option>1</option><option>2</option><option selected>3</option></select></div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin-top:10px;line-height:1.5">💡 Например: для Junior достаточно 1 балла, для Middle нужно 2, для Senior — 3. При оценке Hard Skills система будет сверять фактический балл сотрудника с требуемым по его подуровню.</div>
+      </div>
+    </div>
+
     <div class="modal-actions">
       <button class="btn" onclick="closeAddModal()">Отмена</button>
       <button class="btn btn-primary" onclick="saveComp()">Сохранить</button>
@@ -360,28 +391,24 @@
 <script>
 const comps = {
   hard: [
-    { id:1, name:'HTML / CSS', desc:'Умение создавать семантичную, адаптивную и доступную вёрстку', dir:'frontend', scores:['Не владеет базовыми знаниями','Верстает простые страницы, допускает ошибки','Уверенно верстает сложные макеты, Flexbox/Grid','Эксперт в CSS-архитектуре, дизайн-системы'] },
-    { id:2, name:'JavaScript / TypeScript', desc:'Владение языком, паттернами, асинхронностью и типизацией', dir:'frontend', scores:['Не понимает основ языка','Пишет рабочий код без современных паттернов','Уверенно владеет ES6+, TypeScript, паттерны','Глубокое знание движка, архитектурные решения'] },
-    { id:3, name:'React / Фреймворк', desc:'Проектирование и разработка компонентных приложений', dir:'frontend', scores:['Не работал с фреймворком','Простые компоненты, базовые хуки','Сложные приложения, кастомные хуки, оптимизация','Архитектура приложений, лидерство в направлении'] },
-    { id:4, name:'C# / .NET Core', desc:'Разработка серверных приложений на платформе .NET', dir:'backend', scores:['Не владеет C#','Базовый синтаксис, простые CRUD','Асинхронность, DI, паттерны, middleware','Архитектура микросервисов, performance tuning'] },
-    { id:5, name:'SQL / Базы данных', desc:'Проектирование схем, написание запросов, оптимизация', dir:'backend', scores:['Не пишет SQL-запросы','Простые SELECT/INSERT, базовые JOIN','Сложные запросы, индексы, оптимизация','Проектирование схем, шардинг, репликация'] },
-    { id:6, name:'Тестирование ПО', desc:'Методологии тестирования, написание тест-кейсов', dir:'qa', scores:['Не понимает процесс тестирования','Ручное тестирование по готовым кейсам','Пишет тест-кейсы, автотесты, CI-интеграция','Стратегия тестирования, фреймворки, менторинг'] },
-  ],
-  soft: [
-    { id:7, name:'Коммуникация', desc:'Умение чётко доносить мысли и воспринимать обратную связь', dir:'all', scores:['Не может донести мысль','Иногда путано объясняет','Обычно чётко и структурировано','Всегда ясно, адаптирует стиль под аудиторию'] },
-    { id:8, name:'Командная работа', desc:'Готовность помогать коллегам и работать в команде', dir:'all', scores:['Работает изолированно','Помогает только если попросят','Активно участвует в команде','Драйвит команду, разрешает конфликты'] },
-    { id:9, name:'Ответственность', desc:'Принятие ответственности за свои решения и результат', dir:'all', scores:['Перекладывает ответственность','Избегает сложных решений','Обычно берёт ответственность','Всегда несёт полную ответственность'] },
-    { id:10, name:'Инициативность', desc:'Предложение улучшений и готовность брать сложные задачи', dir:'all', scores:['Не проявляет инициативу','Крайне редко предлагает','Периодически предлагает улучшения','Регулярно драйвит изменения'] },
+    { id:1, name:'HTML / CSS', desc:'Умение создавать семантичную, адаптивную и доступную вёрстку', dir:'frontend', scores:['Не владеет базовыми знаниями','Верстает простые страницы, допускает ошибки','Уверенно верстает сложные макеты, Flexbox/Grid','Эксперт в CSS-архитектуре, дизайн-системы'], levels:{Jun1:0,Jun2:1,Jun3:1,Mid1:2,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+    { id:2, name:'JavaScript / TypeScript', desc:'Владение языком, паттернами, асинхронностью и типизацией', dir:'frontend', scores:['Не понимает основ языка','Пишет рабочий код без современных паттернов','Уверенно владеет ES6+, TypeScript, паттерны','Глубокое знание движка, архитектурные решения'], levels:{Jun1:0,Jun2:1,Jun3:1,Mid1:2,Mid2:2,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:3, name:'React / Фреймворк', desc:'Проектирование и разработка компонентных приложений', dir:'frontend', scores:['Не работал с фреймворком','Простые компоненты, базовые хуки','Сложные приложения, кастомные хуки, оптимизация','Архитектура приложений, лидерство в направлении'], levels:{Jun1:0,Jun2:0,Jun3:1,Mid1:1,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+    { id:4, name:'C# / .NET Core', desc:'Разработка серверных приложений на платформе .NET', dir:'backend', scores:['Не владеет C#','Базовый синтаксис, простые CRUD','Асинхронность, DI, паттерны, middleware','Архитектура микросервисов, performance tuning'], levels:{Jun1:0,Jun2:1,Jun3:1,Mid1:2,Mid2:2,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
+    { id:5, name:'SQL / Базы данных', desc:'Проектирование схем, написание запросов, оптимизация', dir:'backend', scores:['Не пишет SQL-запросы','Простые SELECT/INSERT, базовые JOIN','Сложные запросы, индексы, оптимизация','Проектирование схем, шардинг, репликация'], levels:{Jun1:0,Jun2:0,Jun3:1,Mid1:1,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+    { id:6, name:'Тестирование ПО', desc:'Методологии тестирования, написание тест-кейсов', dir:'qa', scores:['Не понимает процесс тестирования','Ручное тестирование по готовым кейсам','Пишет тест-кейсы, автотесты, CI-интеграция','Стратегия тестирования, фреймворки, менторинг'], levels:{Jun1:0,Jun2:1,Jun3:1,Mid1:2,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
   ],
   srv: [
-    { id:11, name:'Автономность решений', desc:'Способность самостоятельно принимать решения без эскалации', dir:'all', scores:['Требуется постоянное руководство','Решает типовые вопросы, эскалирует нестандартные','Самостоятельно решает большинство вопросов','Принимает сложные решения автономно'] },
-    { id:12, name:'Сложность задач', desc:'Уровень сложности задач, которые сотрудник берёт', dir:'all', scores:['Только простые чётко описанные задачи','Средняя сложность, затрудняется при неопределённости','Сложные задачи с высокой неопределённостью','Максимальная сложность, архитектурный уровень'] },
-    { id:13, name:'Масштаб влияния', desc:'Объём системы/процессов, на которые влияют решения', dir:'all', scores:['Влияет только на свои задачи','Влияет на ближайших коллег','Влияет на всю команду или направление','Влияет на несколько команд или продукт'] },
+    { id:11, name:'Автономность решений', desc:'Способность самостоятельно принимать решения без эскалации', dir:'all', scores:['Требуется постоянное руководство','Решает типовые вопросы, эскалирует нестандартные','Самостоятельно решает большинство вопросов','Принимает сложные решения автономно'], levels:{Jun1:0,Jun2:0,Jun3:1,Mid1:1,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+    { id:12, name:'Сложность задач', desc:'Уровень сложности задач, которые сотрудник берёт', dir:'all', scores:['Только простые чётко описанные задачи','Средняя сложность, затрудняется при неопределённости','Сложные задачи с высокой неопределённостью','Максимальная сложность, архитектурный уровень'], levels:{Jun1:0,Jun2:1,Jun3:1,Mid1:2,Mid2:2,Mid3:2,Sen1:3,Sen2:3,Sen3:3} },
+    { id:13, name:'Масштаб влияния', desc:'Объём системы/процессов, на которые влияют решения', dir:'all', scores:['Влияет только на свои задачи','Влияет на ближайших коллег','Влияет на всю команду или направление','Влияет на несколько команд или продукт'], levels:{Jun1:0,Jun2:0,Jun3:1,Mid1:1,Mid2:2,Mid3:3,Sen1:3,Sen2:3,Sen3:3} },
   ]
 };
 
+const levelNames = ['Jun1','Jun2','Jun3','Mid1','Mid2','Mid3','Sen1','Sen2','Sen3'];
+
 let activeTab = 'hard';
-let activeDir = 'all';
+let activeDir = 'backend';
 
 function setTab(btn, tab) {
   activeTab = tab;
@@ -390,19 +417,17 @@ function setTab(btn, tab) {
   renderComps();
 }
 
-function setDir(btn, dir) {
+function setDirFromSelect(dir) {
   activeDir = dir;
-  document.querySelectorAll('.dir-chip').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
   renderComps();
 }
 
 function renderComps() {
   const list = document.getElementById('comp-list');
-  const items = (comps[activeTab] || []).filter(c => activeDir === 'all' || c.dir === activeDir || c.dir === 'all');
+  const items = (comps[activeTab] || []).filter(c => c.dir === activeDir || c.dir === 'all');
 
   if (items.length === 0) {
-    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Нет компетенций для выбранного фильтра</div>';
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--muted)">Нет компетенций для выбранного направления</div>';
     return;
   }
 
@@ -417,7 +442,7 @@ function renderComps() {
           </div>
         </div>
         <div class="comp-item-right">
-          <span class="badge badge-teal" style="font-size:9px">${c.dir === 'all' ? 'Все' : dirLabel(c.dir)}</span>
+          <span class="badge badge-teal" style="font-size:9px">${c.dir === 'all' ? 'Общее' : dirLabel(c.dir)}</span>
           <svg class="chevron" viewBox="0 0 20 20" fill="currentColor"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>
         </div>
       </div>
@@ -430,13 +455,134 @@ function renderComps() {
             </div>
           `).join('')}
         </div>
+        ${c.levels ? `
+        <div class="levels-section">
+          <div class="levels-title">📊 Требуемый балл по подуровням</div>
+          <table class="levels-table">
+            <thead><tr>${levelNames.map(lv => `<th>${lv}</th>`).join('')}</tr></thead>
+            <tbody><tr>${levelNames.map(lv => {
+              const v = c.levels[lv];
+              return `<td class="lv-${v}">${v}</td>`;
+            }).join('')}</tr></tbody>
+          </table>
+        </div>
+        ` : ''}
         <div class="comp-item-actions">
           <button class="action-btn" onclick="event.stopPropagation();alert('Редактировать: ${c.name}')">✎ Редактировать</button>
-          <button class="action-btn btn-danger" onclick="event.stopPropagation();alert('Удалить: ${c.name}')">🗑 Удалить</button>
+          <button class="action-btn btn-danger" onclick="event.stopPropagation();alert('Удалить из этого направления: ${c.name}')">🗑 Удалить</button>
         </div>
       </div>
     </div>
   `).join('');
+  
+  renderSummary(items);
+}
+
+function renderSummary(items) {
+  const summaryEl = document.getElementById('dir-summary');
+  
+  const itemsWithLevels = items.filter(c => c.levels);
+  
+  if (itemsWithLevels.length === 0) {
+    summaryEl.style.display = 'none';
+    return;
+  }
+  
+  summaryEl.style.display = 'block';
+  
+  // For each level, sum scores across all competencies
+  const sums = {};
+  levelNames.forEach(lv => {
+    sums[lv] = itemsWithLevels.reduce((acc, c) => acc + (c.levels[lv] || 0), 0);
+  });
+  
+  // Max possible: each competency = 3
+  const maxPossible = itemsWithLevels.length * 3;
+  
+  const dirLabelMap = { backend:'.NET Backend', frontend:'Frontend', qa:'QA', data:'Data', mobile:'Mobile' };
+  
+  summaryEl.innerHTML = `
+    <div class="dir-summary-header">
+      <div>
+        <div class="dir-summary-title">📊 Итого требований по уровням</div>
+        <div class="dir-summary-subtitle">${activeTab === 'hard' ? `Сумма требуемых баллов по всем компетенциям направления «${dirLabelMap[activeDir] || activeDir}»` : 'Сумма требуемых баллов по всем компетенциям СРВ (общие для всех направлений)'}</div>
+      </div>
+      <div class="dir-summary-meta">
+        Компетенций: <strong>${itemsWithLevels.length}</strong> · Максимум возможный: <strong>${maxPossible}</strong> баллов
+      </div>
+    </div>
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Уровень</th>
+          ${levelNames.map(lv => `<th>${lv}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${itemsWithLevels.map(c => `
+          <tr>
+            <td>${c.name}</td>
+            ${levelNames.map(lv => {
+              const v = c.levels[lv];
+              return `<td class="summary-cell-lv-${v}">${v}</td>`;
+            }).join('')}
+          </tr>
+        `).join('')}
+        <tr class="sum-row">
+          <td>Итого / ${maxPossible}</td>
+          ${levelNames.map(lv => `<td>${sums[lv]}</td>`).join('')}
+        </tr>
+      </tbody>
+    </table>
+  `;
+}
+
+// === IMPORT MODAL: copy competency from another direction ===
+function openImportModal() {
+  const allDirs = ['backend','frontend','qa','data','mobile'];
+  const otherDirs = allDirs.filter(d => d !== activeDir);
+
+  // Get all competencies from other directions in current tab
+  const items = (comps[activeTab] || []).filter(c => otherDirs.includes(c.dir));
+
+  if (items.length === 0) {
+    alert('В других направлениях нет компетенций для импорта');
+    return;
+  }
+
+  const itemsHtml = items.map(c => `
+    <label class="import-item">
+      <input type="checkbox" value="${c.id}" style="width:16px;height:16px;accent-color:var(--accent);flex-shrink:0">
+      <div style="flex:1">
+        <div style="font-weight:500;font-size:13px">${c.name}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${c.desc}</div>
+      </div>
+      <span class="badge badge-teal" style="font-size:9px">${dirLabel(c.dir)}</span>
+    </label>
+  `).join('');
+
+  document.getElementById('import-list').innerHTML = itemsHtml;
+  document.getElementById('import-modal').classList.add('show');
+  document.getElementById('import-target-name').textContent = dirLabel(activeDir);
+}
+
+function closeImportModal() {
+  document.getElementById('import-modal').classList.remove('show');
+}
+
+function importSelected() {
+  const checked = document.querySelectorAll('#import-list input[type="checkbox"]:checked');
+  if (checked.length === 0) {
+    alert('Выберите хотя бы одну компетенцию для импорта');
+    return;
+  }
+  alert(`Импортировано компетенций: ${checked.length}\nВ направление "${dirLabel(activeDir)}"`);
+  closeImportModal();
+}
+
+function tabLabel(t) {
+  const m = { hard:'Hard Skills', srv:'СРВ' };
+  return m[t] || t;
 }
 
 function dirLabel(d) {
@@ -448,22 +594,19 @@ function toggleComp(id) {
   document.getElementById('comp-' + id).classList.toggle('open');
 }
 
-function toggleActualize() {
-  const checked = document.getElementById('act-check').checked;
-  const dot = document.getElementById('act-dot');
-  const text = document.getElementById('act-text');
-  if (checked) {
-    dot.className = 'actualize-dot ok';
-    text.textContent = 'Матрица актуализирована для выбранного направления';
-    text.style.color = 'var(--green)';
-  } else {
-    dot.className = 'actualize-dot warn';
-    text.textContent = 'Матрица НЕ актуализирована — при запуске цикла будет предупреждение';
-    text.style.color = 'var(--amber)';
-  }
+function openAddModal() {
+  document.getElementById('add-modal').classList.add('show');
+  toggleLevelsSection();
 }
 
-function openAddModal() { document.getElementById('add-modal').classList.add('show'); }
+function toggleLevelsSection() {
+  const type = document.getElementById('m-type').value;
+  const section = document.getElementById('m-levels-section');
+  if (section) {
+    // Both Hard and СРВ have level requirements
+    section.style.display = (type === 'hard' || type === 'srv') ? 'block' : 'none';
+  }
+}
 function closeAddModal() { document.getElementById('add-modal').classList.remove('show'); }
 function saveComp() { closeAddModal(); alert('Компетенция сохранена!'); }
 
@@ -488,5 +631,316 @@ function toggleTheme() {
 })();
 
 </script>
+<!-- IMPORT FROM OTHER DIRECTION MODAL -->
+<style>
+  .import-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--bg3);
+    cursor: pointer; transition: all 0.12s; margin-bottom: 6px;
+  }
+  .import-item:hover { border-color: var(--border2); background: var(--bg4); }
+  .import-list-wrap { max-height: 380px; overflow-y: auto; padding: 2px; }
+</style>
+<div class="modal-overlay" id="import-modal" onclick="if(event.target===this)closeImportModal()">
+  <div class="modal" style="max-width: 600px">
+    <div class="modal-title">📋 Импорт компетенций из другого направления</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px">
+      Выберите компетенции, чтобы добавить их в направление <strong id="import-target-name" style="color:var(--text)">.NET Backend</strong>.
+      Все описания и шкалы 0-3 будут скопированы.
+    </div>
+    <div class="import-list-wrap" id="import-list">
+      <!-- filled by JS -->
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeImportModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="importSelected()">Импортировать выбранные</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXCEL IMPORT MODAL -->
+<style>
+  .excel-step { display: none; }
+  .excel-step.active { display: block; }
+  .step-indicator { display: flex; gap: 8px; margin-bottom: 18px; padding: 10px 14px; background: var(--bg3); border-radius: 8px; align-items: center; }
+  .step-dot { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 700; font-size: 11px; flex-shrink: 0; background: var(--bg4); color: var(--muted); }
+  .step-dot.active { background: var(--accent); color: #fff; }
+  .step-dot.done { background: var(--green); color: #fff; }
+  .step-label { font-size: 11px; color: var(--muted); font-weight: 500; }
+  .step-label.active { color: var(--text); font-weight: 600; }
+  .step-arrow { color: var(--muted); font-size: 12px; }
+  .excel-upload-zone {
+    background: var(--bg3); border: 2px dashed var(--border2); border-radius: 12px;
+    padding: 40px; text-align: center; cursor: pointer; transition: all 0.15s;
+    margin-bottom: 14px;
+  }
+  .excel-upload-zone:hover { border-color: var(--accent); background: rgba(108,123,255,0.04); }
+  .excel-upload-icon { font-size: 36px; margin-bottom: 8px; }
+  .excel-preview-section {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; margin-bottom: 10px;
+  }
+  .excel-preview-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px; }
+  .excel-stat { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12px; }
+  .excel-stat-icon { font-size: 14px; }
+  .excel-list { font-size: 11px; color: var(--muted); line-height: 1.8; max-height: 100px; overflow-y: auto; padding: 6px 10px; background: var(--bg2); border-radius: 6px; border: 1px solid var(--border); margin-top: 6px; }
+</style>
+<div class="modal-overlay" id="excel-modal" onclick="if(event.target===this)closeExcelImportModal()">
+  <div class="modal" style="max-width:680px;max-height:90vh;display:flex;flex-direction:column">
+    <div class="modal-title">📤 Импорт матрицы из Excel</div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+      <div class="step-dot" id="step-dot-1">1</div>
+      <span class="step-label" id="step-label-1">Направление</span>
+      <span class="step-arrow">→</span>
+      <div class="step-dot" id="step-dot-2">2</div>
+      <span class="step-label" id="step-label-2">Файл</span>
+      <span class="step-arrow">→</span>
+      <div class="step-dot" id="step-dot-3">3</div>
+      <span class="step-label" id="step-label-3">Предпросмотр</span>
+      <span class="step-arrow">→</span>
+      <div class="step-dot" id="step-dot-4">4</div>
+      <span class="step-label" id="step-label-4">Импорт</span>
+    </div>
+
+    <div style="flex:1;overflow-y:auto">
+
+    <!-- STEP 1: Direction -->
+    <div class="excel-step active" id="excel-step-1">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5">
+        Выберите направление, для которого вы импортируете матрицу компетенций. <strong style="color:var(--amber)">Внимание: импорт полностью заменит существующую матрицу выбранного направления.</strong>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Направление</label>
+        <select class="field-select" id="excel-dir">
+          <option value="backend">.NET Backend</option>
+          <option value="frontend">Frontend</option>
+          <option value="qa">QA</option>
+          <option value="data">Data</option>
+          <option value="mobile">Mobile</option>
+        </select>
+      </div>
+      <div style="background:rgba(108,123,255,0.06);border:1px solid rgba(108,123,255,0.2);border-radius:10px;padding:12px 14px;font-size:11px;color:var(--muted);line-height:1.6">
+        💡 Импорт ожидает Excel-файл с двумя страницами:<br>
+        <strong style="color:var(--text)">«Матрица [Направление]»</strong> — таблица компетенция × подуровни с баллами 0-3<br>
+        <strong style="color:var(--text)">«Описание [Направление]»</strong> — описание каждой компетенции и описания шкалы 0/1/2/3<br><br>
+        Подуровни считываются автоматически из файла (например Junior1, Junior2, Middle1, TechLead1, и т.д.).
+      </div>
+    </div>
+
+    <!-- STEP 2: File -->
+    <div class="excel-step" id="excel-step-2">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">
+        Загрузите Excel-файл с матрицей компетенций для направления <strong id="excel-dir-name" style="color:var(--text)">.NET Backend</strong>.
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">📗 Шаблон_матрица_компетенций.xlsx</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">2 страницы: Матрица + Описание</div>
+        </div>
+        <button class="btn btn-sm btn-green" onclick="alert('Скачивание шаблона template_matrix.xlsx')">↓ Скачать шаблон</button>
+      </div>
+      <div class="excel-upload-zone" onclick="document.getElementById('excel-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondrop="event.preventDefault();simulateExcelUpload()">
+        <input type="file" id="excel-file" accept=".xlsx,.xls" style="display:none" onchange="simulateExcelUpload()">
+        <div class="excel-upload-icon">📄</div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Перетащите Excel-файл сюда</div>
+        <div style="font-size:11px;color:var(--muted)">или нажмите для выбора · Форматы: .xlsx, .xls</div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Preview -->
+    <div class="excel-step" id="excel-step-3">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">
+        ✅ Файл успешно обработан. Проверьте что будет импортировано:
+      </div>
+
+      <div class="excel-preview-section">
+        <div class="excel-preview-title">📊 Структура файла</div>
+        <div class="excel-stat">
+          <span class="excel-stat-icon">📄</span>
+          <span>Найдено страниц: <strong style="color:var(--text)">2</strong> («Матрица .NET backend», «Описание .NET backend»)</span>
+        </div>
+        <div class="excel-stat">
+          <span class="excel-stat-icon">📏</span>
+          <span>Подуровней в файле: <strong style="color:var(--text)">12</strong> (Junior1-3, Middle1-3, Senior1-3, TechLead1-3)</span>
+        </div>
+        <div class="excel-stat">
+          <span class="excel-stat-icon">⚙️</span>
+          <span>Блоки: <strong style="color:var(--text)">Hard Skills</strong> и <strong style="color:var(--text)">СРВ (Soft Skills)</strong> · Блок «Сложность решения» <span style="color:var(--muted)">— пропущен</span></span>
+        </div>
+      </div>
+
+      <div class="excel-preview-section" style="background:rgba(52,211,153,0.06);border-color:rgba(52,211,153,0.25)">
+        <div class="excel-preview-title" style="color:var(--green)">✅ Что будет импортировано для каждой компетенции</div>
+        <div class="excel-stat"><span class="excel-stat-icon">📝</span><span>Название компетенции</span></div>
+        <div class="excel-stat"><span class="excel-stat-icon">📖</span><span>Краткое описание (что оценивается)</span></div>
+        <div class="excel-stat"><span class="excel-stat-icon">🎯</span><span>Описания баллов <strong style="color:var(--red)">0</strong>, <strong style="color:var(--amber)">1</strong>, <strong style="color:var(--teal)">2</strong>, <strong style="color:var(--green)">3</strong> — полные тексты из листа «Описание»</span></div>
+        <div class="excel-stat"><span class="excel-stat-icon">📊</span><span>Требуемые баллы по 12 подуровням (из листа «Матрица»)</span></div>
+      </div>
+
+      <div class="excel-preview-section">
+        <div class="excel-preview-title">🔧 Hard Skills · 16 компетенций</div>
+        <div class="excel-list">
+          • Знания языка C#<br>
+          • Знание и применение базовых принципов программирования<br>
+          • Система контроля версий<br>
+          • Отладка/Дебагинг кода<br>
+          • Чистота и написание кода<br>
+          • Знание фреймворков<br>
+          • Контейнеризация и оркестрация<br>
+          • Знание и применение БД<br>
+          • Знания работы с брокерами и очередями<br>
+          • Умение проектировать интеграционные взаимодействия<br>
+          • Знание и применение средств документирования API<br>
+          • Тестирование<br>
+          • DevOps и CI/CD<br>
+          • Архитектурные компетенции<br>
+          • Безопасность<br>
+          • Мониторинг и логирование
+        </div>
+      </div>
+
+      <div class="excel-preview-section">
+        <div class="excel-preview-title">🤝 СРВ · 4 компетенции</div>
+        <div class="excel-list">
+          • Работа в команде<br>
+          • Критическое и аналитическое мышление<br>
+          • Управление задачами<br>
+          • Проактивность и инициативность
+        </div>
+      </div>
+
+      <div style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.3);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;margin-bottom:8px">
+        <div style="font-size:16px;flex-shrink:0">⚠️</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">
+          <strong style="color:var(--text)">Будет выполнено:</strong><br>
+          • Удалены все существующие компетенции направления <strong id="excel-dir-warn" style="color:var(--text)">.NET Backend</strong><br>
+          • Созданы 20 новых компетенций (16 Hard + 4 СРВ)<br>
+          • Подуровни направления изменятся с 9 на <strong style="color:var(--text)">12</strong><br>
+          • Все описания шкалы 0-3 и требования по уровням будут импортированы
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Success -->
+    <div class="excel-step" id="excel-step-4">
+      <div style="text-align:center;padding:30px 20px">
+        <div style="font-size:48px;margin-bottom:12px">✅</div>
+        <div style="font-family:var(--font-head);font-size:16px;font-weight:700;color:var(--green);margin-bottom:8px">Матрица успешно импортирована!</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.6">
+          В направление <strong id="excel-dir-done" style="color:var(--text)">.NET Backend</strong> добавлено<br>
+          <strong style="color:var(--text)">20 компетенций</strong> с описаниями шкалы и требованиями по 12 подуровням
+        </div>
+      </div>
+    </div>
+
+    </div>
+
+    <div class="modal-actions" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <button class="btn" onclick="closeExcelImportModal()" id="excel-cancel-btn">Отмена</button>
+      <button class="btn" onclick="excelStepBack()" id="excel-back-btn" style="display:none">← Назад</button>
+      <button class="btn btn-primary" onclick="excelStepNext()" id="excel-next-btn">Далее →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let excelCurrentStep = 1;
+
+function openExcelImportModal() {
+  excelCurrentStep = 1;
+  showExcelStep(1);
+  document.getElementById('excel-modal').classList.add('show');
+}
+
+function closeExcelImportModal() {
+  document.getElementById('excel-modal').classList.remove('show');
+  excelCurrentStep = 1;
+}
+
+function showExcelStep(step) {
+  excelCurrentStep = step;
+  // Hide all steps
+  document.querySelectorAll('.excel-step').forEach(s => s.classList.remove('active'));
+  document.getElementById('excel-step-' + step).classList.add('active');
+
+  // Update step indicators
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('step-dot-' + i);
+    const lab = document.getElementById('step-label-' + i);
+    dot.classList.remove('active', 'done');
+    lab.classList.remove('active');
+    if (i < step) {
+      dot.classList.add('done');
+      dot.textContent = '✓';
+    } else if (i === step) {
+      dot.classList.add('active');
+      lab.classList.add('active');
+      dot.textContent = i;
+    } else {
+      dot.textContent = i;
+    }
+  }
+
+  // Update buttons
+  const nextBtn = document.getElementById('excel-next-btn');
+  const backBtn = document.getElementById('excel-back-btn');
+  const cancelBtn = document.getElementById('excel-cancel-btn');
+
+  if (step === 1) {
+    backBtn.style.display = 'none';
+    nextBtn.style.display = 'inline-flex';
+    nextBtn.textContent = 'Далее →';
+    cancelBtn.style.display = 'inline-flex';
+  } else if (step === 2) {
+    backBtn.style.display = 'inline-flex';
+    nextBtn.style.display = 'none'; // Next only after file upload
+    cancelBtn.style.display = 'inline-flex';
+  } else if (step === 3) {
+    backBtn.style.display = 'inline-flex';
+    nextBtn.style.display = 'inline-flex';
+    nextBtn.textContent = '✓ Импортировать';
+    cancelBtn.style.display = 'inline-flex';
+  } else if (step === 4) {
+    backBtn.style.display = 'none';
+    cancelBtn.style.display = 'none';
+    nextBtn.textContent = 'Готово';
+    nextBtn.style.display = 'inline-flex';
+  }
+
+  // Sync direction labels
+  const dirSel = document.getElementById('excel-dir');
+  const dirLabels = { backend:'.NET Backend', frontend:'Frontend', qa:'QA', data:'Data', mobile:'Mobile' };
+  const dirName = dirLabels[dirSel.value] || dirSel.value;
+  if (document.getElementById('excel-dir-name')) document.getElementById('excel-dir-name').textContent = dirName;
+  if (document.getElementById('excel-dir-warn')) document.getElementById('excel-dir-warn').textContent = dirName;
+  if (document.getElementById('excel-dir-done')) document.getElementById('excel-dir-done').textContent = dirName;
+}
+
+function excelStepNext() {
+  if (excelCurrentStep === 1) {
+    showExcelStep(2);
+  } else if (excelCurrentStep === 3) {
+    // Perform import (simulation)
+    showExcelStep(4);
+  } else if (excelCurrentStep === 4) {
+    closeExcelImportModal();
+  }
+}
+
+function excelStepBack() {
+  if (excelCurrentStep > 1) {
+    showExcelStep(excelCurrentStep - 1);
+  }
+}
+
+function simulateExcelUpload() {
+  // Simulate file processing — go straight to step 3
+  showExcelStep(3);
+}
+</script>
+
 </body>
 </html>
