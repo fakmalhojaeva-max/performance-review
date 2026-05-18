@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Сотрудники</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --sidebar-w: 240px;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; display: flex; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-radius: 10px; cursor: pointer;
+    transition: all 0.15s; color: var(--muted); font-size: 13px; font-weight: 400;
+    text-decoration: none; border: none; background: none; width: 100%; font-family: var(--font-body);
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); }
+  .sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .sidebar-user-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(108,123,255,0.15); color: var(--accent2); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+
+  /* MAIN */
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+  .content { padding: 24px 28px; }
+
+  .btn {
+    font-family: var(--font-body); font-size: 12px; font-weight: 500;
+    padding: 8px 16px; border-radius: 8px; cursor: pointer;
+    transition: all 0.15s; border: 1px solid var(--border2);
+    background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #7b8aff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-danger { color: var(--red); border-color: rgba(248,113,113,0.3); }
+  .btn-danger:hover { background: rgba(248,113,113,0.08); }
+  .btn-green { background: var(--green); border-color: var(--green); color: #0f1117; font-weight: 600; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+  .stat-value { font-family: var(--font-head); font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin-top: 4px; }
+
+  /* UPLOAD ZONE */
+  .upload-section {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 14px; padding: 24px; margin-bottom: 20px;
+  }
+  .upload-section-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .upload-section-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+
+  .template-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 18px; margin-bottom: 14px;
+  }
+  .template-info { flex: 1; }
+  .template-name { font-size: 13px; font-weight: 500; }
+  .template-cols { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .upload-zone {
+    border: 2px dashed var(--border2); border-radius: 12px;
+    padding: 32px 24px; text-align: center; cursor: pointer;
+    transition: all 0.2s; background: transparent;
+  }
+  .upload-zone:hover, .upload-zone.dragover {
+    border-color: var(--accent); background: rgba(108,123,255,0.04);
+  }
+  .upload-icon { font-size: 32px; margin-bottom: 8px; }
+  .upload-text { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+  .upload-hint { font-size: 11px; color: var(--muted); }
+
+  /* UPLOAD RESULT */
+  .upload-result {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px 18px; margin-top: 14px;
+  }
+  .upload-result-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .upload-result-icon { font-size: 20px; }
+  .upload-result-title { font-size: 13px; font-weight: 600; }
+  .upload-result-stats { display: flex; gap: 16px; font-size: 12px; color: var(--muted); }
+  .upload-result-stat strong { color: var(--text); }
+
+  /* TABLE */
+  .table-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .table-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+  .table-title { font-family: var(--font-head); font-size: 14px; font-weight: 700; }
+  .search-input {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 6px 12px; color: var(--text); font-family: var(--font-body);
+    font-size: 12px; outline: none; width: 200px; transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-input::placeholder { color: var(--muted); }
+
+  /* STATUS TABS */
+  .status-tab { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--font-body); display: inline-flex; align-items: center; gap: 6px; transition: all 0.12s; }
+  .status-tab:hover { color: var(--text); border-color: var(--border2); }
+  .status-tab.active { background: rgba(108,123,255,0.12); color: var(--accent2); border-color: rgba(108,123,255,0.3); font-weight: 600; }
+  .tab-count { background: var(--bg4); color: var(--muted); font-size: 10px; padding: 1px 6px; border-radius: 10px; }
+  .status-tab.active .tab-count { background: rgba(108,123,255,0.2); color: var(--accent2); }
+
+  /* STATUS BADGES */
+  .st-active { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.3); }
+  .st-inactive { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.3); }
+  .st-archived { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 600; background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+
+  /* Row styling per status */
+  tr.row-inactive { background: rgba(251,191,36,0.02); border-left: 3px solid rgba(251,191,36,0.4); }
+  tr.row-archived { opacity: 0.55; background: rgba(248,113,113,0.02); }
+  tr.row-archived:hover { opacity: 1; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    padding: 10px 14px; text-align: left; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted);
+    font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 10px 14px; vertical-align: middle; font-size: 12px; }
+
+  .badge {
+    display: inline-block; font-size: 10px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px; letter-spacing: 0.2px;
+  }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+
+  .action-btn {
+    padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer;
+    font-size: 11px; transition: all 0.12s; font-family: var(--font-body);
+  }
+  .action-btn:hover { color: var(--text); border-color: var(--accent); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6); z-index: 200;
+    align-items: center; justify-content: center; backdrop-filter: blur(4px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px; padding: 28px; max-width: 520px; width: 90%; }
+  .modal-title { font-family: var(--font-head); font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+  .field-group { margin-bottom: 16px; }
+  .field-label { display: block; font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .field-input {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 9px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 13px; outline: none;
+  }
+  .field-input:focus { border-color: var(--accent); }
+  .field-select {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 8px; padding: 9px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 13px; outline: none; appearance: none;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar { width: 60px; }
+    .sidebar .nav-text, .sidebar-logo small { display: none; }
+    .main { margin-left: 60px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    table { min-width: 700px; }
+    .table-card { overflow-x: auto; }
+  }
+
+  
+
+
+  
+
+
+  /* NOTIFICATIONS */
+  .notif-wrap { position: relative; display: inline-block; }
+  .notif-btn { position: relative; width: 36px; height: 36px; border-radius: 9px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0; }
+  .notif-btn:hover { background: var(--bg4); border-color: var(--border2); }
+  .notif-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--red); color: #fff; font-family: var(--font-head); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 5px; border: 2px solid var(--bg); }
+  .notif-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; width: 380px; max-height: 480px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.5); z-index: 1000; overflow: hidden; flex-direction: column; }
+  .notif-dropdown.show { display: flex; }
+  .notif-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+  .notif-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; }
+  .notif-mark { font-size: 11px; color: var(--accent2); cursor: pointer; background: none; border: none; font-family: var(--font-body); }
+  .notif-mark:hover { text-decoration: underline; }
+  .notif-list { flex: 1; overflow-y: auto; }
+  .notif-item { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; cursor: pointer; transition: background 0.1s; text-decoration: none; color: var(--text); position: relative; }
+  .notif-item:hover { background: rgba(255,255,255,0.02); }
+  .notif-item.unread { background: rgba(108,123,255,0.04); padding-left: 20px; }
+  .notif-item.unread::before { content: ''; position: absolute; left: 6px; top: 18px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .notif-item-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .notif-icon-task { background: rgba(251,191,36,0.12); color: var(--amber); }
+  .notif-icon-deadline { background: rgba(248,113,113,0.12); color: var(--red); }
+  .notif-icon-meeting { background: rgba(45,212,191,0.12); color: var(--teal); }
+  .notif-icon-result { background: rgba(52,211,153,0.12); color: var(--green); }
+  .notif-icon-system { background: rgba(108,123,255,0.12); color: var(--accent2); }
+  .notif-content { flex: 1; min-width: 0; }
+  .notif-text { font-size: 12px; line-height: 1.4; margin-bottom: 3px; }
+  .notif-text strong { color: var(--text); font-weight: 600; }
+  .notif-time { font-size: 10px; color: var(--muted); }
+  .notif-footer { padding: 10px 16px; border-top: 1px solid var(--border); text-align: center; flex-shrink: 0; }
+  .notif-footer a { font-size: 11px; color: var(--accent2); text-decoration: none; }
+  .notif-footer a:hover { text-decoration: underline; }
+  .theme-toggle { width: 36px; height: 36px; border-radius: 9px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0; }
+  .theme-toggle:hover { background: var(--bg4); border-color: var(--border2); }
+
+
+  body.light { --bg: #f7f8fc; --bg2: #ffffff; --bg3: #f1f3f9; --bg4: #e7eaf2; --border: rgba(0,0,0,0.07); --border2: rgba(0,0,0,0.12); --text: #1a1d2e; --muted: #6b7184; }
+  body.light .nav-item.active { background: rgba(108,123,255,0.1); color: var(--accent); }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">Review<span>OS</span><small>Админ-панель</small></div>
+  <div class="sidebar-nav">
+    <a class="nav-item" href="admin-dashboard.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span class="nav-text">Обзор</span></a>
+    <a class="nav-item" href="admin.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm0 2h12v2H4V5zm0 4h5v6H4V9zm7 0h5v6h-5V9z"/></svg><span class="nav-text">Циклы оценки</span></a>
+    <a class="nav-item active" href="admin-employees.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zm8 0a3 3 0 11-6 0 3 3 0 016 0zm-4.07 11c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg><span class="nav-text">Сотрудники</span></a>
+    <a class="nav-item" href="admin-references.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span class="nav-text">Справочники</span></a>
+    <a class="nav-item" href="admin-competencies.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 8a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zm6-6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zm2 6a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/></svg><span class="nav-text">Компетенции</span></a>
+    <a class="nav-item" href="admin-users.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clip-rule="evenodd"/></svg><span class="nav-text">Пользователи</span></a>
+    <a class="nav-item" href="admin-analytics.html"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg><span class="nav-text">Аналитика</span></a>
+    <a class="nav-item" href="index.html" style="border-top:1px solid var(--border);margin-top:8px;padding-top:12px"><svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg><span class="nav-text">Выход</span></a>
+  </div>
+  <div class="sidebar-footer"><div class="sidebar-user"><div class="sidebar-user-avatar">HR</div><div><div style="font-weight:500;color:var(--text);font-size:12px">Анна Сидорова</div><div style="font-size:10px;color:var(--muted)">HR-администратор</div></div></div></div>
+
+      <button class="btn" onclick="alert('Экспорт текущего списка в Excel')">↓ Экспорт</button>
+      <button class="btn btn-primary" onclick="openAddModal()">+ Добавить вручную</button>
+    </div>
+  </div>
+
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="topbar-title">Сотрудники</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Переключить тему">☀️</button>
+      <div class="notif-wrap">
+        <button class="notif-btn" onclick="toggleNotif(event)">🔔<span class="notif-badge">3</span></button>
+        <div class="notif-dropdown" id="notif-dropdown">
+          <div class="notif-header"><div class="notif-title">Уведомления</div><button class="notif-mark" onclick="markAllRead(event)">Отметить все</button></div>
+          <div class="notif-list">
+            <a class="notif-item unread" href="#"><div class="notif-item-icon">⏰</div><div class="notif-content"><div class="notif-text">Дедлайн самооценки <strong>через 2 дня</strong></div><div class="notif-time">2 часа назад</div></div></a>
+            <a class="notif-item unread" href="#"><div class="notif-item-icon">📋</div><div class="notif-content"><div class="notif-text">Просрочена форма у <strong>Татьяны Беловой</strong></div><div class="notif-time">5 часов назад</div></div></a>
+            <a class="notif-item" href="#"><div class="notif-item-icon">⚙</div><div class="notif-content"><div class="notif-text">Запущен новый цикл <strong>Q2 2026</strong></div><div class="notif-time">3 дня назад</div></div></a>
+          </div>
+          <div class="notif-footer"><a href="#">Все уведомления →</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="content">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Всего сотрудников</div>
+        <div class="stat-value">24</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Направлений</div>
+        <div class="stat-value" style="color:var(--accent2)">5</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Команд</div>
+        <div class="stat-value" style="color:var(--teal)">7</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Последняя загрузка</div>
+        <div class="stat-value" style="font-size:14px;margin-top:8px;color:var(--muted)">15.04.2026</div>
+      </div>
+    </div>
+
+    <!-- UPLOAD SECTION -->
+    <div class="upload-section">
+      <div class="upload-section-title">Загрузка списка сотрудников</div>
+      <div class="upload-section-desc">Скачайте шаблон, заполните его и загрузите обратно. Новые сотрудники будут добавлены, существующие — обновлены по ФИО.</div>
+
+      <div class="template-row">
+        <div class="template-info">
+          <div class="template-name">📗 Шаблон_сотрудники.xlsx</div>
+          <div class="template-cols">Колонки: ФИО · Email · Должность · Направление · Руководитель · Продакт-оунер · Текущий уровень · Команда</div>
+        </div>
+        <button class="btn btn-green" onclick="alert('Скачивание шаблона template_employees.xlsx')">↓ Скачать шаблон</button>
+      </div>
+
+      <div class="upload-zone" id="upload-zone"
+        onclick="document.getElementById('file-input').click()"
+        ondragover="event.preventDefault();this.classList.add('dragover')"
+        ondragleave="this.classList.remove('dragover')"
+        ondrop="event.preventDefault();this.classList.remove('dragover');simulateUpload()">
+        <input type="file" id="file-input" accept=".xlsx,.xls,.csv" style="display:none" onchange="simulateUpload()">
+        <div class="upload-icon">📄</div>
+        <div class="upload-text">Перетащите файл сюда или нажмите для выбора</div>
+        <div class="upload-hint">Форматы: .xlsx, .xls, .csv</div>
+      </div>
+
+      <div class="upload-result" id="upload-result" style="display:none">
+        <div class="upload-result-header">
+          <span class="upload-result-icon">✅</span>
+          <span class="upload-result-title">Файл успешно проверен — подтвердите импорт</span>
+        </div>
+        <div class="upload-result-stats">
+          <span>Будут добавлены: <strong style="color:var(--green)">3</strong></span>
+          <span>Будут обновлены: <strong style="color:var(--amber)">5</strong></span>
+          <span>Без изменений: <strong>16</strong></span>
+          <span>Ошибок: <strong style="color:var(--red)">0</strong></span>
+        </div>
+
+        <!-- WARNING: missing employees -->
+        <div style="margin-top:14px;padding:14px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.3);border-radius:10px">
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+            <div style="font-size:18px;flex-shrink:0">⚠️</div>
+            <div style="flex:1">
+              <div style="font-family:var(--font-head);font-weight:700;font-size:13px;color:var(--amber);margin-bottom:4px">Отсутствуют в файле: 3 сотрудника</div>
+              <div style="font-size:11px;color:var(--muted);line-height:1.5">
+                Этих сотрудников нет в загружаемом списке. Они автоматически будут переведены в статус <strong style="color:var(--text)">«Неактивный»</strong> и не будут участвовать в новых циклах оценки. Их оценки в завершённых циклах сохранятся.
+              </div>
+            </div>
+          </div>
+
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin-bottom:10px">
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px">Список:</div>
+            <div style="font-size:12px;line-height:1.8">
+              • Зайцева Екатерина Олеговна — Data Analyst<br>
+              • Иванова Татьяна Сергеевна — QA инженер<br>
+              • Кузнецов Андрей Петрович — DevOps инженер
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px">Действие со «старыми» сотрудниками:</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px">
+              <input type="radio" name="missing-action" value="inactive" checked style="accent-color:var(--amber)">
+              <span><strong style="color:var(--amber)">🟡 Перевести в «Неактивные»</strong> (рекомендуется)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px">
+              <input type="radio" name="missing-action" value="archive" style="accent-color:var(--red)">
+              <span><strong style="color:var(--red)">🔴 Архивировать</strong> (финальное действие)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px">
+              <input type="radio" name="missing-action" value="keep" style="accent-color:var(--green)">
+              <span><strong style="color:var(--green)">🟢 Оставить «Активными»</strong> (если временное несоответствие)</span>
+            </label>
+          </div>
+        </div>
+
+        <label style="display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer">
+          <input type="checkbox" id="gen-credentials" checked style="width:16px;height:16px;accent-color:var(--accent)">
+          <div>
+            <div style="font-size:12px;font-weight:500;color:var(--text)">Сгенерировать логины и пароли для новых сотрудников</div>
+            <div style="font-size:11px;color:var(--muted)">Будет создан список с временными паролями, которые HR может разослать или передать лично</div>
+          </div>
+        </label>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+          <button class="btn" onclick="document.getElementById('upload-result').style.display='none'">Отмена</button>
+          <button class="btn btn-primary" onclick="confirmImport()">Подтвердить импорт</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEES TABLE -->
+    <div class="table-card">
+      <div class="table-header" style="flex-wrap:wrap;gap:12px">
+        <div class="table-title">Все сотрудники</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap" id="status-tabs">
+          <button class="status-tab active" data-status="all" onclick="setStatusFilter(this,'all')">Все <span class="tab-count" id="cnt-all">12</span></button>
+          <button class="status-tab" data-status="active" onclick="setStatusFilter(this,'active')">🟢 Активные <span class="tab-count" id="cnt-active">10</span></button>
+          <button class="status-tab" data-status="inactive" onclick="setStatusFilter(this,'inactive')">🟡 Неактивные <span class="tab-count" id="cnt-inactive">1</span></button>
+          <button class="status-tab" data-status="archived" onclick="setStatusFilter(this,'archived')">🔴 Архивные <span class="tab-count" id="cnt-archived">1</span></button>
+        </div>
+        <input class="search-input" type="text" placeholder="🔍 Поиск по ФИО..." oninput="searchEmployees(this.value)">
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Статус</th>
+            <th>ФИО</th>
+            <th>Email</th>
+            <th>Должность</th>
+            <th>Системная роль</th>
+            <th>Направление</th>
+            <th>Руководитель</th>
+            <th>Продакт-оунер</th>
+            <th>Уровень</th>
+            <th>Команда</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="emp-body"></tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD EMPLOYEE MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-title">Добавить сотрудника</div>
+    <div class="field-group">
+      <label class="field-label">ФИО</label>
+      <input class="field-input" type="text" placeholder="Фамилия Имя Отчество">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Email</label>
+      <input class="field-input" type="email" placeholder="employee@company.com">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Должность</label>
+      <input class="field-input" type="text" placeholder="Например: Frontend разработчик">
+    </div>
+
+    <!-- SYSTEM ROLES -->
+    <div style="background:rgba(108,123,255,0.04);border:1px solid rgba(108,123,255,0.2);border-radius:10px;padding:12px 14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:600;color:var(--text);margin-bottom:8px">🛡 Системные роли (можно выбрать несколько)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px">
+          <input type="checkbox" checked style="width:14px;height:14px;accent-color:var(--accent)"> Сотрудник
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px">
+          <input type="checkbox" style="width:14px;height:14px;accent-color:var(--teal)"> Руководитель
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px">
+          <input type="checkbox" style="width:14px;height:14px;accent-color:#f472b6"> Продакт-оунер
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px">
+          <input type="checkbox" style="width:14px;height:14px;accent-color:var(--accent2)"> HR-админ
+        </label>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field-group">
+        <label class="field-label">Направление</label>
+        <select class="field-select">
+          <option>.NET Backend</option><option>Frontend</option><option>QA</option><option>Data</option><option>Mobile</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Команда</label>
+        <input class="field-input" type="text" placeholder="Например: Platform">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field-group">
+        <label class="field-label">Руководитель</label>
+        <input class="field-input" type="text" placeholder="ФИО руководителя">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Продакт-оунер</label>
+        <input class="field-input" type="text" placeholder="ФИО продакт-оунера">
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Текущий уровень</label>
+      <select class="field-select">
+        <option>Jun1</option><option>Jun2</option><option>Jun3</option>
+        <option>Mid1</option><option selected>Mid2</option><option>Mid3</option>
+        <option>Sen1</option><option>Sen2</option><option>Sen3</option>
+      </select>
+    </div>
+    <label style="display:flex;align-items:center;gap:10px;margin-top:4px;padding:12px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;cursor:pointer">
+      <input type="checkbox" id="single-gen-credentials" checked style="width:16px;height:16px;accent-color:var(--accent)">
+      <div>
+        <div style="font-size:12px;font-weight:500;color:var(--text)">Сгенерировать логин и пароль</div>
+        <div style="font-size:11px;color:var(--muted)">После сохранения откроется окно с временным паролем — его можно будет скопировать или отправить на email</div>
+      </div>
+    </label>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeAddModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="saveNewEmployee()">Добавить</button>
+    </div>
+  </div>
+
+
+<script>
+const employees = [
+  { name:'Козлов Алексей Иванович', email:'a.kozlov@company.com', position:'.NET разработчик', systemRoles:['manager','employee'], dir:'.NET Backend', manager:'Петров С.А.', po:'Иванов Д.К.', level:'Mid2', team:'Platform', status:'active' },
+  { name:'Иванова Мария Сергеевна', email:'m.ivanova@company.com', position:'Frontend разработчик', systemRoles:['employee'], dir:'Frontend', manager:'Козлов А.И.', po:'Иванов Д.К.', level:'Sen1', team:'Web App', status:'active' },
+  { name:'Ли Дмитрий Олегович', email:'d.li@company.com', position:'QA инженер', systemRoles:['employee'], dir:'QA', manager:'Смирнова О.В.', po:'Иванов Д.К.', level:'Jun3', team:'Testing', status:'active' },
+  { name:'Петрова Анна Викторовна', email:'a.petrova@company.com', position:'Data Engineer', systemRoles:['employee'], dir:'Data', manager:'Волков С.П.', po:'Сидоров К.Л.', level:'Mid1', team:'Analytics', status:'active' },
+  { name:'Волков Сергей Павлович', email:'s.volkov@company.com', position:'Mobile разработчик', systemRoles:['manager','employee'], dir:'Mobile', manager:'Петров С.А.', po:'Сидоров К.Л.', level:'Mid3', team:'Apps', status:'active' },
+  { name:'Смирнова Ольга Васильевна', email:'o.smirnova@company.com', position:'QA Lead', systemRoles:['manager'], dir:'QA', manager:'Козлов А.И.', po:'Иванов Д.К.', level:'Sen2', team:'Testing', status:'active' },
+  { name:'Новиков Игорь Андреевич', email:'i.novikov@company.com', position:'.NET разработчик', systemRoles:['employee'], dir:'.NET Backend', manager:'Петров С.А.', po:'Иванов Д.К.', level:'Sen2', team:'Platform', status:'active' },
+  { name:'Белова Татьяна Николаевна', email:'t.belova@company.com', position:'QA инженер', systemRoles:['employee'], dir:'QA', manager:'Смирнова О.В.', po:'Иванов Д.К.', level:'Mid2', team:'Testing', status:'inactive' },
+  { name:'Морозов Павел Дмитриевич', email:'p.morozov@company.com', position:'DevOps инженер', systemRoles:['employee'], dir:'.NET Backend', manager:'Петров С.А.', po:'Иванов Д.К.', level:'Mid1', team:'Infrastructure', status:'active' },
+  { name:'Иванов Дмитрий Константинович', email:'d.ivanov@company.com', position:'Product Owner', systemRoles:['po'], dir:'Frontend', manager:'—', po:'—', level:'Sen1', team:'Web App', status:'active' },
+  { name:'Сидорова Анна Михайловна', email:'a.sidorova@company.com', position:'HR-администратор', systemRoles:['hr','employee'], dir:'HR', manager:'—', po:'—', level:'Mid3', team:'HR', status:'active' },
+  { name:'Зайцева Екатерина Олеговна', email:'e.zaytseva@company.com', position:'Data Analyst', systemRoles:['employee'], dir:'Data', manager:'Волков С.П.', po:'Сидоров К.Л.', level:'Jun1', team:'Analytics', status:'archived' },
+];
+
+const roleLabels = {
+  employee: { text:'Сотрудник', bg:'rgba(52,211,153,0.12)', color:'var(--green)', border:'rgba(52,211,153,0.3)' },
+  manager: { text:'Руководитель', bg:'rgba(45,212,191,0.12)', color:'var(--teal)', border:'rgba(45,212,191,0.3)' },
+  po: { text:'ПО', bg:'rgba(244,114,182,0.12)', color:'#f472b6', border:'rgba(244,114,182,0.3)' },
+  hr: { text:'HR', bg:'rgba(167,139,250,0.12)', color:'var(--accent2)', border:'rgba(167,139,250,0.3)' }
+};
+
+const statusLabels = {
+  active: { text:'🟢 Активный', cls:'st-active' },
+  inactive: { text:'🟡 Неактивный', cls:'st-inactive' },
+  archived: { text:'🔴 Архив', cls:'st-archived' },
+};
+
+let currentStatusFilter = 'all';
+
+function renderRoles(roles) {
+  if (!roles || roles.length === 0) return '<span style="color:var(--muted);font-size:11px">—</span>';
+  return roles.map(r => {
+    const rl = roleLabels[r];
+    if (!rl) return '';
+    return `<span style="display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;background:${rl.bg};color:${rl.color};border:1px solid ${rl.border};margin-right:3px">${rl.text}</span>`;
+  }).join('');
+}
+
+function setStatusFilter(btn, status) {
+  document.querySelectorAll('.status-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentStatusFilter = status;
+  renderEmployees(document.querySelector('.search-input').value);
+}
+
+function updateCounts() {
+  document.getElementById('cnt-all').textContent = employees.length;
+  document.getElementById('cnt-active').textContent = employees.filter(e => e.status === 'active').length;
+  document.getElementById('cnt-inactive').textContent = employees.filter(e => e.status === 'inactive').length;
+  document.getElementById('cnt-archived').textContent = employees.filter(e => e.status === 'archived').length;
+}
+
+function getStatusActions(e) {
+  // Edit always available except for archived (only restore)
+  let actions = '';
+  if (e.status === 'archived') {
+    actions += `<button class="action-btn" onclick="alert('Архивный сотрудник, действия ограничены')" title="Только просмотр" style="opacity:0.5;cursor:not-allowed">✎</button>`;
+  } else {
+    actions += `<button class="action-btn" onclick="alert('Редактировать: ${e.name}')" title="Редактировать">✎</button>`;
+  }
+  
+  // Status change actions
+  if (e.status === 'active') {
+    actions += ` <button class="action-btn" onclick="changeStatus('${e.email}', 'inactive')" title="Деактивировать" style="color:var(--amber)">⏸</button>`;
+  } else if (e.status === 'inactive') {
+    actions += ` <button class="action-btn" onclick="changeStatus('${e.email}', 'active')" title="Восстановить" style="color:var(--green)">▶</button>`;
+    actions += ` <button class="action-btn" onclick="changeStatus('${e.email}', 'archived')" title="Архивировать" style="color:var(--red)">📦</button>`;
+  }
+  // Archived has no further actions (only view, no delete since history)
+  return actions;
+}
+
+function renderEmployees(search = '') {
+  const tbody = document.getElementById('emp-body');
+  let filtered = employees.filter(e => !search || e.name.toLowerCase().includes(search.toLowerCase()));
+  if (currentStatusFilter !== 'all') {
+    filtered = filtered.filter(e => e.status === currentStatusFilter);
+  }
+  
+  updateCounts();
+  
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:30px;color:var(--muted)">Сотрудники не найдены</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = filtered.map(e => {
+    const st = statusLabels[e.status];
+    const rowCls = e.status === 'inactive' ? 'row-inactive' : (e.status === 'archived' ? 'row-archived' : '');
+    return `
+    <tr class="${rowCls}">
+      <td><span class="${st.cls}">${st.text}</span></td>
+      <td style="font-weight:500">${e.name}</td>
+      <td style="color:var(--muted);font-size:11px">${e.email}</td>
+      <td style="color:var(--muted)">${e.position}</td>
+      <td>${renderRoles(e.systemRoles)}</td>
+      <td><span class="badge badge-teal">${e.dir}</span></td>
+      <td style="color:var(--muted)">${e.manager}</td>
+      <td style="color:var(--muted)">${e.po}</td>
+      <td><span class="badge badge-blue">${e.level}</span></td>
+      <td style="color:var(--muted)">${e.team}</td>
+      <td style="white-space:nowrap">${getStatusActions(e)}</td>
+    </tr>
+  `;
+  }).join('');
+}
+
+function changeStatus(email, newStatus) {
+  const emp = employees.find(e => e.email === email);
+  if (!emp) return;
+  
+  const transitions = {
+    'inactive': { title:'Перевести в Неактивный', text:`Сотрудник «${emp.name}» больше не будет участвовать в новых циклах оценки.\n\nЕго оценки в завершённых циклах сохранятся.\n\nПродолжить?`, color:'amber' },
+    'active': { title:'Восстановить', text:`Восстановить сотрудника «${emp.name}» в активный статус?\n\nОн снова сможет участвовать в циклах оценки.`, color:'green' },
+    'archived': { title:'Архивировать', text:`Архивировать сотрудника «${emp.name}»?\n\n⚠️ Это финальное действие — вернуть из архива нельзя.\n\nОценки в завершённых циклах сохранятся в истории.`, color:'red' }
+  };
+  
+  const t = transitions[newStatus];
+  if (!t) return;
+  
+  if (confirm(t.text)) {
+    emp.status = newStatus;
+    renderEmployees(document.querySelector('.search-input').value);
+    
+    // Show success notification
+    const notice = document.createElement('div');
+    const colors = { amber:'var(--amber)', green:'var(--green)', red:'var(--red)' };
+    const bgs = { amber:'rgba(251,191,36,0.3)', green:'rgba(52,211,153,0.3)', red:'rgba(248,113,113,0.3)' };
+    notice.style.cssText = `position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid ${bgs[t.color]};color:${colors[t.color]};padding:12px 16px;border-radius:10px;font-size:12px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.4)`;
+    notice.textContent = `✓ ${emp.name}: статус изменён на «${statusLabels[newStatus].text}»`;
+    document.body.appendChild(notice);
+    setTimeout(() => notice.remove(), 3500);
+  }
+}
+
+function searchEmployees(val) { renderEmployees(val); }
+function simulateUpload() {
+  document.getElementById('upload-result').style.display = 'block';
+}
+
+function confirmImport() {
+  const action = document.querySelector('input[name="missing-action"]:checked').value;
+  const labels = {
+    inactive: '🟡 переведены в Неактивные',
+    archive: '🔴 архивированы',
+    keep: '🟢 оставлены активными'
+  };
+
+  const genCreds = document.getElementById('gen-credentials').checked;
+
+  document.getElementById('upload-result').style.display = 'none';
+
+  if (genCreds) {
+    // Show credentials modal with generated logins/passwords
+    showCredentialsModal();
+  } else {
+    alert(`Импорт завершён!\n\n✓ Добавлено: 3\n✓ Обновлено: 5\n✓ Отсутствующие сотрудники ${labels[action]}: 3`);
+  }
+}
+
+function showCredentialsModal() {
+  // Demo data of "new employees" with generated credentials
+  const newCreds = [
+    { name: 'Кузнецов Андрей Петрович', email: 'a.kuznetsov@company.com', password: 'Mq8#kP2vL' },
+    { name: 'Иванова Татьяна Сергеевна', email: 't.ivanova@company.com', password: 'Xw3$nT9pQ' },
+    { name: 'Соколов Никита Дмитриевич', email: 'n.sokolov@company.com', password: 'Bk5!hY4rM' },
+  ];
+
+  const rows = newCreds.map(c => `
+    <tr>
+      <td style="padding:10px 12px;font-size:12px;font-weight:500">${c.name}</td>
+      <td style="padding:10px 12px;font-family:monospace;font-size:11px;color:var(--muted)">${c.email}</td>
+      <td style="padding:10px 12px"><code style="font-family:monospace;font-size:12px;background:var(--bg3);padding:3px 8px;border-radius:5px;color:var(--accent2);border:1px solid var(--border)">${c.password}</code></td>
+      <td style="padding:10px 12px;text-align:center"><button class="action-btn" onclick="copyText('${c.password}')" title="Копировать пароль">📋</button></td>
+    </tr>
+  `).join('');
+
+  document.getElementById('cred-list').innerHTML = rows;
+  document.getElementById('credentials-modal').classList.add('show');
+}
+
+function closeCredentialsModal() {
+  document.getElementById('credentials-modal').classList.remove('show');
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid rgba(52,211,153,0.3);color:var(--green);padding:10px 14px;border-radius:8px;font-size:12px;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.4)';
+    toast.textContent = `✓ Скопировано: ${text}`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  });
+}
+
+function exportCredentials() {
+  alert('📥 Файл credentials_2026-05-15.csv будет скачан\n\nФормат: ФИО, Email, Пароль, Дата создания');
+}
+
+function sendCredentialsByEmail() {
+  if (confirm('Разослать пароли по email каждому сотруднику?\n\nКаждый сотрудник получит свои данные на свой email.\nПароли в общем письме никому не отправятся.')) {
+    alert('✓ Письма отправлены 3 новым сотрудникам');
+    closeCredentialsModal();
+  }
+}
+function openAddModal() { document.getElementById('add-modal').classList.add('show'); }
+function closeAddModal() { document.getElementById('add-modal').classList.remove('show'); }
+
+function saveNewEmployee() {
+  // Get values from form
+  const inputs = document.querySelectorAll('#add-modal input[type="text"], #add-modal input[type="email"]');
+  const name = inputs[0]?.value.trim() || 'Новый сотрудник';
+  const email = inputs[1]?.value.trim() || 'newemployee@company.com';
+  const genCreds = document.getElementById('single-gen-credentials').checked;
+
+  closeAddModal();
+
+  if (genCreds) {
+    // Generate password
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    const symbols = '!@#$%&*';
+    let password = '';
+    for (let i = 0; i < 8; i++) password += chars[Math.floor(Math.random() * chars.length)];
+    password += symbols[Math.floor(Math.random() * symbols.length)];
+
+    // Show single-employee credentials modal
+    document.getElementById('single-result-name').textContent = name;
+    document.getElementById('single-result-email').textContent = email;
+    document.getElementById('single-result-password').textContent = password;
+    document.getElementById('single-credentials-modal').classList.add('show');
+  } else {
+    // Just show success toast
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid rgba(52,211,153,0.3);color:var(--green);padding:12px 16px;border-radius:10px;font-size:12px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,0.4)';
+    toast.textContent = `✓ Сотрудник «${name}» добавлен (без учётной записи)`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+}
+
+function closeSingleCredentialsModal() {
+  document.getElementById('single-credentials-modal').classList.remove('show');
+}
+
+function copySinglePassword() {
+  const pwd = document.getElementById('single-result-password').textContent;
+  navigator.clipboard.writeText(pwd).then(() => {
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed;bottom:20px;right:20px;background:var(--bg2);border:1px solid rgba(52,211,153,0.3);color:var(--green);padding:10px 14px;border-radius:8px;font-size:12px;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.4)';
+    toast.textContent = `✓ Пароль скопирован`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 2000);
+  });
+}
+
+function sendSingleByEmail() {
+  const email = document.getElementById('single-result-email').textContent;
+  alert(`✓ Логин и пароль отправлены на email: ${email}\n\nСотруднику предложат сменить пароль при первом входе.`);
+  closeSingleCredentialsModal();
+}
+
+renderEmployees();
+
+function toggleNotif(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('notif-dropdown').classList.toggle('show');
+}
+function markAllRead(e) {
+  if (e) e.stopPropagation();
+  document.querySelectorAll('.notif-item').forEach(i => i.classList.remove('unread'));
+  document.querySelector('.notif-badge').style.display = 'none';
+}
+document.addEventListener('click', function(e) {
+  const dd = document.getElementById('notif-dropdown');
+  if (dd && !dd.contains(e.target) && !e.target.closest('.notif-btn')) {
+    dd.classList.remove('show');
+  }
+});
+
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('reviewos-theme', isLight ? 'light' : 'dark');
+  const btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = isLight ? '🌙' : '☀️';
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('reviewos-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.querySelector('.theme-toggle');
+    if (btn) btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
+})();
+
+</script>
+<!-- SINGLE EMPLOYEE CREDENTIALS MODAL (после ручного добавления одного сотрудника) -->
+<div class="modal-overlay" id="single-credentials-modal" onclick="if(event.target===this)closeSingleCredentialsModal()">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-title">🔑 Учётная запись создана</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+      Сотрудник <strong style="color:var(--text)" id="single-result-name">—</strong> успешно добавлен. Создана учётная запись с временным паролем. <strong style="color:var(--amber)">При первом входе</strong> ему будет предложено сменить пароль на свой.
+    </div>
+
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:4px">Логин (email)</div>
+          <div style="font-family:monospace;font-size:13px;color:var(--text)" id="single-result-email">—</div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:4px">Временный пароль</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <code style="font-family:monospace;font-size:15px;background:var(--bg2);padding:6px 12px;border-radius:6px;color:var(--accent2);border:1px solid var(--border);flex:1" id="single-result-password">—</code>
+            <button class="btn btn-sm" onclick="copySinglePassword()" title="Копировать">📋</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:12px 14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:14px">
+      <div style="font-size:16px;flex-shrink:0">⚠️</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.5">
+        <strong style="color:var(--text)">Сохраните этот пароль сейчас!</strong> После закрытия окна пароль уже не будет отображаться — для повторного просмотра нужно будет сделать сброс через раздел «Пользователи».
+      </div>
+    </div>
+
+    <div class="modal-actions" style="display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn" onclick="sendSingleByEmail()">📧 Отправить на email</button>
+      <button class="btn btn-primary" onclick="closeSingleCredentialsModal()">Готово</button>
+    </div>
+  </div>
+</div>
+
+<!-- CREDENTIALS MODAL (после импорта новых сотрудников) -->
+<div class="modal-overlay" id="credentials-modal" onclick="if(event.target===this)closeCredentialsModal()">
+  <div class="modal" style="max-width:720px;max-height:90vh;display:flex;flex-direction:column">
+    <div class="modal-title">🔑 Сгенерированные данные для входа</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.6">
+      Создано <strong style="color:var(--green)">3 учётные записи</strong>. Каждый сотрудник может войти в систему с указанным email и временным паролем. <strong style="color:var(--amber)">При первом входе</strong> ему будет предложено сменить пароль на свой.
+    </div>
+
+    <div style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px">
+      <div style="font-size:16px;flex-shrink:0">⚠️</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.5">
+        <strong style="color:var(--text)">Сохраните этот список!</strong> После закрытия окна пароли уже не будут отображаться — их можно будет только <strong style="color:var(--text)">сбросить</strong> через раздел «Пользователи».
+      </div>
+    </div>
+
+    <div style="flex:1;overflow-y:auto;background:var(--bg3);border:1px solid var(--border);border-radius:10px">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="background:var(--bg2)">
+            <th style="padding:10px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">ФИО</th>
+            <th style="padding:10px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">Email (логин)</th>
+            <th style="padding:10px 12px;text-align:left;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border)">Временный пароль</th>
+            <th style="padding:10px 12px;text-align:center;font-size:10px;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1px solid var(--border);width:50px"></th>
+          </tr>
+        </thead>
+        <tbody id="cred-list"></tbody>
+      </table>
+    </div>
+
+    <div class="modal-actions" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+      <button class="btn" onclick="exportCredentials()">↓ Скачать в CSV</button>
+      <button class="btn" onclick="sendCredentialsByEmail()">📧 Разослать каждому на email</button>
+      <button class="btn btn-primary" onclick="closeCredentialsModal()">Готово</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

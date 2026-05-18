@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewOS — Дашборд руководителя</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333; --bg4: #252a3a;
+    --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --muted: #7a7f94;
+    --accent: #6c7bff; --accent2: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --red: #f87171; --teal: #2dd4bf;
+    --font-head: 'Syne', sans-serif; --font-body: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-body); font-size: 13px; line-height: 1.5; min-height: 100vh; padding-left: 220px; }
+  @media (max-width: 900px) { body { padding-left: 60px; } }
+
+  /* USER SIDEBAR */
+  .user-sidebar { width: 220px; min-height: 100vh; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; left: 0; top: 0; bottom: 0; z-index: 50; }
+  .user-sidebar-logo { padding: 20px 20px 24px; font-family: var(--font-head); font-size: 17px; font-weight: 800; letter-spacing: -0.5px; border-bottom: 1px solid var(--border); text-decoration: none; color: var(--text); display: block; }
+  .user-sidebar-logo span { color: var(--accent); }
+  .user-sidebar-logo small { display: block; font-size: 10px; color: var(--muted); font-weight: 400; font-family: var(--font-body); margin-top: 2px; letter-spacing: 0.5px; text-transform: uppercase; }
+  .user-sidebar-nav { flex: 1; padding: 12px 10px; display: flex; flex-direction: column; gap: 2px; }
+  .user-nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 10px; cursor: pointer; transition: all 0.15s; color: var(--muted); font-size: 13px; text-decoration: none; border: none; background: none; width: 100%; font-family: var(--font-body); font-weight: 400; }
+  .user-nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+  .user-nav-item.active { background: rgba(108,123,255,0.12); color: var(--accent2); font-weight: 500; border: 1px solid rgba(108,123,255,0.2); }
+  .user-nav-icon { width: 18px; height: 18px; opacity: 0.6; flex-shrink: 0; }
+  .user-nav-item.active .user-nav-icon { opacity: 1; }
+  .user-sidebar-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+  .user-sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .user-sidebar-user { display: flex; align-items: center; gap: 8px; }
+  .user-sidebar-avatar { width: 28px; height: 28px; border-radius: 8px; background: rgba(45,212,191,0.15); color: var(--teal); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 10px; font-weight: 700; }
+  @media (max-width: 900px) { .user-sidebar { width: 60px; } .user-sidebar-logo small, .user-nav-item span:not(.user-nav-icon) { display: none; } .user-sidebar-footer { display: none; } }
+
+  /* TOPBAR */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 28px; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 40; }
+  .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 700; }
+  .breadcrumb { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .breadcrumb a { color: var(--accent2); text-decoration: none; }
+  .content { padding: 24px 28px; max-width: 1200px; }
+
+  .btn { font-family: var(--font-body); font-size: 12px; font-weight: 500; padding: 8px 16px; border-radius: 8px; cursor: pointer; transition: all 0.15s; border: 1px solid var(--border2); background: var(--bg3); color: var(--text); display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+  .btn:hover { background: rgba(255,255,255,0.07); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #7b8aff; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-green { background: var(--green); border-color: var(--green); color: #0f1117; font-weight: 600; }
+
+  .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+  .badge-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.2); }
+  .badge-amber { background: rgba(251,191,36,0.12); color: var(--amber); border: 1px solid rgba(251,191,36,0.2); }
+  .badge-blue { background: rgba(108,123,255,0.12); color: var(--accent2); border: 1px solid rgba(108,123,255,0.2); }
+  .badge-teal { background: rgba(45,212,191,0.12); color: var(--teal); border: 1px solid rgba(45,212,191,0.2); }
+  .badge-red { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.2); }
+  .badge-gray { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+
+  /* PROFILE */
+  .profile-card {
+    background: linear-gradient(135deg, var(--bg2) 0%, rgba(45,212,191,0.05) 100%);
+    border: 1px solid var(--border); border-radius: 16px;
+    padding: 22px 26px; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .profile-avatar { width: 64px; height: 64px; border-radius: 14px; background: rgba(45,212,191,0.15); color: var(--teal); display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 22px; font-weight: 800; border: 2px solid rgba(45,212,191,0.3); flex-shrink: 0; }
+  .profile-info { flex: 1; }
+  .profile-name { font-family: var(--font-head); font-size: 18px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 3px; }
+  .profile-position { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .profile-meta { display: flex; gap: 16px; flex-wrap: wrap; }
+  .profile-meta-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+  .profile-meta-val { color: var(--text); font-weight: 500; }
+
+  /* STATS ROW */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+  .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+  .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .stat-info { flex: 1; }
+  .stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  .stat-value { font-family: var(--font-head); font-size: 22px; font-weight: 800; line-height: 1.1; margin-top: 2px; }
+
+  @media (max-width: 900px) { .stats-row { grid-template-columns: repeat(2, 1fr) !important; } }
+
+  /* SECTION */
+  .section { margin-bottom: 28px; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .section-title { font-family: var(--font-head); font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+
+  /* MY TASKS BLOCK (compact) */
+  .my-tasks {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .my-tasks-header {
+    background: rgba(108,123,255,0.06); padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .my-tasks-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; color: var(--accent2); }
+  .my-tasks-list {  }
+  .my-task-item {
+    display: flex; align-items: center; gap: 14px;
+    padding: 12px 18px; border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  .my-task-item:last-child { border-bottom: none; }
+  .my-task-item:hover { background: rgba(255,255,255,0.02); }
+  .my-task-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .my-task-content { flex: 1; }
+  .my-task-title { font-size: 12px; font-weight: 500; }
+  .my-task-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .my-task-action { flex-shrink: 0; }
+
+  /* SUBORDINATES TABLE */
+  .sub-table-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+  }
+  .sub-filters {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .filter-chip { font-size: 11px; padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.12s; font-family: var(--font-body); }
+  .filter-chip:hover, .filter-chip.active { border-color: var(--accent); color: var(--accent2); background: rgba(108,123,255,0.08); }
+  .search-input { margin-left: auto; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; color: var(--text); font-family: var(--font-body); font-size: 12px; outline: none; width: 200px; }
+  .search-input:focus { border-color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th { padding: 10px 16px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.015); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: rgba(255,255,255,0.02); }
+  td { padding: 12px 16px; vertical-align: middle; font-size: 12px; }
+
+  .emp-cell { display: flex; align-items: center; gap: 10px; }
+  .emp-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .emp-name { font-weight: 500; font-size: 12px; }
+  .emp-pos { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* Stages indicator (mini) */
+  .stages-mini { display: flex; gap: 4px; }
+  .stage-dot {
+    width: 22px; height: 22px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; font-family: var(--font-head);
+    transition: all 0.15s; cursor: help;
+  }
+  .stage-dot.done { background: rgba(52,211,153,0.15); color: var(--green); border: 1px solid rgba(52,211,153,0.25); }
+  .stage-dot.active { background: rgba(108,123,255,0.15); color: var(--accent2); border: 1px solid rgba(108,123,255,0.25); animation: pulse 2s ease infinite; }
+  .stage-dot.todo { background: var(--bg4); color: var(--muted); border: 1px solid var(--border); }
+  .stage-dot.skip { background: rgba(248,113,113,0.08); color: var(--red); border: 1px solid rgba(248,113,113,0.2); text-decoration: line-through; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(108,123,255,0); } 50% { box-shadow: 0 0 0 4px rgba(108,123,255,0.15); } }
+
+  .progress-cell { min-width: 130px; }
+  .progress-text { font-size: 11px; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; }
+  .progress-bar-bg { width: 100%; height: 4px; background: var(--border2); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 2px; }
+
+  .actions-cell { display: flex; gap: 4px; flex-wrap: wrap; }
+  .act-btn {
+    padding: 4px 10px; border-radius: 6px;
+    border: 1px solid var(--border); background: transparent;
+    font-size: 11px; font-weight: 500; cursor: pointer;
+    transition: all 0.12s; font-family: var(--font-body);
+    text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .act-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .act-btn.primary:hover { background: #7b8aff; }
+  .act-btn:hover { color: var(--text); border-color: var(--border2); }
+  .act-btn.done { color: var(--green); border-color: rgba(52,211,153,0.3); cursor: default; }
+  .act-btn.done:hover { background: transparent; }
+
+  /* DEADLINE */
+  .deadline-cell { font-size: 11px; }
+  .deadline-cell.overdue { color: var(--red); font-weight: 600; }
+  .deadline-cell.soon { color: var(--amber); font-weight: 600; }
+  .deadline-cell.ok { color: var(--muted); }
+
+  /* HIERARCHY INDICATOR */
+  .hierarchy-info {
+    background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.2);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px; font-size: 11px;
+  }
+
+  /* LIGHT THEME */
+  body.light {
+    --bg: #f7f8fc;
+    --bg2: #ffffff;
+    --bg3: #f1f3f9;
+    --bg4: #e7eaf2;
+    --border: rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text: #1a1d2e;
+    --muted: #6b7184;
+  }
+  body.light .nav-item.active, body.light .user-nav-item.active {
+    background: rgba(108,123,255,0.1);
+    color: var(--accent);
+  }
+  body.light table thead th { background: rgba(0,0,0,0.02); }
+  body.light tbody tr:hover { background: rgba(0,0,0,0.02); }
+
+  /* THEME TOGGLE */
+  .theme-toggle {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text); cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; font-size: 16px;
+  }
+  .theme-toggle:hover { background: var(--bg4); border-color: var(--border2); }
+
+
+  /* NOTIFICATIONS */
+  .notif-wrap { position: relative; display: inline-block; }
+  .notif-btn { position: relative; width: 36px; height: 36px; border-radius: 9px; background: var(--bg3); border: 1px solid var(--border); color: var(--text); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0; }
+  .notif-btn:hover { background: var(--bg4); border-color: var(--border2); }
+  .notif-badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--red); color: #fff; font-family: var(--font-head); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 5px; border: 2px solid var(--bg); }
+  .notif-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; width: 380px; max-height: 480px; background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.5); z-index: 1000; overflow: hidden; flex-direction: column; }
+  .notif-dropdown.show { display: flex; }
+  .notif-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .notif-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; }
+  .notif-mark { font-size: 11px; color: var(--accent2); cursor: pointer; background: none; border: none; }
+  .notif-list { flex: 1; overflow-y: auto; }
+  .notif-item { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; cursor: pointer; text-decoration: none; color: var(--text); position: relative; }
+  .notif-item:hover { background: rgba(255,255,255,0.02); }
+  .notif-item.unread { background: rgba(108,123,255,0.04); padding-left: 20px; }
+  .notif-item.unread::before { content: ''; position: absolute; left: 6px; top: 18px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+  .notif-item-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; background: rgba(108,123,255,0.12); color: var(--accent2); }
+  .notif-content { flex: 1; }
+  .notif-text { font-size: 12px; line-height: 1.4; }
+  .notif-time { font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .notif-footer { padding: 10px 16px; border-top: 1px solid var(--border); text-align: center; }
+  .notif-footer a { font-size: 11px; color: var(--accent2); text-decoration: none; }
+
+
+  /* EVALUATION MODALS */
+  .eval-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+    z-index: 1000; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .eval-modal-overlay.show { display: flex; }
+  .eval-modal {
+    background: var(--bg2); border: 1px solid var(--border2);
+    border-radius: 14px; width: 100%; max-width: 720px;
+    max-height: 90vh; display: flex; flex-direction: column;
+    overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  }
+  .eval-modal-header {
+    padding: 18px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(135deg, var(--bg2) 0%, rgba(108,123,255,0.04) 100%);
+  }
+  .eval-modal-avatar {
+    width: 44px; height: 44px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-size: 14px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .eval-modal-info { flex: 1; }
+  .eval-modal-name { font-family: var(--font-head); font-size: 15px; font-weight: 700; }
+  .eval-modal-pos { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .eval-modal-type {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+    background: rgba(108,123,255,0.12); color: var(--accent2);
+    border: 1px solid rgba(108,123,255,0.25);
+  }
+  .eval-modal-close {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--muted); width: 30px; height: 30px;
+    border-radius: 8px; cursor: pointer; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .eval-modal-close:hover { color: var(--text); border-color: var(--border2); }
+  .eval-modal-body {
+    flex: 1; overflow-y: auto; padding: 22px 24px;
+  }
+  .eval-modal-footer {
+    padding: 14px 24px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; background: var(--bg);
+  }
+
+  /* LEVEL REQUIREMENTS BAR (узкая таблица сверху каждой компетенции) */
+  .level-req-bar {
+    background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 10px; margin-bottom: 10px;
+  }
+  .level-req-header { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .level-req-grid {
+    display: grid; grid-template-columns: repeat(9, 1fr); gap: 3px;
+  }
+  .level-req-cell {
+    text-align: center; padding: 4px 0;
+    font-family: var(--font-head); font-weight: 700; font-size: 12px;
+    border-radius: 5px; position: relative;
+  }
+  .level-req-cell .lv-name {
+    font-family: var(--font-body); font-size: 8px; font-weight: 600;
+    color: var(--muted); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 1px;
+  }
+  .level-req-cell.req-0 { background: rgba(248,113,113,0.08); color: var(--red); }
+  .level-req-cell.req-1 { background: rgba(251,191,36,0.08); color: var(--amber); }
+  .level-req-cell.req-2 { background: rgba(45,212,191,0.08); color: var(--teal); }
+  .level-req-cell.req-3 { background: rgba(52,211,153,0.1); color: var(--green); }
+  .level-req-cell.current {
+    box-shadow: 0 0 0 2px var(--accent2);
+    transform: scale(1.05);
+  }
+  .level-req-cell.current::before {
+    content: '▼'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    color: var(--accent2); font-size: 10px;
+  }
+
+  /* MATRIX SUMMARY TABLE (внизу модалок оценки) */
+  .matrix-summary-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
+  .matrix-summary-table th { padding: 8px 6px; text-align: center; font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.02); white-space: nowrap; }
+  .matrix-summary-table th.lv-current { background: rgba(108,123,255,0.12); color: var(--accent2); }
+  .matrix-summary-table td { padding: 7px 6px; text-align: center; font-family: var(--font-head); font-weight: 600; font-size: 12px; border-bottom: 1px solid var(--border); }
+  .matrix-summary-table td:first-child { text-align: left; padding-left: 10px; font-family: var(--font-body); font-weight: 500; color: var(--text); white-space: nowrap; }
+  .matrix-summary-table td.lv-0 { color: var(--red); }
+  .matrix-summary-table td.lv-1 { color: var(--amber); }
+  .matrix-summary-table td.lv-2 { color: var(--teal); }
+  .matrix-summary-table td.lv-3 { color: var(--green); }
+  .matrix-summary-table td.lv-current { background: rgba(108,123,255,0.08); box-shadow: inset 2px 0 0 var(--accent2), inset -2px 0 0 var(--accent2); }
+  .matrix-summary-table td.lv-actual { background: rgba(108,123,255,0.1); color: var(--accent2); font-size: 14px; font-weight: 800; }
+  .matrix-summary-table tr.row-total td { border-top: 2px solid var(--border2); background: rgba(255,255,255,0.02); font-family: var(--font-head); font-weight: 800; font-size: 14px; color: var(--text); padding-top: 10px; padding-bottom: 10px; }
+  .matrix-summary-table tr.row-total td:first-child { color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px; }
+
+  /* TOTAL SCORES BLOCK (внизу модалки) */
+  .totals-block {
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 12px; padding: 14px 16px; margin-top: 14px;
+  }
+  .totals-title { font-family: var(--font-head); font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .totals-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+  }
+  .totals-cell {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .totals-cell-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; margin-bottom: 4px; }
+  .totals-cell-value { font-family: var(--font-head); font-size: 18px; font-weight: 700; }
+  .totals-cell-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+  .totals-cell.actual .totals-cell-value { color: var(--accent2); }
+  .totals-cell.required .totals-cell-value { color: var(--text); }
+  .totals-cell.gap .totals-cell-value.gap-ok { color: var(--green); }
+  .totals-cell.gap .totals-cell-value.gap-warn { color: var(--amber); }
+  .totals-cell.gap .totals-cell-value.gap-bad { color: var(--red); }
+
+  /* COMPETENCY ROW */
+  .comp-row {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;
+  }
+  .comp-name { font-weight: 500; font-size: 13px; margin-bottom: 4px; }
+  .comp-desc { font-size: 11px; color: var(--muted); margin-bottom: 12px; }
+
+  /* Score cards layout - shows all 4 descriptions */
+  .score-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+    align-items: stretch;
+  }
+  .score-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px; cursor: pointer;
+    transition: all 0.15s; text-align: left;
+    display: flex; flex-direction: column; gap: 6px;
+    font-family: var(--font-body);
+    height: 110px;
+    overflow: hidden;
+  }
+  .score-card:hover { border-color: var(--border2); }
+  .score-card-header {
+    display: flex; align-items: center; gap: 6px;
+    flex-shrink: 0;
+  }
+  .score-card-num {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-weight: 700; font-size: 12px;
+    background: var(--bg4); color: var(--muted);
+    flex-shrink: 0;
+  }
+  .score-card-label {
+    font-size: 11px; font-weight: 600; color: var(--text);
+  }
+  .score-card-desc {
+    font-size: 10px; color: var(--muted); line-height: 1.4;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  /* Custom scrollbar for descriptions */
+  .score-card-desc::-webkit-scrollbar { width: 4px; }
+  .score-card-desc::-webkit-scrollbar-track { background: transparent; }
+  .score-card-desc::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+  .score-card-desc::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+  .score-card.selected {
+    background: rgba(108,123,255,0.08);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .score-card.selected .score-card-num {
+    background: var(--accent); color: #fff;
+  }
+  .score-card.n0.selected { background: rgba(248,113,113,0.08); border-color: var(--red); box-shadow: 0 0 0 1px var(--red); }
+  .score-card.n0.selected .score-card-num { background: var(--red); }
+  .score-card.n1.selected { background: rgba(251,191,36,0.08); border-color: var(--amber); box-shadow: 0 0 0 1px var(--amber); }
+  .score-card.n1.selected .score-card-num { background: var(--amber); color: #1a1d2e; }
+  .score-card.n2.selected { background: rgba(45,212,191,0.08); border-color: var(--teal); box-shadow: 0 0 0 1px var(--teal); }
+  .score-card.n2.selected .score-card-num { background: var(--teal); color: #1a1d2e; }
+  .score-card.n3.selected { background: rgba(52,211,153,0.08); border-color: var(--green); box-shadow: 0 0 0 1px var(--green); }
+  .score-card.n3.selected .score-card-num { background: var(--green); color: #1a1d2e; }
+
+  @media (max-width: 700px) {
+    .score-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* PERFORMANCE CRITERIA */
+  .perf-block { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .perf-block:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+  .perf-block-title { font-family: var(--font-head); font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+  .perf-block-desc { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+  .perf-toggle {
+    display: flex; gap: 8px; margin-bottom: 8px;
+  }
+  .perf-toggle-btn {
+    flex: 1; padding: 10px;
+    border-radius: 8px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted);
+    font-family: var(--font-body); font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: all 0.12s;
+  }
+  .perf-toggle-btn.yes.selected { background: rgba(52,211,153,0.12); color: var(--green); border-color: rgba(52,211,153,0.4); }
+  .perf-toggle-btn.no.selected { background: rgba(248,113,113,0.12); color: var(--red); border-color: rgba(248,113,113,0.4); }
+  .perf-comment {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 8px; padding: 8px 12px; color: var(--text);
+    font-family: var(--font-body); font-size: 12px; outline: none;
+    resize: vertical; min-height: 50px;
+  }
+  .perf-comment:focus { border-color: var(--accent); }
+  .perf-comment::placeholder { color: var(--muted); }
+
+  .final-decision {
+    background: rgba(108,123,255,0.06); border: 1px solid rgba(108,123,255,0.2);
+    border-radius: 10px; padding: 14px 16px; margin-top: 14px;
+  }
+  .final-decision-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 8px; }
+
+  .progress-info { font-size: 11px; color: var(--muted); }
+
+</style>
+</head>
+<body>
+
+<!-- USER SIDEBAR -->
+<div class="user-sidebar">
+  <a class="user-sidebar-logo" href="index.html">ReviewOS<small>Система оценки</small></a>
+  <div class="user-sidebar-nav">
+    <a class="user-nav-item active" href="manager-profile.html"><svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 6a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zm10 0a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><span>Дашборд</span></a>
+    <div class="user-sidebar-divider"></div>
+    <a class="user-nav-item" href="index.html"><svg class="user-nav-icon" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg><span>Главная</span></a>
+  </div>
+  <div class="user-sidebar-footer">
+    <div class="user-sidebar-user">
+      <div class="user-sidebar-avatar">АК</div>
+      <div>
+        <div style="font-weight:500;color:var(--text);font-size:12px">Алексей Козлов</div>
+        <div style="font-size:10px;color:var(--muted)">Руководитель · Frontend</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Дашборд
+  <div style="display:flex;gap:8px;align-items:center"><button class="theme-toggle" onclick="toggleTheme()" title="Переключить тему">☀️</button>
+      <div class="notif-wrap">
+        <button class="notif-btn" onclick="toggleNotif(event)">🔔<span class="notif-badge">3</span></button>
+        <div class="notif-dropdown" id="notif-dropdown">
+          <div class="notif-header"><div class="notif-title">Уведомления</div><button class="notif-mark" onclick="markAllRead(event)">Отметить все</button></div>
+          <div class="notif-list">
+            <a class="notif-item unread" href="#"><div class="notif-item-icon">⏰</div><div class="notif-content"><div class="notif-text">Дедлайн самооценки <strong>через 2 дня</strong></div><div class="notif-time">2 часа назад</div></div></a>
+            <a class="notif-item unread" href="#"><div class="notif-item-icon">📋</div><div class="notif-content"><div class="notif-text">Назначена встреча 1-on-1 на <strong>15 июня</strong></div><div class="notif-time">Вчера</div></div></a>
+            <a class="notif-item" href="#"><div class="notif-item-icon">⚙</div><div class="notif-content"><div class="notif-text">Запущен новый цикл <strong>Q2 2026</strong></div><div class="notif-time">3 дня назад</div></div></a>
+          </div>
+          <div class="notif-footer"><a href="#">Все уведомления →</a></div>
+        </div>
+      </div></div>
+</div>
+    <div class="breadcrumb"><a href="index.html">Главная</a> → Дашборд руководителя</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- PROFILE -->
+  <div class="profile-card">
+    <div class="profile-avatar">АК</div>
+    <div class="profile-info">
+      <div class="profile-name">Алексей Козлов</div>
+      <div class="profile-position">Frontend Lead · Команда Web App</div>
+      <div class="profile-meta">
+        <div class="profile-meta-item">Грейд: <span class="badge badge-green" style="margin-left:2px">Sen2</span></div>
+        <div class="profile-meta-item">Подчинённых: <span class="profile-meta-val">5</span></div>
+        <div class="profile-meta-item">Руководитель: <span class="profile-meta-val">Петров С.А.</span></div>
+        <div class="profile-meta-item">Цикл: <span class="badge badge-amber" style="margin-left:2px">Q2 2026</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS - what manager needs to do -->
+  <div class="stats-row" style="grid-template-columns:repeat(5,1fr)">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(108,123,255,0.12);color:var(--accent2)">👥</div>
+      <div class="stat-info"><div class="stat-label">Подчинённых</div><div class="stat-value">5</div></div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(45,212,191,0.25);background:rgba(45,212,191,0.03)">
+      <div class="stat-icon" style="background:rgba(45,212,191,0.12);color:var(--teal)">💻</div>
+      <div class="stat-info">
+        <div class="stat-label">Hard Skills</div>
+        <div class="stat-value" style="color:var(--teal)">2</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">ждут оценки</div>
+      </div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(251,191,36,0.25);background:rgba(251,191,36,0.03)">
+      <div class="stat-icon" style="background:rgba(251,191,36,0.12);color:var(--amber)">🎯</div>
+      <div class="stat-info">
+        <div class="stat-label">СРВ</div>
+        <div class="stat-value" style="color:var(--amber)">1</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">ждёт оценки</div>
+      </div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(248,113,113,0.25);background:rgba(248,113,113,0.03)">
+      <div class="stat-icon" style="background:rgba(248,113,113,0.12);color:var(--red)">📁</div>
+      <div class="stat-info">
+        <div class="stat-label">1-on-1</div>
+        <div class="stat-value" style="color:var(--red)">1</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">ждёт встречи</div>
+      </div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(52,211,153,0.25);background:rgba(52,211,153,0.03)">
+      <div class="stat-icon" style="background:rgba(52,211,153,0.12);color:var(--green)">✓</div>
+      <div class="stat-info">
+        <div class="stat-label">Завершено</div>
+        <div class="stat-value" style="color:var(--green)">1</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">из 5</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPROVAL REQUEST BLOCK (от ПО) -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">⚠️ Запрос на согласование от ПО</div>
+      <span style="font-size:11px;color:var(--amber)">Требует решения</span>
+    </div>
+
+    <div class="my-tasks" style="border-color:rgba(251,191,36,0.3)">
+      <div class="my-tasks-header" style="border-color:rgba(251,191,36,0.2)">
+        <div class="my-tasks-title" style="color:var(--amber)">Продакт-оунер выставил «Недопуск» сотруднику — требуется ваше решение</div>
+      </div>
+      <div class="my-tasks-list">
+        <div class="my-task-item">
+          <div class="my-task-icon" style="background:rgba(251,191,36,0.15);color:var(--amber);font-size:16px">📋</div>
+          <div class="my-task-content">
+            <div class="my-task-title">Татьяна Белова — Performance: «Недопуск»</div>
+            <div class="my-task-meta">От Иванова Д. (ПО · Web App) · 1 час назад</div>
+          </div>
+          <div class="my-task-action">
+            <button class="btn btn-primary btn-sm" onclick="openApprovalModal()">Рассмотреть</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY TASKS BLOCK -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">📋 Мои задачи</div>
+      <span style="font-size:11px;color:var(--muted)">Как сотрудник</span>
+    </div>
+
+    <div class="my-tasks">
+      <div class="my-tasks-header">
+        <div class="my-tasks-title">Вам также нужно пройти оценку как сотруднику</div>
+        <a href="employee-profile.html" class="btn btn-sm">Открыть мой профиль →</a>
+      </div>
+      <div class="my-tasks-list">
+        <div class="my-task-item">
+          <div class="my-task-icon" style="background:rgba(108,123,255,0.12);color:var(--accent2)">✍️</div>
+          <div class="my-task-content">
+            <div class="my-task-title">Заполнить самооценку</div>
+            <div class="my-task-meta">До 1 июня · осталось 2 дня</div>
+          </div>
+          <div class="my-task-action">
+            <a href="self-assessment.html" class="btn btn-primary btn-sm">Заполнить</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBORDINATES -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">👥 Мои сотрудники</div>
+      <span style="font-size:11px;color:var(--muted)">5 подчинённых</span>
+    </div>
+
+    <div class="hierarchy-info">
+      <span style="font-size:14px">ℹ️</span>
+      <div>Вы видите своих <strong>прямых подчинённых</strong>. Если у вас есть Лиды в подчинении — их подчинённые тоже отображаются (всё дерево вниз по иерархии).</div>
+    </div>
+
+    <div class="sub-table-card">
+      <div class="sub-filters">
+        <button class="filter-chip active" onclick="setFilter(this,'all')">Все</button>
+        <button class="filter-chip" onclick="setFilter(this,'awaiting')">Жду оценки</button>
+        <button class="filter-chip" onclick="setFilter(this,'progress')">В процессе</button>
+        <button class="filter-chip" onclick="setFilter(this,'done')">Завершено</button>
+        <input class="search-input" placeholder="🔍 Поиск...">
+      </div>
+
+      <table>
+        <thead><tr>
+          <th>Сотрудник</th>
+          <th>Грейд</th>
+          <th>Этапы оценки</th>
+          <th>Прогресс</th>
+          <th>Дедлайн</th>
+          <th>Действия</th>
+        </tr></thead>
+        <tbody>
+
+          <!-- Employee 1 - awaiting Hard Skills -->
+          <tr>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar" style="background:rgba(52,211,153,0.15);color:var(--green)">МИ</div>
+                <div>
+                  <div class="emp-name">Мария Иванова</div>
+                  <div class="emp-pos">Frontend · Web App</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Sen1</span></td>
+            <td>
+              <div class="stages-mini">
+                <div class="stage-dot done" title="Самооценка">С</div>
+                <div class="stage-dot done" title="Performance">P</div>
+                <div class="stage-dot active" title="Hard Skills — ваша задача">H</div>
+                <div class="stage-dot todo" title="СРВ — ваша задача">СРВ</div>
+                <div class="stage-dot todo" title="1-on-1 — ваша задача">1-1</div>
+              </div>
+            </td>
+            <td class="progress-cell">
+              <div class="progress-text"><span>3 из 6 этапов</span><span>50%</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:50%;background:var(--accent2)"></div></div>
+            </td>
+            <td><div class="deadline-cell soon">⏰ 5 июня · 6 дней</div></td>
+            <td>
+              <div class="actions-cell">
+                <button class="act-btn primary" onclick="openHardModal('Мария Иванова', 'Frontend · Web App', 'МИ', {bg:'rgba(52,211,153,0.15)', fg:'var(--green)'})">Hard Skills</button>
+                <a href="employee-card.html" class="act-btn">📁 Карточка</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Employee 2 - waiting for self-assessment -->
+          <tr>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar" style="background:rgba(108,123,255,0.15);color:var(--accent2)">ДЛ</div>
+                <div>
+                  <div class="emp-name">Дмитрий Ли</div>
+                  <div class="emp-pos">QA · Web App</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Mid2</span></td>
+            <td>
+              <div class="stages-mini">
+                <div class="stage-dot active" title="Самооценка — ждём от сотрудника">С</div>
+                <div class="stage-dot todo" title="Performance">P</div>
+                <div class="stage-dot todo" title="Hard Skills — ваша задача">H</div>
+                <div class="stage-dot todo" title="СРВ — ваша задача">СРВ</div>
+                <div class="stage-dot todo" title="1-on-1 — ваша задача">1-1</div>
+              </div>
+            </td>
+            <td class="progress-cell">
+              <div class="progress-text"><span>0 из 6 этапов</span><span>0%</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0%"></div></div>
+            </td>
+            <td><div class="deadline-cell ok">10 июня · 11 дней</div></td>
+            <td>
+              <div class="actions-cell">
+                <button class="act-btn" onclick="alert('Отправить напоминание Дмитрию Ли')">📨 Напомнить</button>
+                <a href="employee-card.html" class="act-btn">📁 Карточка</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Employee 3 - awaiting СРВ -->
+          <tr>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar" style="background:rgba(167,139,250,0.15);color:var(--accent2)">ОС</div>
+                <div>
+                  <div class="emp-name">Ольга Смирнова</div>
+                  <div class="emp-pos">QA Lead · Testing</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Sen1</span></td>
+            <td>
+              <div class="stages-mini">
+                <div class="stage-dot done" title="Самооценка">С</div>
+                <div class="stage-dot done" title="Performance">P</div>
+                <div class="stage-dot done" title="Hard Skills">H</div>
+                <div class="stage-dot active" title="СРВ — ваша задача">СРВ</div>
+                <div class="stage-dot todo" title="1-on-1 — ваша задача">1-1</div>
+              </div>
+            </td>
+            <td class="progress-cell">
+              <div class="progress-text"><span>4 из 6 этапов</span><span>67%</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:67%;background:var(--teal)"></div></div>
+            </td>
+            <td><div class="deadline-cell ok">8 июня · 9 дней</div></td>
+            <td>
+              <div class="actions-cell">
+                <button class="act-btn primary" onclick="openSrvModal('Ольга Смирнова', 'QA Lead · Testing', 'ОС', {bg:'rgba(167,139,250,0.15)', fg:'var(--accent2)'})">Оценить СРВ</button>
+                <a href="employee-card.html" class="act-btn">📁 Карточка</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Employee 4 - 1-on-1 ready -->
+          <tr>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar" style="background:rgba(244,114,182,0.15);color:#f472b6">ИН</div>
+                <div>
+                  <div class="emp-name">Игорь Новиков</div>
+                  <div class="emp-pos">Frontend · Web App</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Mid3</span></td>
+            <td>
+              <div class="stages-mini">
+                <div class="stage-dot done" title="Самооценка">С</div>
+                <div class="stage-dot done" title="Performance">P</div>
+                <div class="stage-dot done" title="Hard Skills">H</div>
+                <div class="stage-dot done" title="СРВ">СРВ</div>
+                <div class="stage-dot active" title="1-on-1 — ваша задача">1-1</div>
+              </div>
+            </td>
+            <td class="progress-cell">
+              <div class="progress-text"><span>5 из 6 этапов</span><span>83%</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:83%;background:var(--green)"></div></div>
+            </td>
+            <td><div class="deadline-cell overdue">⏰ Просрочено · вчера</div></td>
+            <td>
+              <div class="actions-cell">
+                <a href="employee-card.html" class="act-btn primary">📁 1-on-1</a>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Employee 5 - all done -->
+          <tr>
+            <td>
+              <div class="emp-cell">
+                <div class="emp-avatar" style="background:rgba(251,191,36,0.15);color:var(--amber)">ТБ</div>
+                <div>
+                  <div class="emp-name">Татьяна Белова</div>
+                  <div class="emp-pos">Frontend · Web App</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-blue">Mid1</span></td>
+            <td>
+              <div class="stages-mini">
+                <div class="stage-dot done" title="Самооценка">С</div>
+                <div class="stage-dot done" title="Performance">P</div>
+                <div class="stage-dot done" title="Hard Skills">H</div>
+                <div class="stage-dot done" title="СРВ">СРВ</div>
+                <div class="stage-dot done" title="1-on-1">1-1</div>
+              </div>
+            </td>
+            <td class="progress-cell">
+              <div class="progress-text"><span>6 из 6 этапов</span><span style="color:var(--green)">100%</span></div>
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:100%;background:var(--green)"></div></div>
+            </td>
+            <td><div class="deadline-cell ok"><span class="badge badge-green" style="font-size:9px">✓ Завершено</span></div></td>
+            <td>
+              <div class="actions-cell">
+                <a href="employee-card.html" class="act-btn">📁 Карточка</a>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <!-- LEGEND -->
+    <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:5px;color:var(--muted)"><div class="stage-dot done" style="width:18px;height:18px;font-size:8px">✓</div>Этап завершён</div>
+      <div style="display:flex;align-items:center;gap:5px;color:var(--muted)"><div class="stage-dot active" style="width:18px;height:18px;font-size:8px">⌛</div>Ваша задача / в процессе</div>
+      <div style="display:flex;align-items:center;gap:5px;color:var(--muted)"><div class="stage-dot todo" style="width:18px;height:18px;font-size:8px">·</div>Этап ожидает</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function setFilter(btn, f) {
+  document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('reviewos-theme', isLight ? 'light' : 'dark');
+  const btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = isLight ? '🌙' : '☀️';
+}
+
+(function initTheme() {
+  const saved = localStorage.getItem('reviewos-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+  }
+  document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.querySelector('.theme-toggle');
+    if (btn) btn.textContent = document.body.classList.contains('light') ? '🌙' : '☀️';
+  });
+})();
+
+
+function toggleNotif(e) { if (e) e.stopPropagation(); document.getElementById('notif-dropdown').classList.toggle('show'); }
+function markAllRead(e) { if (e) e.stopPropagation(); document.querySelectorAll('.notif-item').forEach(i => i.classList.remove('unread')); const b = document.querySelector('.notif-badge'); if (b) b.style.display = 'none'; }
+document.addEventListener('click', function(e) { const dd = document.getElementById('notif-dropdown'); if (dd && !dd.contains(e.target) && !e.target.closest('.notif-btn')) dd.classList.remove('show'); });
+
+</script>
+
+<!-- HARD SKILLS MODAL -->
+<div class="eval-modal-overlay" id="hard-modal">
+  <div class="eval-modal">
+    <div class="eval-modal-header">
+      <div class="eval-modal-avatar" id="hard-avatar">МИ</div>
+      <div class="eval-modal-info">
+        <div class="eval-modal-name" id="hard-name">Мария Иванова</div>
+        <div class="eval-modal-pos" id="hard-pos">Frontend разработчик</div>
+      </div>
+      <span class="eval-modal-type">Hard Skills</span>
+      <button class="eval-modal-close" onclick="closeModal('hard-modal')">✕</button>
+    </div>
+    <div class="eval-modal-body">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Оцените уровень владения каждой компетенцией от 0 до 3</div>
+      
+      
+      <div class="comp-row">
+        <div class="comp-name">HTML / CSS</div>
+        <div class="comp-desc">Семантичная, адаптивная и доступная вёрстка</div>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Не владеет</span>
+            </div>
+            <div class="score-card-desc">Не понимает базовых тегов и принципов CSS</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Базово</span>
+            </div>
+            <div class="score-card-desc">Делает простую вёрстку, путается с Flexbox/Grid</div>
+          </div>
+          <div class="score-card n2 selected" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Уверенно использует Flexbox/Grid, делает адаптивную вёрстку</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Эксперт</span>
+            </div>
+            <div class="score-card-desc">Архитектура CSS, дизайн-системы, доступность (a11y)</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="comp-row">
+        <div class="comp-name">JavaScript / TypeScript</div>
+        <div class="comp-desc">Владение языком, паттернами, асинхронностью</div>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Не владеет</span>
+            </div>
+            <div class="score-card-desc">Не пишет код самостоятельно</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Базово</span>
+            </div>
+            <div class="score-card-desc">Простые скрипты, базовый синтаксис</div>
+          </div>
+          <div class="score-card n2 selected" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Async/await, паттерны, типизация в TypeScript</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Эксперт</span>
+            </div>
+            <div class="score-card-desc">Глубокое понимание engine, оптимизация, продвинутые типы</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="comp-row">
+        <div class="comp-name">React / Фреймворк</div>
+        <div class="comp-desc">Проектирование компонентных приложений на React</div>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Не владеет</span>
+            </div>
+            <div class="score-card-desc">Не работал с React</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Базово</span>
+            </div>
+            <div class="score-card-desc">Понимает hooks, компоненты, простой state</div>
+          </div>
+          <div class="score-card n2" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Архитектура приложений, оптимизация ре-рендеров, контекст</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Эксперт</span>
+            </div>
+            <div class="score-card-desc">Сложные паттерны, custom hooks, проектирование с нуля</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="comp-row">
+        <div class="comp-name">Web Performance</div>
+        <div class="comp-desc">Оптимизация производительности, Core Web Vitals</div>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Не владеет</span>
+            </div>
+            <div class="score-card-desc">Не знает о метриках производительности</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Базово</span>
+            </div>
+            <div class="score-card-desc">Понимает что такое LCP, FID, CLS</div>
+          </div>
+          <div class="score-card n2" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Оптимизирует bundle, lazy loading, кэширование</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Эксперт</span>
+            </div>
+            <div class="score-card-desc">Глубокая оптимизация, профилирование, RUM</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="text-align:center;color:var(--muted);font-size:11px;padding:6px">+ ещё 4 компетенции</div>
+
+      <!-- TOTALS MATRIX BLOCK -->
+      <div class="totals-block">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="totals-title" style="margin-bottom:2px">📊 Итоговая матрица Hard Skills</div>
+            <div style="font-size:11px;color:var(--muted)">Текущий уровень сотрудника: <strong style="color:var(--accent2)">Mid2</strong></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div style="background:rgba(108,123,255,0.1);border:1px solid rgba(108,123,255,0.3);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Факт</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--accent2)">14</div>
+            </div>
+            <div style="background:var(--bg2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Mid2</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px">16</div>
+            </div>
+            <div style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Разрыв</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--amber)">−2</div>
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="matrix-summary-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">Компетенция</th>
+              <th>Jun1</th><th>Jun2</th><th>Jun3</th><th>Mid1</th><th class="lv-current">Mid2</th><th>Mid3</th><th>Sen1</th><th>Sen2</th><th>Sen3</th>
+              <th style="background:rgba(108,123,255,0.1);color:var(--accent2)">Факт</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>HTML / CSS</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>JavaScript / TypeScript</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2 lv-current">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>React / Фреймворк</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">1</td></tr>
+            <tr><td>Web Performance</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1 lv-current">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>Node.js / Backend для FE</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>Тестирование (Jest, Cypress)</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>CI/CD и инфраструктура</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">1</td></tr>
+            <tr><td>Архитектура и паттерны</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2 lv-current">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr class="row-total">
+              <td>ИТОГО</td>
+              <td>0</td><td>3</td><td>7</td><td>11</td><td class="lv-current"><strong>16</strong></td><td>17</td><td>22</td><td>24</td><td>24</td>
+              <td style="color:var(--accent2)"><strong>14</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <div style="margin-top:10px;padding:10px 12px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.25);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.5">
+          ⚠️ Фактический балл сотрудника (14) ниже требования для уровня Mid2 (16). Рекомендуется обсудить на 1-on-1. Прокрутите вверх чтобы изменить оценки.
+        </div>
+      </div>
+    </div>
+    <div class="eval-modal-footer">
+      <span class="progress-info">Заполнено: 2 из 8 компетенций</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="closeModal('hard-modal')">Отмена</button>
+        <button class="btn btn-sm" onclick="saveDraft('hard-modal')">💾 Черновик</button>
+        <button class="btn btn-primary btn-sm" onclick="saveAndClose('hard-modal')">Сохранить и закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- СРВ MODAL -->
+<div class="eval-modal-overlay" id="srv-modal">
+  <div class="eval-modal">
+    <div class="eval-modal-header">
+      <div class="eval-modal-avatar" id="srv-avatar" style="background:rgba(167,139,250,0.15);color:var(--accent2)">ОС</div>
+      <div class="eval-modal-info">
+        <div class="eval-modal-name" id="srv-name">Ольга Смирнова</div>
+        <div class="eval-modal-pos" id="srv-pos">QA Lead</div>
+      </div>
+      <span class="eval-modal-type">СРВ</span>
+      <button class="eval-modal-close" onclick="closeModal('srv-modal')">✕</button>
+    </div>
+    <div class="eval-modal-body">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Система Развития: оцените 6 компетенций развития от 0 до 3</div>
+      
+      
+      <div class="comp-row">
+        <div class="comp-name">Самостоятельность</div>
+        <div class="comp-desc">Способность принимать решения и доводить дела до конца без напоминаний</div>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Низкая</span>
+            </div>
+            <div class="score-card-desc">Постоянно ждёт указаний, не принимает решений сам</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Развивается</span>
+            </div>
+            <div class="score-card-desc">Иногда требует напоминаний и помощи</div>
+          </div>
+          <div class="score-card n2 selected" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Сам ведёт задачи, эскалирует только сложные ситуации</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Высокая</span>
+            </div>
+            <div class="score-card-desc">Полностью автономен, инициирует решения для команды</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="comp-row">
+        <div class="comp-name">Ответственность</div>
+        <div class="comp-desc">Признание ошибок, готовность нести последствия за свои решения</div>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Низкая</span>
+            </div>
+            <div class="score-card-desc">Перекладывает ответственность на других</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Развивается</span>
+            </div>
+            <div class="score-card-desc">Признаёт ошибки только при прямых вопросах</div>
+          </div>
+          <div class="score-card n2" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Открыто признаёт ошибки, исправляет их</div>
+          </div>
+          <div class="score-card n3 selected" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Высокая</span>
+            </div>
+            <div class="score-card-desc">Берёт ответственность за команду, учится на ошибках</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="comp-row">
+        <div class="comp-name">Коммуникация</div>
+        <div class="comp-desc">Чёткое донесение мыслей, активное слушание, конструктивный диалог</div>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Слабая</span>
+            </div>
+            <div class="score-card-desc">Не может донести мысль, плохо слушает</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Развивается</span>
+            </div>
+            <div class="score-card-desc">Иногда путано объясняет, но старается</div>
+          </div>
+          <div class="score-card n2" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Чётко и структурировано общается, слушает</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Высокая</span>
+            </div>
+            <div class="score-card-desc">Адаптирует стиль под аудиторию, медиатор конфликтов</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="comp-row">
+        <div class="comp-name">Командная работа</div>
+        <div class="comp-desc">Помощь коллегам, готовность к компромиссам, поддержка</div>
+        <div class="score-grid">
+          <div class="score-card n0" onclick="selectCard(this)" data-score="0">
+            <div class="score-card-header">
+              <span class="score-card-num">0</span>
+              <span class="score-card-label">Низкая</span>
+            </div>
+            <div class="score-card-desc">Работает изолированно, не помогает коллегам</div>
+          </div>
+          <div class="score-card n1" onclick="selectCard(this)" data-score="1">
+            <div class="score-card-header">
+              <span class="score-card-num">1</span>
+              <span class="score-card-label">Развивается</span>
+            </div>
+            <div class="score-card-desc">Помогает только когда просят</div>
+          </div>
+          <div class="score-card n2" onclick="selectCard(this)" data-score="2">
+            <div class="score-card-header">
+              <span class="score-card-num">2</span>
+              <span class="score-card-label">Уверенно</span>
+            </div>
+            <div class="score-card-desc">Активно помогает коллегам, делится знаниями</div>
+          </div>
+          <div class="score-card n3" onclick="selectCard(this)" data-score="3">
+            <div class="score-card-header">
+              <span class="score-card-num">3</span>
+              <span class="score-card-label">Высокая</span>
+            </div>
+            <div class="score-card-desc">Драйвер командного духа, ментор для младших</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="text-align:center;color:var(--muted);font-size:11px;padding:6px">+ ещё 2 компетенции</div>
+
+      <!-- TOTALS MATRIX BLOCK -->
+      <div class="totals-block">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="totals-title" style="margin-bottom:2px">📊 Итоговая матрица СРВ</div>
+            <div style="font-size:11px;color:var(--muted)">Текущий уровень сотрудника: <strong style="color:var(--accent2)">Sen2</strong></div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div style="background:rgba(108,123,255,0.1);border:1px solid rgba(108,123,255,0.3);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Факт</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--accent2)">17</div>
+            </div>
+            <div style="background:var(--bg2);border:1px solid var(--border);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Sen2</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px">18</div>
+            </div>
+            <div style="background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);padding:6px 12px;border-radius:8px;text-align:center">
+              <div style="font-size:9px;color:var(--muted);text-transform:uppercase;font-weight:600">Разрыв</div>
+              <div style="font-family:var(--font-head);font-weight:700;font-size:16px;color:var(--amber)">−1</div>
+            </div>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+        <table class="matrix-summary-table">
+          <thead>
+            <tr>
+              <th style="text-align:left">Компетенция</th>
+              <th>Jun1</th><th>Jun2</th><th>Jun3</th><th>Mid1</th><th>Mid2</th><th>Mid3</th><th>Sen1</th><th class="lv-current">Sen2</th><th>Sen3</th>
+              <th style="background:rgba(108,123,255,0.1);color:var(--accent2)">Факт</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Самостоятельность</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">3</td></tr>
+            <tr><td>Ответственность</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">3</td></tr>
+            <tr><td>Коммуникация</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3">3</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">2</td></tr>
+            <tr><td>Командная работа</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">3</td></tr>
+            <tr><td>Развитие и обучение</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3">3</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">3</td></tr>
+            <tr><td>Лидерство и менторинг</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-0">0</td><td class="lv-1">1</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-2">2</td><td class="lv-3 lv-current">3</td><td class="lv-3">3</td><td class="lv-actual">3</td></tr>
+            <tr class="row-total">
+              <td>ИТОГО</td>
+              <td>0</td><td>2</td><td>5</td><td>8</td><td>12</td><td>13</td><td>17</td><td class="lv-current"><strong>18</strong></td><td>18</td>
+              <td style="color:var(--accent2)"><strong>17</strong></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <div style="margin-top:10px;padding:10px 12px;background:rgba(45,212,191,0.06);border:1px solid rgba(45,212,191,0.25);border-radius:8px;font-size:11px;color:var(--muted);line-height:1.5">
+          💡 Фактический балл (17) почти соответствует требованию Sen2 (18). Незначительный разрыв допустим — сотрудник на уровне.
+        </div>
+      </div>
+    </div>
+    <div class="eval-modal-footer">
+      <span class="progress-info">Заполнено: 2 из 6 компетенций</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="closeModal('srv-modal')">Отмена</button>
+        <button class="btn btn-sm" onclick="saveDraft('srv-modal')">💾 Черновик</button>
+        <button class="btn btn-primary btn-sm" onclick="saveAndClose('srv-modal')">Сохранить и закрыть</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function openHardModal(name, pos, initials, color) {
+  document.getElementById('hard-name').textContent = name;
+  document.getElementById('hard-pos').textContent = pos;
+  const avatar = document.getElementById('hard-avatar');
+  avatar.textContent = initials;
+  if (color) avatar.style.background = color.bg, avatar.style.color = color.fg;
+  document.getElementById('hard-modal').classList.add('show');
+}
+
+function openSrvModal(name, pos, initials, color) {
+  document.getElementById('srv-name').textContent = name;
+  document.getElementById('srv-pos').textContent = pos;
+  const avatar = document.getElementById('srv-avatar');
+  avatar.textContent = initials;
+  if (color) avatar.style.background = color.bg, avatar.style.color = color.fg;
+  document.getElementById('srv-modal').classList.add('show');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function saveDraft(id) {
+  alert('Черновик сохранён');
+  closeModal(id);
+}
+
+function saveAndClose(id) {
+  alert('Оценка сохранена');
+  closeModal(id);
+}
+
+function selectComp(btn) {
+  btn.parentElement.querySelectorAll('.comp-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function selectCard(card) {
+  card.parentElement.querySelectorAll('.score-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
+// Close on overlay click
+document.querySelectorAll('.eval-modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) overlay.classList.remove('show');
+  });
+});
+</script>
+
+<!-- APPROVAL MODAL (from PO Недопуск request) -->
+<div class="eval-modal-overlay" id="approval-modal">
+  <div class="eval-modal" style="max-width: 760px">
+    <div class="eval-modal-header">
+      <div class="eval-modal-avatar" style="background:rgba(251,191,36,0.15);color:var(--amber)">ТБ</div>
+      <div class="eval-modal-info">
+        <div class="eval-modal-name">Татьяна Белова</div>
+        <div class="eval-modal-pos">Frontend разработчик · Web App</div>
+      </div>
+      <span class="eval-modal-type" style="background:rgba(251,191,36,0.12);color:var(--amber);border-color:rgba(251,191,36,0.3)">📋 Согласование</span>
+      <button class="eval-modal-close" onclick="closeModal('approval-modal')">✕</button>
+    </div>
+    <div class="eval-modal-body">
+      <!-- Approval header -->
+      <div style="background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.3);border-radius:10px;padding:14px;margin-bottom:18px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <div style="font-size:18px">⚠️</div>
+          <div style="font-family:var(--font-head);font-weight:700;font-size:13px;color:var(--amber)">Запрос на согласование «Недопуска»</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5">
+          Иванов Дмитрий (Продакт-оунер) выставил решение «Недопуск к дальнейшей оценке». Ваше решение требуется для финализации статуса.
+        </div>
+      </div>
+
+      <!-- PO's evaluation by criterion -->
+      <div style="margin-bottom:18px">
+        <div style="font-family:var(--font-head);font-weight:700;font-size:13px;margin-bottom:10px">Оценка ПО по критериям</div>
+        
+        <div class="comp-row" style="margin-bottom:8px">
+          <div class="comp-name" style="font-size:12px">1. Закрытие задач в срок</div>
+          <div class="comp-desc" style="font-size:11px">«Срывает дедлайны последние 2 спринта, не успевает по 30-40% задач»</div>
+        </div>
+        <div class="comp-row" style="margin-bottom:8px">
+          <div class="comp-name" style="font-size:12px">2. Качество выполнения</div>
+          <div class="comp-desc" style="font-size:11px">«Много замечаний на ревью, регрессы в продакшене на её фичах»</div>
+        </div>
+        <div class="comp-row" style="margin-bottom:8px">
+          <div class="comp-name" style="font-size:12px">3. Инициативность</div>
+          <div class="comp-desc" style="font-size:11px">«Не предлагает улучшений, делает только что назначено»</div>
+        </div>
+        <div class="comp-row" style="margin-bottom:8px">
+          <div class="comp-name" style="font-size:12px">4. Командное взаимодействие</div>
+          <div class="comp-desc" style="font-size:11px">«Есть жалобы от коллег на сложности в коммуникации»</div>
+        </div>
+        <div class="comp-row" style="margin-bottom:0">
+          <div class="comp-name" style="font-size:12px">5. Соблюдение процессов</div>
+          <div class="comp-desc" style="font-size:11px">«Часто пропускает стендапы, забывает обновлять статус задач»</div>
+        </div>
+      </div>
+
+      <!-- PO's reasoning -->
+      <div style="background:rgba(248,113,113,0.06);border:1px solid rgba(248,113,113,0.25);border-radius:10px;padding:14px;margin-bottom:18px">
+        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:6px">Обоснование ПО</div>
+        <div style="font-size:12px;line-height:1.6;color:var(--text)">
+          Сотрудник систематически не справляется с базовыми обязанностями последние 2 квартала. Несмотря на наставничество и адаптацию задач, прогресса нет. Считаю, что необходимо принять кадровое решение, прежде чем продолжать оценку Hard Skills и СРВ.
+        </div>
+      </div>
+
+      <!-- Approval route status -->
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:18px">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:10px">Маршрут согласования</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:11px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px">✓</div>
+            <span style="color:var(--text);font-weight:500">ПО (отправил)</span>
+          </div>
+          <span style="color:var(--muted)">→</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <div style="width:24px;height:24px;border-radius:50%;background:var(--amber);color:#1a1d2e;display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:10px">!</div>
+            <span style="color:var(--text);font-weight:600">Вы (ожидает)</span>
+          </div>
+          <span style="color:var(--muted)">→</span>
+          <div style="display:flex;align-items:center;gap:6px;opacity:0.6">
+            <div style="width:24px;height:24px;border-radius:50%;background:rgba(167,139,250,0.15);color:var(--accent2);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:700;font-size:10px">HR</div>
+            <span style="color:var(--muted)">HR</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Decision section -->
+      <div style="border-top:1px solid var(--border);padding-top:18px">
+        <div style="font-family:var(--font-head);font-weight:700;font-size:13px;margin-bottom:10px">Ваше решение</div>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <button class="perf-toggle-btn yes" onclick="selectApproval(this, 'approve')" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer">✓ Поддерживаю «Недопуск»</button>
+          <button class="perf-toggle-btn no" onclick="selectApproval(this, 'reject')" style="flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer">✕ Не согласен (вернуть к допуску)</button>
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;display:block;margin-bottom:6px">Комментарий к решению</label>
+          <textarea id="approval-comment" placeholder="Поясните своё решение для ПО и HR..." style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--font-body);font-size:12px;outline:none;resize:vertical;min-height:60px"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="eval-modal-footer">
+      <span class="progress-info" style="font-size:11px;color:var(--muted)">После вашего решения заявка переходит к HR</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="closeModal('approval-modal')">Закрыть</button>
+        <button class="btn btn-primary btn-sm" onclick="submitApproval()">Отправить решение</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.perf-toggle-btn:hover { color: var(--text) !important; }
+.perf-toggle-btn.yes.selected { background: rgba(52,211,153,0.12) !important; color: var(--green) !important; border-color: rgba(52,211,153,0.4) !important; font-weight: 600 !important; }
+.perf-toggle-btn.no.selected { background: rgba(248,113,113,0.12) !important; color: var(--red) !important; border-color: rgba(248,113,113,0.4) !important; font-weight: 600 !important; }
+</style>
+
+<script>
+let approvalDecision = null;
+function openApprovalModal() {
+  document.getElementById('approval-modal').classList.add('show');
+}
+function selectApproval(btn, decision) {
+  btn.parentElement.querySelectorAll('.perf-toggle-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  approvalDecision = decision;
+}
+function submitApproval() {
+  if (!approvalDecision) {
+    alert('Выберите решение: поддержать или не согласиться');
+    return;
+  }
+  const comment = document.getElementById('approval-comment').value.trim();
+  if (!comment) {
+    alert('Укажите комментарий к решению');
+    return;
+  }
+  if (approvalDecision === 'approve') {
+    alert('Ваше решение «Поддерживаю Недопуск» отправлено в HR.\n\nСтатус: Передано на финальное согласование HR');
+  } else {
+    alert('Ваше решение «Не согласен» отправлено в HR.\n\nСтатус: Передано на финальное согласование HR');
+  }
+  closeModal('approval-modal');
+  approvalDecision = null;
+}
+</script>
+
+</body>
+</html>
